@@ -1,10 +1,15 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
+import { useI18n } from '@/locales/client';
 
 const SignInProviders = () => {
+  const t = useI18n();
+
   return (
     <>
       <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-        <span className="bg-card text-muted-foreground relative z-10 px-2">Or continue with</span>
+        <span className="bg-card text-muted-foreground relative z-10 px-2">{t('auth.orContinueWith')}</span>
       </div>
       <div className="grid grid-cols-3 gap-4">
         <Button variant="outline" type="button" className="w-full">
@@ -14,7 +19,7 @@ const SignInProviders = () => {
               fill="currentColor"
             />
           </svg>
-          <span className="sr-only">Login with Apple</span>
+          <span className="sr-only">{t('auth.apple')}</span>
         </Button>
         <Button variant="outline" type="button" className="w-full">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -23,7 +28,7 @@ const SignInProviders = () => {
               fill="currentColor"
             />
           </svg>
-          <span className="sr-only">Login with Google</span>
+          <span className="sr-only">{t('auth.google')}</span>
         </Button>
         <Button variant="outline" type="button" className="w-full">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -32,7 +37,7 @@ const SignInProviders = () => {
               fill="currentColor"
             />
           </svg>
-          <span className="sr-only">Login with Meta</span>
+          <span className="sr-only">{t('auth.meta')}</span>
         </Button>
       </div>
     </>

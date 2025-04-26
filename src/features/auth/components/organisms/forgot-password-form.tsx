@@ -4,37 +4,31 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
 import { z } from 'zod';
 
-import { PasswordInput } from '@/components/atoms/password-input';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import SignInProviders from '@/features/auth/components/molecules/sign-in-providers';
 import { useI18n } from '@/locales/client';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@components/ui/form';
 
-import { login } from '../../api/actions/auth';
+import { resetCredential } from '../../api/lib/auth';
 import { executeServerAction } from '../../utils/execute-server-action';
 
 interface FormValues {
   email: string;
-  password: string;
 }
 
 const defaultValues: FormValues = {
   email: '',
-  password: '',
 };
 
-const LoginForm = () => {
+const ForgotPasswordForm = () => {
   const t = useI18n();
 
   const router = useRouter();
 
   const validationSchema = z.object({
     email: z.string().email(),
-    password: z.string(),
   });
 
   const form = useForm<FormValues>({
@@ -44,11 +38,7 @@ const LoginForm = () => {
   });
 
   const onSubmit = async (values: FormValues) => {
-    await executeServerAction(() => login(values.email, values.password));
-
-    toast.success(t('auth.login.dontHaveAccount'));
-
-    router.push('/inventory');
+    await executeServerAction(() => resetCredential(values.email));
   };
 
   return (
@@ -56,8 +46,7 @@ const LoginForm = () => {
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center text-center">
-            <h1 className="text-2xl font-bold">{t('auth.login.title')}</h1>
-            <p className="text-muted-foreground text-base text-balance">{t('auth.login.subtitle')}</p>
+            <h1 className="text-2xl font-bold">{t('auth.forgotPassword.title')}</h1>
           </div>
           <div className="grid gap-3">
             <FormField
@@ -74,36 +63,13 @@ const LoginForm = () => {
               )}
             />
           </div>
-          <div className="grid gap-3">
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    {t('auth.password')}
-                    <Link
-                      href="/forgot-password"
-                      className="ml-auto text-sm underline-offset-2 hover:underline font-normal">
-                      {t('auth.login.forgotYourPassword')}
-                    </Link>
-                  </FormLabel>
-                  <FormControl>
-                    <PasswordInput placeholder="********" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
           <Button type="submit" className="w-full">
-            {t('auth.login.loginButton')}
+            {t('auth.forgotPassword.reset')}
           </Button>
-          <SignInProviders />
           <div className="text-center text-sm">
-            {t('auth.login.dontHaveAccount')}
-            <Link href="/sign-up" className="underline underline-offset-4 ml-1">
-              {t('auth.login.signUp')}
+            {t('auth.forgotPassword.alreadyHaveAccount')}
+            <Link href="/login" className="underline underline-offset-4 ml-1">
+              {t('auth.forgotPassword.login')}
             </Link>
           </div>
         </div>
@@ -112,4 +78,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default ForgotPasswordForm;

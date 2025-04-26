@@ -1,3 +1,5 @@
+import SignUpForm from '@features/auth/components/organisms/sign-up-form';
+
 export default function SignUpPage() {
-  return <div>SignUpPage</div>;
+  return <SignUpForm />;
 }
