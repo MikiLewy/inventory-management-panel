@@ -2,20 +2,24 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'nextjs-toploader/app';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { z } from 'zod';
 
+import api from '@/api/clients/api';
 import { PasswordInput } from '@/components/atoms/password-input';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import SignInProviders from '@/features/auth/components/molecules/sign-in-providers';
-import { useI18n } from '@/locales/client';
+import { useUser } from '@/features/auth/providers/auth-providers';
+import { SupabaseError } from '@/features/auth/types/supabase-error';
+import { useCurrentLocale, useI18n } from '@/locales/client';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@components/ui/form';
 
-import { login } from '../../api/actions/auth';
-import { executeServerAction } from '../../utils/execute-server-action';
+import { login } from '../../../api/actions/auth';
+import { executeServerAction } from '../../../utils/execute-server-action';
+
+import { useLoginSchema } from './schema/login-schema';
 
 interface FormValues {
   email: string;
@@ -30,12 +34,13 @@ const defaultValues: FormValues = {
 const LoginForm = () => {
   const t = useI18n();
 
+  const user = useUser();
+
+  const currentLocale = useCurrentLocale();
+
   const router = useRouter();
 
-  const validationSchema = z.object({
-    email: z.string().email(),
-    password: z.string(),
-  });
+  const validationSchema = useLoginSchema();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(validationSchema),
@@ -44,12 +49,24 @@ const LoginForm = () => {
   });
 
   const onSubmit = async (values: FormValues) => {
-    await executeServerAction(() => login(values.email, values.password));
+    try {
+      const accessToken = await executeServerAction(() => login(values.email, values.password));
 
-    toast.success(t('auth.login.dontHaveAccount'));
+      api.defaults.headers.common.Authorization = `${accessToken}`;
 
-    router.push('/inventory');
+      router.push('/verify');
+    } catch (error) {
+      const supabaseError = error as SupabaseError;
+
+      toast.error(supabaseError.message);
+    }
   };
+
+  useEffect(() => {
+    if (user) {
+      router.push(`/${currentLocale}/inventory`);
+    }
+  }, [user, form.formState.errors.root?.message, currentLocale]);
 
   return (
     <Form {...form}>
@@ -99,7 +116,6 @@ const LoginForm = () => {
           <Button type="submit" className="w-full">
             {t('auth.login.loginButton')}
           </Button>
-          <SignInProviders />
           <div className="text-center text-sm">
             {t('auth.login.dontHaveAccount')}
             <Link href="/sign-up" className="underline underline-offset-4 ml-1">

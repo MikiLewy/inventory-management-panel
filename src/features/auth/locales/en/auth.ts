@@ -26,6 +26,7 @@ export default {
     forgotYourPassword: 'Forgot your password?',
     loginButton: 'Login',
     dontHaveAccount: 'Don’t have an account?',
+    noAccessToPanelError: 'You don’t have access to this panel',
     signUp: 'Sign up',
   },
   forgotPassword: {

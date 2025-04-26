@@ -53,10 +53,32 @@ export const signUp = async (email: string, password: string): Promise<string | 
   return response.data.session?.access_token || '';
 };
 
-export const updatePassword = async (password: string): Promise<void | ServerActionErrorResponse> => {
+export const updatePassword = async (authCode: string, password: string): Promise<void | ServerActionErrorResponse> => {
   const supabase = await createClient();
 
+  const { data: _, error } = await supabase.auth.exchangeCodeForSession(authCode);
+
+  if (error) {
+    return {
+      error: error.message,
+    };
+  }
+
   const response = await supabase.auth.updateUser({ password });
+
+  if (response.error) {
+    return {
+      error: response.error.message,
+    };
+  }
+};
+
+export const forgotPassword = async (email: string): Promise<void | ServerActionErrorResponse> => {
+  const supabase = await createClient();
+
+  const response = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/set-up-password`,
+  });
 
   if (response.error) {
     return {

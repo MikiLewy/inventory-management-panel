@@ -1,7 +1,7 @@
 import { ReactElement } from 'react';
-import { Toaster } from 'react-hot-toast';
 
 import { I18nProviderClient } from '@/locales/client';
+import { Providers } from '@/providers/providers';
 
 export default async function SubLayout({
   params,
@@ -14,8 +14,7 @@ export default async function SubLayout({
 
   return (
     <I18nProviderClient locale={locale}>
-      {children}
-      <Toaster />
+      <Providers>{children}</Providers>
     </I18nProviderClient>
   );
 }

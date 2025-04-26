@@ -1,6 +1,6 @@
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
-import { authRoutes } from '@/constants/auth-routes';
+import { publicRoutes } from '@/constants/public-routes';
 import { createClient } from '@/features/auth/utils/supabase/middleware';
 
 import { CustomMiddleware } from './custom-middleware';
@@ -13,7 +13,7 @@ export function withAuthMiddleware(middleware: CustomMiddleware) {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user && !authRoutes.includes(request.nextUrl.pathname)) {
+    if (!user && !publicRoutes.includes(request.nextUrl.pathname)) {
       return NextResponse.redirect(new URL('/en/login', request.url));
     }
 

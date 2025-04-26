@@ -2,17 +2,19 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import toast from 'react-hot-toast';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { forgotPassword } from '@/features/auth/api/actions/auth';
+import { SupabaseError } from '@/features/auth/types/supabase-error';
+import { executeServerAction } from '@/features/auth/utils/execute-server-action';
 import { useI18n } from '@/locales/client';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@components/ui/form';
 
-import { resetCredential } from '../../api/lib/auth';
-import { executeServerAction } from '../../utils/execute-server-action';
+import { useForgotPasswordSchema } from './schema/forgot-password-schema';
 
 interface FormValues {
   email: string;
@@ -25,11 +27,9 @@ const defaultValues: FormValues = {
 const ForgotPasswordForm = () => {
   const t = useI18n();
 
-  const router = useRouter();
+  const [isDisabledResendEmailButton, setIsDisabledResendEmailButton] = useState(false);
 
-  const validationSchema = z.object({
-    email: z.string().email(),
-  });
+  const validationSchema = useForgotPasswordSchema();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(validationSchema),
@@ -38,7 +38,20 @@ const ForgotPasswordForm = () => {
   });
 
   const onSubmit = async (values: FormValues) => {
-    await executeServerAction(() => resetCredential(values.email));
+    try {
+      setIsDisabledResendEmailButton(true);
+      await executeServerAction(() => forgotPassword(values.email));
+      setTimeout(() => {
+        setIsDisabledResendEmailButton(false);
+      }, 60 * 1000);
+
+      setIsDisabledResendEmailButton(true);
+      toast.success(t('auth.forgotPassword.resetSuccess'));
+    } catch (error) {
+      const supabaseError = error as SupabaseError;
+
+      toast.error(supabaseError.message);
+    }
   };
 
   return (
@@ -63,7 +76,7 @@ const ForgotPasswordForm = () => {
               )}
             />
           </div>
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full" disabled={isDisabledResendEmailButton}>
             {t('auth.forgotPassword.reset')}
           </Button>
           <div className="text-center text-sm">
