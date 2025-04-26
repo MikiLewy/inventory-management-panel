@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { getI18n } from '@/locales/server';
@@ -13,10 +15,12 @@ const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
             <CardContent className="grid p-0 md:grid-cols-2 min-h-96">
               <div className="p-6 md:p-8 flex flex-col justify-center items-stretch">{children}</div>
               <div className="bg-muted relative hidden md:block">
-                <img
+                <Image
                   src="/auth.png"
-                  alt="Image"
-                  className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+                  width={500}
+                  height={500}
+                  alt="Brand Image"
+                  className="absolute inset-0 h-full w-full object-cover"
                 />
               </div>
             </CardContent>

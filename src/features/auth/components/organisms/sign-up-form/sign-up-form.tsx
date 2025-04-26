@@ -29,7 +29,7 @@ const defaultValues: FormValues = {
   passwordConfirmation: '',
 };
 
-const LoginForm = () => {
+const SignUpForm = () => {
   const t = useI18n();
 
   const router = useRouter();
@@ -122,4 +122,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default SignUpForm;
