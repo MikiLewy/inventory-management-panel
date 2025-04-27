@@ -9,7 +9,7 @@ const NoAccess = () => {
 
   return (
     <div className="flex flex-col items-center justify-center gap-5 min-h-screen bg-background-primary">
-      <h1 className="text-primary font-medium text-2xl">{t('auth.login.noAccessToPanelError')}</h1>
+      <h1 className="text-foreground font-medium text-2xl">{t('auth.login.noAccessToPanelError')}</h1>
       <Button
         onClick={async () => {
           await logout();
