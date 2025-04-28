@@ -1,13 +1,5 @@
-'use client';
-
-import { Button } from '@/components/ui/button';
-import { logout } from '@/features/auth/api/actions/auth';
+import { Inventory } from '@/features/inventory/index.server';
 
 export default function InventoryPage() {
-  return (
-    <div>
-      Inventory
-      <Button onClick={() => logout()}>Log out</Button>
-    </div>
-  );
+  return <Inventory />;
 }
