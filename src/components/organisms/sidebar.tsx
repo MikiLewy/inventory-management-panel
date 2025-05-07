@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/sidebar';
 
 import { SidebarItems } from '../molecules/sidebar-items';
+import { Separator } from '../ui/separator';
 
 export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarComponent>) {
   return (
@@ -33,6 +34,7 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarCompone
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+        <Separator />
       </SidebarHeader>
       <SidebarGroup>
         <SidebarContent>

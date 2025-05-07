@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 
 import api from '@/api/clients/api';
 import { createClient } from '@/features/auth/utils/supabase/server';
+import { fetchCategories } from '@/shared/api/lib/categories';
 
 export default async function IndexPage() {
   const supabase = await createClient();
@@ -16,14 +17,13 @@ export default async function IndexPage() {
 
   api.defaults.headers.common.Authorization = `Bearer ${sessionData?.session?.access_token}`;
 
-  // TODO: REPLACE WITH DIFFERENT API CALL WHEN API WILL BE READY
-  const data = await Promise.allSettled([api.post('/verify')]);
-
-  if (data?.[0]?.status === 'fulfilled') {
-    if (data?.[0]?.value?.status === 200) {
-      return redirect('/inventory');
+  await Promise.allSettled([fetchCategories(true)]).then(results => {
+    if (results?.[0]?.status === 'fulfilled') {
+      if (results?.[0]?.value.length > 0) {
+        return redirect('/inventory');
+      }
     }
-  }
+  });
 
   return redirect('/no-access');
 }

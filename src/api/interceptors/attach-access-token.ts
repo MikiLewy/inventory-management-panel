@@ -1,9 +1,15 @@
 import { InternalAxiosRequestConfig } from 'axios';
 
-import { authStoreOutsideComponent } from '@/features/auth/providers/auth-providers';
+import supabase from '@/features/auth/utils/supabase/client';
 
 export const attachAccessToken = async (config: InternalAxiosRequestConfig) => {
-  const { session } = authStoreOutsideComponent();
+  if (config.skipAttachAccessToken) {
+    return config;
+  }
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
   if (session) {
     config.headers['Authorization'] = `Bearer ${session?.access_token}`;
