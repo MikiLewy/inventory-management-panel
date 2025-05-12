@@ -14,7 +14,7 @@ export function Table<TData>({ columnsLength, table }: TableProps<TData>) {
   const t = useI18n();
 
   return (
-    <div className="rounded-md border border-t-0">
+    <div className="rounded-md border">
       <DataTable>
         <TableHeader>
           {table.getHeaderGroups().map(headerGroup => (

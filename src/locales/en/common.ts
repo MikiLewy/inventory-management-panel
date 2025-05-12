@@ -11,6 +11,12 @@ export default {
     dark: 'Dark',
     system: 'System',
   },
+  button: {
+    loading: 'Loading...',
+    nextStep: 'Next step',
+    previousStep: 'Previous step',
+    submit: 'Submit',
+  },
   clearFilters: 'Clear filters',
   sort: {
     asc: 'Asc',
@@ -30,4 +36,5 @@ export default {
   noResultsFound: 'No results found',
   selected: '{count} selected',
   noDataAvailable: 'No data available',
+  step: 'Step {step}',
 } as const;

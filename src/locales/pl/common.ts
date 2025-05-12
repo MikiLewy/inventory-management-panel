@@ -30,4 +30,5 @@ export default {
   noResultsFound: 'Nie znaleziono wyników',
   selected: '{count} wybranych',
   noDataAvailable: 'Brak danych',
+  step: 'Krok {step}',
 } as const;
