@@ -14,6 +14,7 @@ import {
   CreateProductStepperTitle,
   CreateProductStates,
 } from '@/features/inventory/utils/create-product-machine';
+import { useI18n } from '@/locales/client';
 import { SizeUnit } from '@/types/enum/size-unit';
 
 import ProductDetails from '../../molecules/create-product/product-details';
@@ -57,6 +58,8 @@ interface Props {
 }
 
 export function CreateProductSheet({ open, onClose }: Props) {
+  const t = useI18n();
+
   const validationSchema = useCreateProductSchema();
 
   const form = useForm<z.infer<typeof validationSchema>>({
@@ -109,8 +112,8 @@ export function CreateProductSheet({ open, onClose }: Props) {
   return (
     <SheetContent className="min-w-4xl flex flex-col">
       <SheetHeader>
-        <SheetTitle>Add item</SheetTitle>
-        <SheetDescription>Add a brand new item to your inventory.</SheetDescription>
+        <SheetTitle>{t('createProduct.title')}</SheetTitle>
+        <SheetDescription>{t('createProduct.description')}</SheetDescription>
       </SheetHeader>
       <div className="mx-4 flex flex-col grow">
         <Stepper steps={staticSteps} context={context} />

@@ -17,6 +17,7 @@ import { getSizesByCategories, sizeUnits } from '@/constants/sizes';
 import { useCreateProduct } from '@/features/inventory/hooks/mutation/use-create-product';
 import { CreateProductEvent } from '@/features/inventory/utils/create-product-machine';
 import { cn } from '@/lib/utils';
+import { useI18n } from '@/locales/client';
 import { CategoryEnum } from '@/shared/api/types/enum/category';
 import { useCategories } from '@/shared/hooks/query/use-categories';
 import { SizeUnit } from '@/types/enum/size-unit';
@@ -29,6 +30,8 @@ interface Props {
 }
 
 const SizeAndPrice = ({ send, onClose }: Props) => {
+  const t = useI18n();
+
   const {
     control,
     watch,
@@ -92,7 +95,7 @@ const SizeAndPrice = ({ send, onClose }: Props) => {
           control={control}
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <div className="flex flex-col gap-2 w-full">
-              <FormLabel>Size unit *</FormLabel>
+              <FormLabel>{t('createProduct.steps.sizeAndPrice.sizeUnit')} *</FormLabel>
               <Select
                 value={value?.toString() || ''}
                 defaultValue={value?.toString() || ''}
@@ -101,7 +104,7 @@ const SizeAndPrice = ({ send, onClose }: Props) => {
                   remove();
                 }}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select size unit" />
+                  <SelectValue placeholder={t('createProduct.steps.sizeAndPrice.sizeUnitPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent side="bottom">
                   {sizeUnits.map(unit => (
@@ -120,10 +123,10 @@ const SizeAndPrice = ({ send, onClose }: Props) => {
         {isSneakers && sizeUnit === SizeUnit.EU ? (
           <TabsList className="w-[400px] mb-2">
             <TabsTrigger value="standard" onClick={() => setValue('euSizingType', 'standard')}>
-              Standard
+              {t('createProduct.steps.sizeAndPrice.standard')}
             </TabsTrigger>
             <TabsTrigger value="adidas" onClick={() => setValue('euSizingType', 'adidas')}>
-              Adidas
+              {t('createProduct.steps.sizeAndPrice.adidas')}
             </TabsTrigger>
           </TabsList>
         ) : null}
@@ -174,7 +177,7 @@ const SizeAndPrice = ({ send, onClose }: Props) => {
                   </Button>
                 </span>
               </TooltipTrigger>
-              <TooltipContent side="bottom">Add custom size</TooltipContent>
+              <TooltipContent side="bottom">{t('createProduct.steps.sizeAndPrice.addCustomSize')}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
@@ -188,9 +191,9 @@ const SizeAndPrice = ({ send, onClose }: Props) => {
                 name={`products.${index}.size`}
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Size *</FormLabel>
+                    <FormLabel>{t('createProduct.steps.sizeAndPrice.size')} *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Size" {...field} />
+                      <Input placeholder={t('createProduct.steps.sizeAndPrice.sizePlaceholder')} {...field} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -200,9 +203,9 @@ const SizeAndPrice = ({ send, onClose }: Props) => {
                 name={`products.${index}.purchasePrice`}
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Price *</FormLabel>
+                    <FormLabel>{t('createProduct.steps.sizeAndPrice.price')} *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Purchase price" {...field} />
+                      <Input placeholder={t('createProduct.steps.sizeAndPrice.pricePlaceholder')} {...field} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -212,9 +215,14 @@ const SizeAndPrice = ({ send, onClose }: Props) => {
                 name={`products.${index}.quantity`}
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Quantity *</FormLabel>
+                    <FormLabel>{t('createProduct.steps.sizeAndPrice.quantity')} *</FormLabel>
                     <FormControl>
-                      <Input type="number" min={1} placeholder="Product quantity" {...field} />
+                      <Input
+                        type="number"
+                        min={1}
+                        placeholder={t('createProduct.steps.sizeAndPrice.quantityPlaceholder')}
+                        {...field}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -224,9 +232,9 @@ const SizeAndPrice = ({ send, onClose }: Props) => {
                 name={`products.${index}.purchasePlace`}
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Purchase place</FormLabel>
+                    <FormLabel>{t('createProduct.steps.sizeAndPrice.purchasePlace')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Purchase place" {...field} />
+                      <Input placeholder={t('createProduct.steps.sizeAndPrice.purchasePlacePlaceholder')} {...field} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -236,7 +244,7 @@ const SizeAndPrice = ({ send, onClose }: Props) => {
                 name={`products.${index}.purchaseDate`}
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Purchase date *</FormLabel>
+                    <FormLabel>{t('createProduct.steps.sizeAndPrice.purchaseDate')}</FormLabel>
                     <FormControl>
                       <DatePicker value={new Date(field.value || new Date())} onChange={field.onChange} />
                     </FormControl>

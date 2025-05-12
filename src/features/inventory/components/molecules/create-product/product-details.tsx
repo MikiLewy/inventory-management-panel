@@ -7,7 +7,7 @@ import { FormField } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectValue, SelectTrigger, SelectItem } from '@/components/ui/select';
 import { CreateProductEvent } from '@/features/inventory/utils/create-product-machine';
-import { useCurrentLocale } from '@/locales/client';
+import { useCurrentLocale, useI18n } from '@/locales/client';
 import { useCategories } from '@/shared/hooks/query/use-categories';
 
 import { CreateProductFormValues } from '../../organisms/create-product-sheet/create-product-sheet';
@@ -17,6 +17,8 @@ interface Props {
 }
 
 const ProductDetails = ({ send }: Props) => {
+  const t = useI18n();
+
   const {
     control,
     watch,
@@ -46,9 +48,9 @@ const ProductDetails = ({ send }: Props) => {
             name="name"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Name *</FormLabel>
+                <FormLabel>{t('createProduct.steps.productDetails.name')} *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Product name" {...field} />
+                  <Input placeholder={t('createProduct.steps.productDetails.namePlaceholder')} {...field} />
                 </FormControl>
               </FormItem>
             )}
@@ -58,9 +60,9 @@ const ProductDetails = ({ send }: Props) => {
             name="sku"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>SKU *</FormLabel>
+                <FormLabel>{t('createProduct.steps.productDetails.sku')} *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Product sku" {...field} />
+                  <Input placeholder={t('createProduct.steps.productDetails.skuPlaceholder')} {...field} />
                 </FormControl>
               </FormItem>
             )}
@@ -82,7 +84,7 @@ const ProductDetails = ({ send }: Props) => {
             control={control}
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <div className="flex flex-col gap-2 w-full">
-                <FormLabel>Category *</FormLabel>
+                <FormLabel>{t('createProduct.steps.productDetails.category')} *</FormLabel>
                 <Select
                   value={value?.toString() || ''}
                   defaultValue={value?.toString() || ''}
@@ -91,7 +93,7 @@ const ProductDetails = ({ send }: Props) => {
                     setValue('products', [], { shouldDirty: true, shouldTouch: true, shouldValidate: true });
                   }}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select category" />
+                    <SelectValue placeholder={t('createProduct.steps.productDetails.categoryPlaceholder')} />
                   </SelectTrigger>
                   <SelectContent side="bottom">
                     {categoriesData?.map(category => (
@@ -110,9 +112,9 @@ const ProductDetails = ({ send }: Props) => {
             name="brand"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Brand</FormLabel>
+                <FormLabel>{t('createProduct.steps.productDetails.brand')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="Brand" {...field} />
+                  <Input placeholder={t('createProduct.steps.productDetails.brandPlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
