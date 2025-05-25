@@ -1,57 +1,70 @@
 'use client';
 
-import { ColumnDef } from '@tanstack/react-table';
+import { useCallback, useState } from 'react';
 
-import { Product } from '@/features/inventory/api/types/products';
+import ActionsTableMenu, { Action } from '@/components/atoms/actions-table-menu';
 import { useProducts } from '@/features/inventory/hooks/query/use-products';
-import { useCurrentLocale } from '@/locales/client';
-import { useCategories } from '@/shared/hooks/query/use-categories';
+import {
+  InventoryActionSlotPayload,
+  useInventoryTableColumns,
+} from '@/features/inventory/hooks/use-inventory-table-columns';
+import { useDialog } from '@/hooks/use-dialog';
+import { useUrlPagination } from '@/hooks/use-url-pagination';
+import { useUrlQuery } from '@/hooks/use-url-query';
+import { useI18n } from '@/locales/client';
+import { calculatePageIndex } from '@/utils/calculate-page-index';
 
+import RemoveProductDialog from '../../organisms/dialogs/remove-product-dialog';
 import { InventoryTable } from '../../organisms/inventory-table';
 
 const ClientInventory = () => {
-  const currentLocale = useCurrentLocale();
+  const t = useI18n();
 
-  const { data } = useCategories();
+  const { query, handleChangeQuery } = useUrlQuery();
 
-  const { data: productsData } = useProducts({ page: 1, perPage: 10 });
+  const { page, perPage, onPaginationChange } = useUrlPagination();
 
-  const columns: ColumnDef<Product>[] = [
-    {
-      header: 'Name',
-      accessorKey: 'name',
-    },
-    {
-      header: 'SKU',
-      accessorKey: 'sku',
-    },
-    {
-      header: 'Category',
-      accessorKey: 'category',
-      cell: ({ row }) => {
-        const category = data?.find(category => category.id === row.original.categoryId);
+  const { data: productsData } = useProducts({ page, perPage, query });
 
-        return category?.translations[currentLocale];
+  const [selectedProduct, setSelectedProduct] = useState<InventoryActionSlotPayload | null>(null);
+
+  const [isOpenRemoveProductDialog, handleOpenRemoveProductDialog, handleCloseRemoveProductDialog] = useDialog();
+
+  const actionsSlot = useCallback((payload: InventoryActionSlotPayload) => {
+    const actions: Action[] = [
+      {
+        key: 'remove',
+        label: t('common.button.remove'),
+        onClick: () => {
+          handleOpenRemoveProductDialog();
+          setSelectedProduct(payload);
+        },
       },
-    },
-    {
-      header: 'Status',
-      accessorKey: 'status',
-      cell: ({ row }) => {
-        const status = row.original.status;
+    ];
 
-        return status;
-      },
-    },
-    {
-      header: 'Actions',
-      accessorKey: 'actions',
-    },
-  ];
+    return <ActionsTableMenu actions={actions} />;
+  }, []);
+
+  const columns = useInventoryTableColumns(actionsSlot);
 
   return (
     <div>
-      <InventoryTable columns={columns} data={productsData || []} />
+      <InventoryTable
+        columns={columns}
+        data={productsData?.resources ?? []}
+        search={{ query, handleChangeQuery }}
+        pagination={{
+          pageIndex: calculatePageIndex(page),
+          pageSize: perPage,
+          totalItems: productsData?.total ?? 0,
+          onPaginationChange,
+        }}
+      />
+      <RemoveProductDialog
+        open={isOpenRemoveProductDialog}
+        onClose={handleCloseRemoveProductDialog}
+        selectedProductId={selectedProduct?.id || 0}
+      />
     </div>
   );
 };

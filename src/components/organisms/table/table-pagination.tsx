@@ -15,8 +15,8 @@ export function TablePagination<TData>({ table }: DataTablePaginationProps<TData
   const t = useI18n();
 
   return (
-    <div className="flex items-center justify-between px-2 mt-2">
-      <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+    <div className="flex items-center justify-between mt-2">
+      <div className="flex w-[100px] items-center  text-sm font-medium">
         {t('common.page')} {table.getState().pagination.pageIndex + 1} {t('common.of')} {table.getPageCount()}
       </div>
       {table.getIsSomeRowsSelected() ? (

@@ -37,4 +37,5 @@ export default {
   selected: '{count} wybranych',
   noDataAvailable: 'Brak danych',
   step: 'Krok {step}',
+  openMenu: 'Otwórz menu',
 } as const;

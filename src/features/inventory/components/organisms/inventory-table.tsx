@@ -8,26 +8,50 @@ import {
   getFacetedRowModel,
   getFacetedUniqueValues,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   SortingState,
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table';
+import { ParserBuilder, SetValues } from 'nuqs';
 import { useState } from 'react';
 
 import ClientOnly from '@/components/molecules/client-only';
 import SearchBar from '@/components/molecules/search-bar';
 import { Table } from '@/components/organisms/table/table';
 import { TablePagination } from '@/components/organisms/table/table-pagination';
+import { TableViewOptions } from '@/components/organisms/table/table-view-options';
 import { Button } from '@/components/ui/button';
+
+type Pagination = {
+  pageIndex: number;
+  pageSize: number;
+  totalItems: number;
+  onPaginationChange: SetValues<{
+    pageIndex: Omit<ParserBuilder<number>, 'parseServerSide'> & {
+      readonly defaultValue: number;
+      parseServerSide(value: string | string[] | undefined): number;
+    };
+    pageSize: Omit<ParserBuilder<number>, 'parseServerSide'> & {
+      readonly defaultValue: number;
+      parseServerSide(value: string | string[] | undefined): number;
+    };
+  }>;
+};
+
+type Search = {
+  query: string;
+  handleChangeQuery: (query: string) => void;
+};
 
 interface TableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  pagination?: Pagination;
+  search?: Search;
 }
 
-export function InventoryTable<TData, TValue>({ columns, data }: TableProps<TData, TValue>) {
+export function InventoryTable<TData, TValue>({ columns, data, pagination, search }: TableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
@@ -37,8 +61,10 @@ export function InventoryTable<TData, TValue>({ columns, data }: TableProps<TDat
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
+    manualPagination: true,
+    rowCount: pagination?.totalItems ?? 10,
+    onPaginationChange: pagination?.onPaginationChange,
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
@@ -49,6 +75,10 @@ export function InventoryTable<TData, TValue>({ columns, data }: TableProps<TDat
       sorting,
       columnFilters,
       columnVisibility,
+      pagination: {
+        pageIndex: pagination?.pageIndex ?? 0,
+        pageSize: pagination?.pageSize ?? 10,
+      },
     },
   });
 
@@ -57,10 +87,7 @@ export function InventoryTable<TData, TValue>({ columns, data }: TableProps<TDat
   return (
     <div className="flex flex-col grow gap-3">
       <div className="flex items-center py-2 gap-2">
-        <SearchBar
-          query={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-          handleChangeQuery={value => table.getColumn('name')?.setFilterValue(value)}
-        />
+        {search ? <SearchBar query={search.query} handleChangeQuery={search.handleChangeQuery} /> : null}
         <div className="flex items-center gap-2">
           {isFiltered ? (
             <Button variant="ghost" onClick={() => table.resetColumnFilters()} className="text-sm px-2 lg:px-3">
@@ -69,10 +96,11 @@ export function InventoryTable<TData, TValue>({ columns, data }: TableProps<TDat
             </Button>
           ) : null}
         </div>
+        <TableViewOptions table={table} />
       </div>
       <ClientOnly>
         <Table columnsLength={columns.length} table={table} />
-        <TablePagination table={table} />
+        {pagination ? <TablePagination table={table} /> : null}
       </ClientOnly>
     </div>
   );

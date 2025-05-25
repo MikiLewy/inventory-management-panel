@@ -15,6 +15,8 @@ export default {
     loading: 'Loading...',
     nextStep: 'Next step',
     previousStep: 'Previous step',
+    remove: 'Remove',
+    yesRemove: 'Yes, remove',
     submit: 'Submit',
   },
   clearFilters: 'Clear filters',
@@ -37,4 +39,5 @@ export default {
   selected: '{count} selected',
   noDataAvailable: 'No data available',
   step: 'Step {step}',
+  openMenu: 'Open menu',
 } as const;
