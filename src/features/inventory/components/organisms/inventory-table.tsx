@@ -9,7 +9,7 @@ import {
   getFacetedUniqueValues,
   getFilteredRowModel,
   getSortedRowModel,
-  SortingState,
+  SortDirection,
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table';
@@ -44,15 +44,36 @@ type Search = {
   handleChangeQuery: (query: string) => void;
 };
 
+type Sortable = {
+  sortBy: string;
+  sortDirection: SortDirection;
+  onSortChange: SetValues<{
+    sortBy: Omit<ParserBuilder<string>, 'parseServerSide'> & {
+      readonly defaultValue: string;
+      parseServerSide(value: string | string[] | undefined): string;
+    };
+    sortDirection: Omit<ParserBuilder<'asc' | 'desc'>, 'parseServerSide'> & {
+      readonly defaultValue: NonNullable<'asc' | 'desc'>;
+      parseServerSide(value: string | string[] | undefined): NonNullable<'asc' | 'desc'>;
+    };
+  }>;
+};
+
 interface TableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   pagination?: Pagination;
   search?: Search;
+  sortable?: Sortable;
 }
 
-export function InventoryTable<TData, TValue>({ columns, data, pagination, search }: TableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+export function InventoryTable<TData, TValue>({
+  columns,
+  data,
+  pagination,
+  search,
+  sortable,
+}: TableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -61,10 +82,11 @@ export function InventoryTable<TData, TValue>({ columns, data, pagination, searc
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    onSortingChange: setSorting,
     manualPagination: true,
+    manualSorting: true,
     rowCount: pagination?.totalItems ?? 10,
     onPaginationChange: pagination?.onPaginationChange,
+    onSortingChange: sortable?.onSortChange,
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
@@ -72,7 +94,7 @@ export function InventoryTable<TData, TValue>({ columns, data, pagination, searc
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     state: {
-      sorting,
+      sorting: sortable ? [{ id: sortable.sortBy, desc: sortable.sortDirection === 'desc' }] : [],
       columnFilters,
       columnVisibility,
       pagination: {

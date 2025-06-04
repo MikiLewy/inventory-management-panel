@@ -11,8 +11,8 @@ import {
 import { useDialog } from '@/hooks/use-dialog';
 import { useUrlPagination } from '@/hooks/use-url-pagination';
 import { useUrlQuery } from '@/hooks/use-url-query';
+import { useUrlSort } from '@/hooks/use-url-sort';
 import { useI18n } from '@/locales/client';
-import { calculatePageIndex } from '@/utils/calculate-page-index';
 
 import RemoveProductDialog from '../../organisms/dialogs/remove-product-dialog';
 import { InventoryTable } from '../../organisms/inventory-table';
@@ -22,9 +22,11 @@ const ClientInventory = () => {
 
   const { query, handleChangeQuery } = useUrlQuery();
 
-  const { page, perPage, onPaginationChange } = useUrlPagination();
+  const { offset, limit, onPaginationChange } = useUrlPagination();
 
-  const { data: productsData } = useProducts({ page, perPage, query });
+  const { sortBy, sortDirection, onSortChange } = useUrlSort('created_at', 'asc');
+
+  const { data: productsData } = useProducts({ offset, limit, query, sortBy, sortDirection });
 
   const [selectedProduct, setSelectedProduct] = useState<InventoryActionSlotPayload | null>(null);
 
@@ -54,10 +56,15 @@ const ClientInventory = () => {
         data={productsData?.resources ?? []}
         search={{ query, handleChangeQuery }}
         pagination={{
-          pageIndex: calculatePageIndex(page),
-          pageSize: perPage,
+          pageIndex: offset,
+          pageSize: limit,
           totalItems: productsData?.total ?? 0,
           onPaginationChange,
+        }}
+        sortable={{
+          sortBy,
+          sortDirection,
+          onSortChange,
         }}
       />
       <RemoveProductDialog

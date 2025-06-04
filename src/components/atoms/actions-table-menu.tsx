@@ -29,7 +29,7 @@ const ActionsTableMenu = ({ actions }: Props) => {
   const t = useI18n();
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-8 w-8 p-0 ml-auto">
           <span className="sr-only">{t('common.openMenu')}</span>

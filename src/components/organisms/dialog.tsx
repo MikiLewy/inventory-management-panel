@@ -49,7 +49,7 @@ const Dialog = ({
   actionsSlot,
 }: Props) => {
   return (
-    <DialogUi open={open} onOpenChange={onClose} defaultOpen={open} modal>
+    <DialogUi open={open} onOpenChange={onClose} defaultOpen={open}>
       <DialogContent
         aria-describedby={description}
         className={cn(scrollable ? 'overflow-y-auto max-h-[550px] sm:max-h-[700px]' : '', 'lg:max-w-xl ')}>

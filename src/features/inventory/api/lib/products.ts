@@ -1,3 +1,5 @@
+import { SortDirection } from '@tanstack/react-table';
+
 import api from '@/api/clients/api';
 import { PaginatedResponse } from '@/types/interfaces/paginated-response';
 
@@ -5,15 +7,19 @@ import { CreateProductPayload } from '../../types/payload/create-product';
 import { Product } from '../types/products';
 
 export const fetchProducts = async (
-  page: number,
-  perPage: number,
+  offset: number,
+  limit: number,
   query: string,
+  sortBy: string,
+  sortDirection: SortDirection,
 ): Promise<PaginatedResponse<Product>> => {
   const { data } = await api.get('/products', {
     params: {
-      page,
-      perPage,
+      offset,
+      limit,
       search: query,
+      sortBy,
+      sortOrder: sortDirection,
     },
   });
 

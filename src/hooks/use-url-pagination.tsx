@@ -2,16 +2,16 @@ import { parseAsIndex, parseAsInteger, useQueryStates } from 'nuqs';
 
 import { Pagination } from '@/types/interfaces/pagination';
 
-export const useUrlPagination = (initialPage: number = 0, initialPerPage: number = 10): Pagination => {
+export const useUrlPagination = (initialOffset: number = 0, initialLimit: number = 10): Pagination => {
   const [pagination, setPagination] = useQueryStates(
     {
-      pageIndex: parseAsIndex.withDefault(initialPage),
-      pageSize: parseAsInteger.withDefault(initialPerPage),
+      pageIndex: parseAsIndex.withDefault(initialOffset),
+      pageSize: parseAsInteger.withDefault(initialLimit),
     },
     {
       urlKeys: {
-        pageIndex: 'page',
-        pageSize: 'perPage',
+        pageIndex: 'offset',
+        pageSize: 'limit',
       },
       history: 'push',
     },
@@ -20,8 +20,8 @@ export const useUrlPagination = (initialPage: number = 0, initialPerPage: number
   const { pageIndex, pageSize } = pagination;
 
   return {
-    page: pageIndex + 1,
-    perPage: pageSize,
+    offset: pageIndex,
+    limit: pageSize,
     onPaginationChange: setPagination,
   };
 };

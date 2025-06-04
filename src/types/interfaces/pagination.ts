@@ -2,8 +2,8 @@ import { ParserBuilder } from 'nuqs';
 import { SetValues } from 'nuqs';
 
 export interface Pagination {
-  page: number;
-  perPage: number;
+  offset: number;
+  limit: number;
   onPaginationChange: SetValues<{
     pageIndex: Omit<ParserBuilder<number>, 'parseServerSide'> & {
       readonly defaultValue: number;
