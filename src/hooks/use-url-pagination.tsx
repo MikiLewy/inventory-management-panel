@@ -1,6 +1,7 @@
 import { parseAsIndex, parseAsInteger, useQueryStates } from 'nuqs';
 
 import { Pagination } from '@/types/interfaces/pagination';
+import { calculatePaginationOffset } from '@/utils/calculate-pagination-offset';
 
 export const useUrlPagination = (initialOffset: number = 0, initialLimit: number = 10): Pagination => {
   const [pagination, setPagination] = useQueryStates(
@@ -10,7 +11,7 @@ export const useUrlPagination = (initialOffset: number = 0, initialLimit: number
     },
     {
       urlKeys: {
-        pageIndex: 'offset',
+        pageIndex: 'pageIndex',
         pageSize: 'limit',
       },
       history: 'push',
@@ -20,7 +21,7 @@ export const useUrlPagination = (initialOffset: number = 0, initialLimit: number
   const { pageIndex, pageSize } = pagination;
 
   return {
-    offset: pageIndex,
+    offset: calculatePaginationOffset(pageIndex, pageSize),
     limit: pageSize,
     onPaginationChange: setPagination,
   };
