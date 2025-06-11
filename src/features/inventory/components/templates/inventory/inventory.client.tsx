@@ -15,6 +15,7 @@ import { useUrlSort } from '@/hooks/use-url-sort';
 import { useI18n } from '@/locales/client';
 
 import RemoveProductDialog from '../../organisms/dialogs/remove-product-dialog';
+import { EditProductSheet } from '../../organisms/edit-product-sheet/edit-product-sheet';
 import { InventoryTable } from '../../organisms/inventory-table';
 
 const ClientInventory = () => {
@@ -24,7 +25,7 @@ const ClientInventory = () => {
 
   const { offset, limit, onPaginationChange } = useUrlPagination();
 
-  const { sortBy, sortDirection, onSortChange } = useUrlSort('created_at', 'asc');
+  const { sortBy, sortDirection, onSortChange } = useUrlSort('updated_at', 'desc');
 
   const { data: productsData } = useProducts({ offset, limit, query, sortBy, sortDirection });
 
@@ -32,8 +33,26 @@ const ClientInventory = () => {
 
   const [isOpenRemoveProductDialog, handleOpenRemoveProductDialog, handleCloseRemoveProductDialog] = useDialog();
 
+  const [isOpenEditProductSheet, handleOpenEditProductSheet, handleCloseEditProductSheet] = useDialog();
+
+  const onQueryChange = useCallback(
+    (query: string) => {
+      handleChangeQuery(query);
+      onPaginationChange({ pageIndex: 0, pageSize: limit });
+    },
+    [handleChangeQuery],
+  );
+
   const actionsSlot = useCallback((payload: InventoryActionSlotPayload) => {
     const actions: Action[] = [
+      {
+        key: 'edit',
+        label: t('common.button.edit'),
+        onClick: () => {
+          handleOpenEditProductSheet();
+          setSelectedProduct(payload);
+        },
+      },
       {
         key: 'remove',
         label: t('common.button.remove'),
@@ -54,7 +73,7 @@ const ClientInventory = () => {
       <InventoryTable
         columns={columns}
         data={productsData?.resources ?? []}
-        search={{ query, handleChangeQuery }}
+        search={{ query, handleChangeQuery: onQueryChange }}
         pagination={{
           pageIndex: offset,
           pageSize: limit,
@@ -70,6 +89,11 @@ const ClientInventory = () => {
       <RemoveProductDialog
         open={isOpenRemoveProductDialog}
         onClose={handleCloseRemoveProductDialog}
+        selectedProductId={selectedProduct?.id || 0}
+      />
+      <EditProductSheet
+        open={isOpenEditProductSheet}
+        onClose={handleCloseEditProductSheet}
         selectedProductId={selectedProduct?.id || 0}
       />
     </div>

@@ -27,7 +27,7 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
   const columns: ColumnDef<Product>[] = [
     {
       accessorKey: 'name',
-      meta: 'name',
+      meta: t('inventory.table.name'),
       enableHiding: false,
       header: ({ column }) => {
         return <TableColumnHeader column={column} title={t('inventory.table.name')} />;
@@ -51,7 +51,7 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
     },
     {
       accessorKey: 'size',
-      meta: 'size',
+      meta: t('inventory.table.size'),
       enableHiding: false,
       header: ({ column }) => {
         return <TableColumnHeader column={column} title={t('inventory.table.size')} />;
@@ -73,15 +73,17 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
     },
     {
       accessorKey: 'sku',
-      meta: 'sku',
+      meta: t('inventory.table.sku'),
       enableHiding: false,
+      enableSorting: false,
       header: ({ column }) => {
         return <TableColumnHeader column={column} title={t('inventory.table.sku')} />;
       },
     },
     {
       accessorKey: 'category',
-      meta: 'category',
+      meta: t('inventory.table.category'),
+      enableSorting: false,
       enableHiding: false,
       filterFn: (rows, columnId, filterValue) => {
         const category = rows.getValue(columnId) as { id: string; name: string; type: CategoryEnum };
@@ -99,8 +101,9 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
     },
     {
       accessorKey: 'status',
-      meta: 'status',
+      meta: t('inventory.table.status'),
       enableHiding: false,
+      enableSorting: false,
       filterFn: (rows, columnId, filterValue) => {
         const status = rows.getValue(columnId) as ProductStatus;
 
@@ -121,7 +124,8 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
     },
     {
       accessorKey: 'brand',
-      meta: 'brand',
+      meta: t('inventory.table.brand'),
+      enableSorting: false,
       header: ({ column }) => {
         return <TableColumnHeader column={column} title={t('inventory.table.brand')} />;
       },
@@ -130,35 +134,42 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
       },
     },
     {
-      accessorKey: 'purchasePrice',
-      meta: 'purchasePrice',
+      accessorKey: 'purchase_price',
+      meta: t('inventory.table.purchasePrice'),
       header: ({ column }) => {
         return <TableColumnHeader column={column} title={t('inventory.table.purchasePrice')} />;
       },
-      cell: ({ getValue }) => {
-        return <p>{(getValue() as number) || '-'}</p>;
+      cell: ({ row }) => {
+        const purchasePrice = row.original.purchasePrice;
+
+        return <p>{purchasePrice || '-'}</p>;
       },
     },
     {
-      accessorKey: 'purchasePlace',
-      meta: 'purchasePlace',
+      accessorKey: 'purchase_place',
+      meta: t('inventory.table.purchasePlace'),
+      enableSorting: false,
       header: ({ column }) => {
         return <TableColumnHeader column={column} title={t('inventory.table.purchasePlace')} />;
       },
-      cell: ({ getValue }) => {
-        return <p>{(getValue() as string) || '-'}</p>;
+      cell: ({ row }) => {
+        const purchasePlace = row.original.purchasePlace;
+
+        return <p>{purchasePlace || '-'}</p>;
       },
     },
     {
-      accessorKey: 'purchaseDate',
-      meta: 'purchaseDate',
+      accessorKey: 'purchase_date',
+      meta: t('inventory.table.purchaseDate'),
       header: ({ column }) => {
         return <TableColumnHeader column={column} title={t('inventory.table.purchaseDate')} />;
       },
-      cell: ({ getValue }) => {
-        return getValue() ? (
+      cell: ({ row }) => {
+        const purchaseDate = row.original.purchaseDate;
+
+        return purchaseDate ? (
           <FormatDate
-            date={new Date(getValue() as string)}
+            date={new Date(purchaseDate)}
             format={`${dateFormats.day}.${dateFormats.month}.${dateFormats.year}`}
           />
         ) : (
@@ -167,15 +178,36 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
       },
     },
     {
-      accessorKey: 'createdAt',
-      meta: 'createdAt',
+      accessorKey: 'created_at',
+      meta: t('inventory.table.createdAt'),
       header: ({ column }) => {
         return <TableColumnHeader column={column} title={t('inventory.table.createdAt')} />;
       },
-      cell: ({ getValue }) => {
-        return getValue() ? (
+      cell: ({ row }) => {
+        const createdAt = row.original.createdAt;
+
+        return createdAt ? (
           <FormatDate
-            date={new Date(getValue() as string)}
+            date={new Date(createdAt)}
+            format={`${dateFormats.day}.${dateFormats.month}.${dateFormats.year}`}
+          />
+        ) : (
+          '-'
+        );
+      },
+    },
+    {
+      accessorKey: 'updated_at',
+      meta: t('inventory.table.updatedAt'),
+      header: ({ column }) => {
+        return <TableColumnHeader column={column} title={t('inventory.table.updatedAt')} />;
+      },
+      cell: ({ row }) => {
+        const updatedAt = row.original.updatedAt;
+
+        return updatedAt ? (
+          <FormatDate
+            date={new Date(updatedAt)}
             format={`${dateFormats.day}.${dateFormats.month}.${dateFormats.year}`}
           />
         ) : (

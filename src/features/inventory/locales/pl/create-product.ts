@@ -1,6 +1,8 @@
 export default {
   title: 'Dodaj produkt',
+  editTitle: 'Edytuj produkt',
   description: 'Dodaj nowy produkt do swojego magazynu.',
+  editDescription: 'Edytuj szczegóły produktu.',
   steps: {
     productDetails: {
       name: 'Nazwa',
@@ -31,5 +33,7 @@ export default {
     },
   },
   success: 'Pomyślnie dodano produkt',
+  successEdit: 'Pomyślnie zaktualizowano produkt',
   error: 'Nie udało się dodać produktu',
+  errorEdit: 'Nie udało się zaktualizować produktu',
 } as const;

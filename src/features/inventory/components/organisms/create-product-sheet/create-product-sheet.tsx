@@ -117,7 +117,6 @@ export function CreateProductSheet({ open, onClose }: Props) {
       </SheetHeader>
       <div className="mx-4 flex flex-col grow">
         <Stepper steps={staticSteps} context={context} />
-
         <div className="mt-8  flex flex-col grow">
           <FormProvider {...form}>{renderStep()}</FormProvider>
         </div>

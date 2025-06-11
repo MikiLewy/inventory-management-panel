@@ -1,6 +1,6 @@
 export default {
   title: 'Inventory',
-  add: 'Add item',
+  add: 'Add product',
   table: {
     name: 'Name',
     size: 'Size',
@@ -13,6 +13,7 @@ export default {
     purchaseDate: 'Purchase date',
     purchasePlace: 'Purchase place',
     createdAt: 'Created at',
+    updatedAt: 'Updated at',
   },
   productStatus: {
     inStock: 'In stock',

@@ -12,17 +12,25 @@ export default {
     purchasePrice: 'Cena zakupu',
     purchaseDate: 'Data zakupu',
     purchasePlace: 'Miejsce zakupu',
-    createdAt: 'Data dodania',
+    createdAt: 'Utworzono',
+    updatedAt: 'Zaktualizowano',
   },
   productStatus: {
     inStock: 'W magazynie',
-    inDelivery: 'W transporcie',
+    inDelivery: 'W dostawie',
   },
   categoryStatus: {
     sneakers: 'Buty',
-    clothing: 'Ubrania',
+    clothing: 'Odzież',
     collectibles: 'Kolekcjonerskie',
     accessories: 'Akcesoria',
     other: 'Inne',
+  },
+  dialog: {
+    remove: {
+      title: 'Usuń produkt',
+      description: 'Czy na pewno chcesz usunąć ten produkt?',
+      success: 'Produkt został pomyślnie usunięty',
+    },
   },
 } as const;

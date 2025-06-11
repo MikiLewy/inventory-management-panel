@@ -14,13 +14,16 @@ export default {
   button: {
     loading: 'Ładowanie...',
     nextStep: 'Następny krok',
+    edit: 'Edytuj',
     previousStep: 'Poprzedni krok',
+    remove: 'Usuń',
+    yesRemove: 'Tak, usuń',
     submit: 'Zatwierdź',
   },
   clearFilters: 'Wyczyść filtry',
   sort: {
-    asc: 'Asc',
-    desc: 'Desc',
+    asc: 'Rosnąco',
+    desc: 'Malejąco',
     hide: 'Ukryj',
   },
   perPage: 'Na stronę',

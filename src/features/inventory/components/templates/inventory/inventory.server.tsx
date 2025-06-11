@@ -1,4 +1,5 @@
 import Page from '@/components/organisms/page/page';
+import { getI18n } from '@/locales/server';
 import HydrationBoundaryProvider from '@/providers/hydration-boundary-provider';
 
 import InventoryPageHeaderActions from '../../organisms/inventory-page-header-actions';
@@ -6,9 +7,11 @@ import InventoryPageHeaderActions from '../../organisms/inventory-page-header-ac
 import ClientInventory from './inventory.client';
 
 const ServerInventory = async () => {
+  const t = await getI18n();
+
   return (
     <Page>
-      <Page.Header title="Inventory">
+      <Page.Header title={t('inventory.title')}>
         <InventoryPageHeaderActions />
       </Page.Header>
       <Page.ContentContainer>

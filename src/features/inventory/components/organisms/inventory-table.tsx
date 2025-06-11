@@ -13,7 +13,7 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table';
-import { ParserBuilder, SetValues } from 'nuqs';
+import { Options, ParserBuilder, SetValues } from 'nuqs';
 import { useState } from 'react';
 
 import ClientOnly from '@/components/molecules/client-only';
@@ -47,16 +47,13 @@ type Search = {
 type Sortable = {
   sortBy: string;
   sortDirection: SortDirection;
-  onSortChange: SetValues<{
-    sortBy: Omit<ParserBuilder<string>, 'parseServerSide'> & {
-      readonly defaultValue: string;
-      parseServerSide(value: string | string[] | undefined): string;
-    };
-    sortDirection: Omit<ParserBuilder<'asc' | 'desc'>, 'parseServerSide'> & {
-      readonly defaultValue: NonNullable<'asc' | 'desc'>;
-      parseServerSide(value: string | string[] | undefined): NonNullable<'asc' | 'desc'>;
-    };
-  }>;
+  onSortChange: (
+    value:
+      | { desc: boolean; id: string }[]
+      | ((old: { desc: boolean; id: string }[] | null) => { desc: boolean; id: string }[] | null)
+      | null,
+    options?: Options | undefined,
+  ) => Promise<URLSearchParams>;
 };
 
 interface TableProps<TData, TValue> {
@@ -86,6 +83,7 @@ export function InventoryTable<TData, TValue>({
     manualSorting: true,
     rowCount: pagination?.totalItems ?? 10,
     onPaginationChange: pagination?.onPaginationChange,
+    // @ts-expect-error tanstack table throws an error but we need to pass here specific function that does not match the type but works properly
     onSortingChange: sortable?.onSortChange,
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,

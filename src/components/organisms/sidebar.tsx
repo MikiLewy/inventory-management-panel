@@ -29,7 +29,7 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarCompone
                 <Box size={16} />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">Gizmo</span>
+                <span className="truncate font-medium">STOQIO</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>

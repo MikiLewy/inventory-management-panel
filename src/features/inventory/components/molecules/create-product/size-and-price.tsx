@@ -287,7 +287,7 @@ const SizeAndPrice = ({ send, onClose }: Props) => {
       </ScrollArea>
 
       <StepNavigatorButtons
-        onNextTitle="Confirm"
+        onNextTitle={t('common.button.submit')}
         nextDisabled={nextDisabled}
         nextIsSubmitting={isPending}
         onNext={handleSubmit(onSubmit)}

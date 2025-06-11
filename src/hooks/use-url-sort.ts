@@ -1,37 +1,36 @@
 import { SortDirection } from '@tanstack/react-table';
-import { parseAsString, parseAsStringLiteral, ParserBuilder, SetValues, useQueryStates } from 'nuqs';
+import { Options, parseAsJson, useQueryState } from 'nuqs';
+import { z } from 'zod';
 
 interface ReturnType {
   sortBy: string;
   sortDirection: SortDirection;
-  onSortChange: SetValues<{
-    sortBy: Omit<ParserBuilder<string>, 'parseServerSide'> & {
-      readonly defaultValue: string;
-      parseServerSide(value: string | string[] | undefined): string;
-    };
-    sortDirection: Omit<ParserBuilder<'asc' | 'desc'>, 'parseServerSide'> & {
-      readonly defaultValue: NonNullable<'asc' | 'desc'>;
-      parseServerSide(value: string | string[] | undefined): NonNullable<'asc' | 'desc'>;
-    };
-  }>;
+  onSortChange: (
+    value:
+      | { desc: boolean; id: string }[]
+      | ((old: { desc: boolean; id: string }[] | null) => { desc: boolean; id: string }[] | null)
+      | null,
+    options?: Options | undefined,
+  ) => Promise<URLSearchParams>;
 }
 
-export const useUrlSort = (initialSortBy: string, initialSortDirection: SortDirection): ReturnType => {
-  const [sort, setSort] = useQueryStates(
-    {
-      sortBy: parseAsString.withDefault(initialSortBy),
-      sortDirection: parseAsStringLiteral(['asc', 'desc']).withDefault(initialSortDirection),
-    },
-    {
-      history: 'push',
-    },
-  );
+const sortingSchema = z.array(
+  z.object({
+    id: z.string().default('updated_at'),
+    desc: z.boolean().default(false),
+  }),
+);
 
-  const { sortBy, sortDirection } = sort;
+export const useUrlSort = (initialSortBy: string, initialSortDirection: SortDirection): ReturnType => {
+  const [sorting, setSorting] = useQueryState('sorting', parseAsJson(sortingSchema.parse));
+
+  const sortBy = sorting ? sorting?.[0]?.id : initialSortBy;
+
+  const sortDirection = sorting ? (sorting?.[0]?.desc ? 'desc' : 'asc') : initialSortDirection;
 
   return {
     sortBy,
     sortDirection,
-    onSortChange: setSort,
+    onSortChange: setSorting,
   };
 };

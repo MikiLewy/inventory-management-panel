@@ -16,6 +16,7 @@ export default {
     nextStep: 'Next step',
     previousStep: 'Previous step',
     remove: 'Remove',
+    edit: 'Edit',
     yesRemove: 'Yes, remove',
     submit: 'Submit',
   },

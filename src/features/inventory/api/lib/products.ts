@@ -4,6 +4,7 @@ import api from '@/api/clients/api';
 import { PaginatedResponse } from '@/types/interfaces/paginated-response';
 
 import { CreateProductPayload } from '../../types/payload/create-product';
+import { UpdateProductPayload } from '../../types/payload/update-product';
 import { Product } from '../types/products';
 
 export const fetchProducts = async (
@@ -26,8 +27,20 @@ export const fetchProducts = async (
   return data;
 };
 
+export const fetchProduct = async (id: number): Promise<Product> => {
+  const { data } = await api.get(`/products/${id}`);
+
+  return data;
+};
+
 export const createProduct = async (product: CreateProductPayload) => {
   const { data } = await api.post('/products', product);
+
+  return data;
+};
+
+export const updateProduct = async (id: number, product: UpdateProductPayload) => {
+  const { data } = await api.patch(`/products/${id}`, product);
 
   return data;
 };

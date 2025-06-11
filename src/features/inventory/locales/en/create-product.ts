@@ -1,6 +1,8 @@
 export default {
-  title: 'Add item',
-  description: 'Add a brand new item to your inventory.',
+  title: 'Add product',
+  editTitle: 'Edit product',
+  description: 'Add a brand new product to your inventory.',
+  editDescription: 'Edit the product details.',
   steps: {
     productDetails: {
       name: 'Name',
@@ -31,5 +33,7 @@ export default {
     },
   },
   success: 'Successfully created product',
+  successEdit: 'Successfully updated product',
   error: 'Failed to create product',
+  errorEdit: 'Failed to update product',
 } as const;
