@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/sidebar';
 
 import { SidebarItems } from '../molecules/sidebar-items';
+import { Separator } from '../ui/separator';
 
 export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarComponent>) {
   return (
@@ -28,11 +29,12 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarCompone
                 <Box size={16} />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">Gizmo</span>
+                <span className="truncate font-medium">STOQIO</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+        <Separator />
       </SidebarHeader>
       <SidebarGroup>
         <SidebarContent>
