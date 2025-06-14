@@ -1,0 +1,21 @@
+export default {
+  title: 'Sales',
+  revertSales: 'Revert sale',
+  table: {
+    name: 'Name',
+    size: 'Size',
+    sizeUnit: 'Size unit',
+    sku: 'SKU',
+    category: 'Category',
+    brand: 'Brand',
+    purchasePrice: 'Purchase price',
+    purchaseDate: 'Purchase date',
+    purchasePlace: 'Purchase place',
+    soldPrice: 'Sold price',
+    soldDate: 'Sold date',
+    soldPlace: 'Sold place',
+    profit: 'Profit',
+    createdAt: 'Created at',
+    updatedAt: 'Updated at',
+  },
+} as const;

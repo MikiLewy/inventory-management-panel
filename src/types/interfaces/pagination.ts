@@ -3,6 +3,7 @@ import { SetValues } from 'nuqs';
 
 export interface Pagination {
   offset: number;
+  pageIndex: number;
   limit: number;
   onPaginationChange: SetValues<{
     pageIndex: Omit<ParserBuilder<number>, 'parseServerSide'> & {

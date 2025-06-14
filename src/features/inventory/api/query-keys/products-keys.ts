@@ -12,9 +12,9 @@ export const productsKeys = {
   }: {
     offset: number;
     limit: number;
-    query: string;
-    sortBy: string;
-    sortDirection: SortDirection;
+    query?: string;
+    sortBy?: string;
+    sortDirection?: SortDirection;
   }) => [...productsKeys.lists(), { offset, limit, query, sortBy, sortDirection }],
   details: (id: number) => [...productsKeys.lists(), 'detail', id],
   detail: (id: number) => [...productsKeys.details(id)],

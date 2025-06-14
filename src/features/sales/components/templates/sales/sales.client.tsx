@@ -1,16 +1,13 @@
 'use client';
 
-import { Tag, Trash } from 'lucide-react';
 import { useCallback, useState } from 'react';
 
 import ActionsTableMenu, { Action } from '@/components/atoms/actions-table-menu';
 import BulkActionsBubble from '@/components/atoms/bulk-actions-bubble';
 import { DataTable } from '@/components/organisms/data-table/data-table';
-import { useProducts } from '@/features/inventory/hooks/query/use-products';
-import {
-  InventoryActionSlotPayload,
-  useInventoryTableColumns,
-} from '@/features/inventory/hooks/use-inventory-table-columns';
+import { InventoryActionSlotPayload } from '@/features/inventory/hooks/use-inventory-table-columns';
+import { useSales } from '@/features/sales/hooks/query/use-sales';
+import { useSalesTableColumns } from '@/features/sales/hooks/use-sales-table-columns';
 import { useDialog } from '@/hooks/use-dialog';
 import { useSelection } from '@/hooks/use-selection';
 import { useUrlPagination } from '@/hooks/use-url-pagination';
@@ -18,9 +15,7 @@ import { useUrlQuery } from '@/hooks/use-url-query';
 import { useUrlSort } from '@/hooks/use-url-sort';
 import { useI18n } from '@/locales/client';
 
-import MarkProductsAsSoldDialog from '../../organisms/dialogs/mark-products-as-sold/mark-products-as-sold';
-import RemoveProductDialog from '../../organisms/dialogs/remove-product-dialog';
-import { EditProductSheet } from '../../organisms/edit-product-sheet/edit-product-sheet';
+import RevertSalesDialog from '../../organisms/dialogs/revert-sales-dialog';
 
 const ClientInventory = () => {
   const t = useI18n();
@@ -31,7 +26,7 @@ const ClientInventory = () => {
 
   const { sortBy, sortDirection, onSortChange } = useUrlSort('updated_at', 'desc');
 
-  const { data: productsData } = useProducts({ offset, limit, query, sortBy, sortDirection });
+  const { data: salesData } = useSales({ offset, limit, query, sortBy, sortDirection });
 
   const [selectedProduct, setSelectedProduct] = useState<InventoryActionSlotPayload | null>(null);
 
@@ -72,25 +67,25 @@ const ClientInventory = () => {
     return <ActionsTableMenu actions={actions} />;
   }, []);
 
-  const [isOpenMarkAsSoldDialog, handleOpenMarkAsSoldDialog, handleCloseMarkAsSoldDialog] = useDialog();
+  const [isOpenRevertSalesDialog, handleOpenRevertSalesDialog, handleCloseRevertSalesDialog] = useDialog();
 
-  const onCancelMarkAsSoldDialog = () => {
-    handleCloseMarkAsSoldDialog();
+  const onCancelRevertSalesDialog = () => {
+    handleCloseRevertSalesDialog();
     handleClearSelected();
   };
 
-  const columns = useInventoryTableColumns(actionsSlot);
+  const columns = useSalesTableColumns(actionsSlot);
 
   return (
     <div>
       <DataTable
         columns={columns}
-        data={productsData?.resources ?? []}
+        data={salesData?.resources ?? []}
         search={{ query, handleChangeQuery: onQueryChange }}
         pagination={{
           pageIndex,
           pageSize: limit,
-          totalItems: productsData?.total ?? 0,
+          totalItems: salesData?.total ?? 0,
           onPaginationChange,
         }}
         sortable={{
@@ -108,37 +103,19 @@ const ClientInventory = () => {
         onClose={handleClearSelected}
         actions={[
           {
-            key: 'mark-as-sold',
-            icon: <Tag />,
-            label: t('inventory.markAsSold'),
-            onClick: handleOpenMarkAsSoldDialog,
-          },
-          {
-            key: 'remove',
-            icon: <Trash />,
-            destructive: true,
-            label: t('common.button.remove'),
+            key: 'revert-sales',
+            label: t('sales.revertSales'),
             onClick: () => {
-              handleOpenMarkAsSoldDialog();
+              handleOpenRevertSalesDialog();
             },
           },
         ]}
         selectedItemsCount={Object.keys(selectedRows).length}
       />
-      <RemoveProductDialog
-        open={isOpenRemoveProductDialog}
-        onClose={handleCloseRemoveProductDialog}
-        selectedProductId={selectedProduct?.id || 0}
-      />
-      <EditProductSheet
-        open={isOpenEditProductSheet}
-        onClose={handleCloseEditProductSheet}
-        selectedProductId={selectedProduct?.id || 0}
-      />
-      <MarkProductsAsSoldDialog
-        open={isOpenMarkAsSoldDialog}
-        onClose={onCancelMarkAsSoldDialog}
-        selectedProductsIds={Object.keys(selectedRows)}
+      <RevertSalesDialog
+        open={isOpenRevertSalesDialog}
+        onClose={onCancelRevertSalesDialog}
+        selectedSalesIds={Object.keys(selectedRows).map(key => Number(key))}
       />
     </div>
   );

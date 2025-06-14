@@ -4,31 +4,29 @@ import { ReactNode } from 'react';
 
 import { FormatDate } from '@/components/atoms/format-date';
 import { TableColumnHeader } from '@/components/organisms/table/table-column-header';
-import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { dateFormats } from '@/constants/date-formats';
 import { useFormatPrice } from '@/hooks/use-format-price';
+import { cn } from '@/lib/utils';
 import { useCurrentLocale, useI18n } from '@/locales/client';
 import { CategoryEnum } from '@/shared/api/types/enum/category';
 import { Language } from '@/types/enum/language';
 import { SizeUnit } from '@/types/enum/size-unit';
 
-import { ProductStatus } from '../api/types/enum/product-status';
-import { Product } from '../api/types/products';
-import { productStatusTranslations } from '../constants/product-status';
+import { Sale } from '../api/types/sales';
 
-export interface InventoryActionSlotPayload {
+export interface SalesActionSlotPayload {
   id: number;
 }
 
-export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionSlotPayload) => ReactNode) => {
+export const useSalesTableColumns = (actionsSlot: (payload: SalesActionSlotPayload) => ReactNode) => {
   const t = useI18n();
 
   const { formatPrice } = useFormatPrice();
 
   const currentLocale = useCurrentLocale();
 
-  const columns: ColumnDef<Product>[] = [
+  const columns: ColumnDef<Sale>[] = [
     {
       id: 'select',
       header: ({ table }) => (
@@ -52,10 +50,10 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
     },
     {
       accessorKey: 'name',
-      meta: t('inventory.table.name'),
+      meta: t('sales.table.name'),
       enableHiding: false,
       header: ({ column }) => {
-        return <TableColumnHeader column={column} title={t('inventory.table.name')} />;
+        return <TableColumnHeader column={column} title={t('sales.table.name')} />;
       },
       cell: ({ getValue, row }) => {
         const imageUrl = row.original.imageUrl;
@@ -76,10 +74,10 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
     },
     {
       accessorKey: 'size',
-      meta: t('inventory.table.size'),
+      meta: t('sales.table.size'),
       enableHiding: false,
       header: ({ column }) => {
-        return <TableColumnHeader column={column} title={t('inventory.table.size')} />;
+        return <TableColumnHeader column={column} title={t('sales.table.size')} />;
       },
       cell: ({ row }) => {
         const size = row.original.size;
@@ -98,71 +96,83 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
     },
     {
       accessorKey: 'sku',
-      meta: t('inventory.table.sku'),
+      meta: t('sales.table.sku'),
       enableHiding: false,
       enableSorting: false,
       header: ({ column }) => {
-        return <TableColumnHeader column={column} title={t('inventory.table.sku')} />;
+        return <TableColumnHeader column={column} title={t('sales.table.sku')} />;
       },
     },
     {
-      accessorKey: 'category',
-      meta: t('inventory.table.category'),
-      enableSorting: false,
-      enableHiding: false,
-      filterFn: (rows, columnId, filterValue) => {
-        const category = rows.getValue(columnId) as { id: string; name: string; type: CategoryEnum };
-
-        return filterValue.includes(category.type.toString());
-      },
+      accessorKey: 'soldPrice',
+      meta: t('sales.table.soldPrice'),
       header: ({ column }) => {
-        return <TableColumnHeader column={column} title={t('inventory.table.category')} />;
+        return <TableColumnHeader column={column} title={t('sales.table.soldPrice')} />;
       },
-      cell: ({ cell }) => {
-        const category = cell.getValue() as { id: string; translations: Record<Language, string>; type: CategoryEnum };
+      cell: ({ row }) => {
+        const soldPrice = row.original.soldPrice;
 
-        return <p>{category.translations?.[currentLocale] || '-'}</p>;
+        return <p>{formatPrice(soldPrice) || '-'}</p>;
       },
     },
     {
-      accessorKey: 'status',
-      meta: t('inventory.table.status'),
-      enableHiding: false,
-      enableSorting: false,
-      filterFn: (rows, columnId, filterValue) => {
-        const status = rows.getValue(columnId) as ProductStatus;
-
-        return filterValue.includes(status.toString());
-      },
+      accessorKey: 'profit',
+      meta: t('sales.table.profit'),
       header: ({ column }) => {
-        return <TableColumnHeader column={column} title={t('inventory.table.status')} />;
+        return <TableColumnHeader column={column} title={t('sales.table.profit')} />;
       },
-      cell: ({ cell }) => {
-        const status = cell.getValue() as ProductStatus;
+      cell: ({ row }) => {
+        const profit = row.original.profit;
+
+        const isProfitPositive = profit > 0;
 
         return (
-          <Badge variant={status === ProductStatus.IN_STOCK ? 'success' : 'warning'} className="capitalize">
-            {t(productStatusTranslations[status])}
-          </Badge>
+          <p
+            className={cn(
+              isProfitPositive ? 'text-[#00A148] dark:text-[#56E57F]' : 'text-[#D60021] dark:text-[#FF9087]',
+            )}>
+            {formatPrice(profit) || '-'}
+          </p>
         );
       },
     },
     {
-      accessorKey: 'brand',
-      meta: t('inventory.table.brand'),
+      accessorKey: 'soldPlace',
+      meta: t('sales.table.soldPlace'),
       enableSorting: false,
       header: ({ column }) => {
-        return <TableColumnHeader column={column} title={t('inventory.table.brand')} />;
+        return <TableColumnHeader column={column} title={t('sales.table.soldPlace')} />;
       },
-      cell: ({ getValue }) => {
-        return <p>{(getValue() as string) || '-'}</p>;
+      cell: ({ row }) => {
+        const soldPlace = row.original.soldPlace;
+
+        return <p>{soldPlace || '-'}</p>;
+      },
+    },
+    {
+      accessorKey: 'sold_date',
+      meta: t('sales.table.soldDate'),
+      header: ({ column }) => {
+        return <TableColumnHeader column={column} title={t('sales.table.soldDate')} />;
+      },
+      cell: ({ row }) => {
+        const soldDate = row.original.soldDate;
+
+        return soldDate ? (
+          <FormatDate
+            date={new Date(soldDate)}
+            format={`${dateFormats.day}.${dateFormats.month}.${dateFormats.year}`}
+          />
+        ) : (
+          '-'
+        );
       },
     },
     {
       accessorKey: 'purchase_price',
-      meta: t('inventory.table.purchasePrice'),
+      meta: t('sales.table.purchasePrice'),
       header: ({ column }) => {
-        return <TableColumnHeader column={column} title={t('inventory.table.purchasePrice')} />;
+        return <TableColumnHeader column={column} title={t('sales.table.purchasePrice')} />;
       },
       cell: ({ row }) => {
         const purchasePrice = row.original.purchasePrice;
@@ -172,10 +182,10 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
     },
     {
       accessorKey: 'purchase_place',
-      meta: t('inventory.table.purchasePlace'),
+      meta: t('sales.table.purchasePlace'),
       enableSorting: false,
       header: ({ column }) => {
-        return <TableColumnHeader column={column} title={t('inventory.table.purchasePlace')} />;
+        return <TableColumnHeader column={column} title={t('sales.table.purchasePlace')} />;
       },
       cell: ({ row }) => {
         const purchasePlace = row.original.purchasePlace;
@@ -185,9 +195,9 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
     },
     {
       accessorKey: 'purchase_date',
-      meta: t('inventory.table.purchaseDate'),
+      meta: t('sales.table.purchaseDate'),
       header: ({ column }) => {
-        return <TableColumnHeader column={column} title={t('inventory.table.purchaseDate')} />;
+        return <TableColumnHeader column={column} title={t('sales.table.purchaseDate')} />;
       },
       cell: ({ row }) => {
         const purchaseDate = row.original.purchaseDate;
@@ -203,10 +213,40 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
       },
     },
     {
-      accessorKey: 'created_at',
-      meta: t('inventory.table.createdAt'),
+      accessorKey: 'category',
+      meta: t('sales.table.category'),
+      enableSorting: false,
+      enableHiding: false,
+      filterFn: (rows, columnId, filterValue) => {
+        const category = rows.getValue(columnId) as { id: string; name: string; type: CategoryEnum };
+
+        return filterValue.includes(category.type.toString());
+      },
       header: ({ column }) => {
-        return <TableColumnHeader column={column} title={t('inventory.table.createdAt')} />;
+        return <TableColumnHeader column={column} title={t('sales.table.category')} />;
+      },
+      cell: ({ cell }) => {
+        const category = cell.getValue() as { id: string; translations: Record<Language, string>; type: CategoryEnum };
+
+        return <p>{category.translations?.[currentLocale] || '-'}</p>;
+      },
+    },
+    {
+      accessorKey: 'brand',
+      meta: t('sales.table.brand'),
+      enableSorting: false,
+      header: ({ column }) => {
+        return <TableColumnHeader column={column} title={t('sales.table.brand')} />;
+      },
+      cell: ({ getValue }) => {
+        return <p>{(getValue() as string) || '-'}</p>;
+      },
+    },
+    {
+      accessorKey: 'created_at',
+      meta: t('sales.table.createdAt'),
+      header: ({ column }) => {
+        return <TableColumnHeader column={column} title={t('sales.table.createdAt')} />;
       },
       cell: ({ row }) => {
         const createdAt = row.original.createdAt;
@@ -223,9 +263,9 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
     },
     {
       accessorKey: 'updated_at',
-      meta: t('inventory.table.updatedAt'),
+      meta: t('sales.table.updatedAt'),
       header: ({ column }) => {
-        return <TableColumnHeader column={column} title={t('inventory.table.updatedAt')} />;
+        return <TableColumnHeader column={column} title={t('sales.table.updatedAt')} />;
       },
       cell: ({ row }) => {
         const updatedAt = row.original.updatedAt;

@@ -41,4 +41,10 @@ export default {
   noDataAvailable: 'Brak danych',
   step: 'Krok {step}',
   openMenu: 'Otwórz menu',
+  bulkActionsBubble: {
+    selectAll: 'Zaznacz wszystko ({count})',
+    previousSelection: 'Poprzedni wybór',
+    allSelected: 'Zaznaczono wszystko',
+    selected: 'Zaznaczono: {count}',
+  },
 } as const;

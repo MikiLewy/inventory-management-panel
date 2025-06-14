@@ -9,6 +9,8 @@ import {
   getFacetedUniqueValues,
   getFilteredRowModel,
   getSortedRowModel,
+  OnChangeFn,
+  RowSelectionState,
   SortDirection,
   useReactTable,
   VisibilityState,
@@ -56,20 +58,27 @@ type Sortable = {
   ) => Promise<URLSearchParams>;
 };
 
+type Selectable = {
+  rowSelection: RowSelectionState;
+  setRowSelection: OnChangeFn<RowSelectionState>;
+};
+
 interface TableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   pagination?: Pagination;
   search?: Search;
   sortable?: Sortable;
+  selectable?: Selectable;
 }
 
-export function InventoryTable<TData, TValue>({
+export function DataTable<TData extends { id: number | string }, TValue>({
   columns,
   data,
   pagination,
   search,
   sortable,
+  selectable,
 }: TableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
@@ -91,6 +100,8 @@ export function InventoryTable<TData, TValue>({
     onColumnVisibilityChange: setColumnVisibility,
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    onRowSelectionChange: selectable?.setRowSelection,
+    getRowId: row => row.id.toString(),
     state: {
       sorting: sortable ? [{ id: sortable.sortBy, desc: sortable.sortDirection === 'desc' }] : [],
       columnFilters,
@@ -99,6 +110,7 @@ export function InventoryTable<TData, TValue>({
         pageIndex: pagination?.pageIndex ?? 0,
         pageSize: pagination?.pageSize ?? 10,
       },
+      rowSelection: selectable?.rowSelection,
     },
   });
 
