@@ -6,10 +6,13 @@ import Dialog, { DialogActions } from '@components/organisms/dialog';
 
 interface Props extends DialogActions {
   selectedSalesIds: number[];
+  selectedProductName?: string;
 }
 
-const RevertSalesDialog = ({ open, onClose, selectedSalesIds }: Props) => {
+const RevertSalesDialog = ({ open, onClose, selectedSalesIds, selectedProductName }: Props) => {
   const t = useI18n();
+
+  const isRevertingMultipleSales = selectedSalesIds.length > 1;
 
   const { mutate, isPending } = useRevertSales();
 
@@ -19,7 +22,9 @@ const RevertSalesDialog = ({ open, onClose, selectedSalesIds }: Props) => {
 
   return (
     <Dialog
-      title={t('sales.dialog.revertSales.title')}
+      title={
+        isRevertingMultipleSales ? t('sales.dialog.revertSales.titleMultiple') : t('sales.dialog.revertSales.title')
+      }
       open={open}
       onClose={onClose}
       onSubmit={onSubmit}
@@ -27,7 +32,13 @@ const RevertSalesDialog = ({ open, onClose, selectedSalesIds }: Props) => {
       isSubmitButtonDisabled={selectedSalesIds.length <= 0}
       confirmButtonText={t('sales.dialog.revertSales.confirmButton')}
       scrollable>
-      <p>{t('sales.dialog.revertSales.description')}</p>
+      <p>
+        {isRevertingMultipleSales
+          ? t('sales.dialog.revertSales.descriptionMultiple')
+          : t('sales.dialog.revertSales.description', {
+              productName: selectedProductName,
+            })}
+      </p>
     </Dialog>
   );
 };

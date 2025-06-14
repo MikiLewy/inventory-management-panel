@@ -17,6 +17,7 @@ import { Sale } from '../api/types/sales';
 
 export interface SalesActionSlotPayload {
   id: number;
+  productName: string;
 }
 
 export const useSalesTableColumns = (actionsSlot: (payload: SalesActionSlotPayload) => ReactNode) => {
@@ -284,10 +285,11 @@ export const useSalesTableColumns = (actionsSlot: (payload: SalesActionSlotPaylo
       id: 'actions',
       enableHiding: false,
       cell: ({ row }) => {
-        const product = row.original;
+        const sale = row.original;
 
         return actionsSlot({
-          id: product.id,
+          id: sale.id,
+          productName: sale.name,
         });
       },
     },

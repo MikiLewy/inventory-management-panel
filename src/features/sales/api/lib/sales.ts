@@ -37,8 +37,8 @@ export const updateSale = async (id: number, sale: Sale) => {
   return data;
 };
 
-export const removeSale = async (id: number) => {
-  await api.delete(`/sales/${id}`);
+export const removeSales = async (salesIds: number[]) => {
+  await api.delete(`/sales`, { data: { salesIds } });
 };
 
 export const revertSales = async (saleIds: number[]) => {

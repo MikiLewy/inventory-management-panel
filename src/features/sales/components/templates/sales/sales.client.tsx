@@ -1,13 +1,13 @@
 'use client';
 
+import { TrashIcon } from 'lucide-react';
 import { useCallback, useState } from 'react';
 
 import ActionsTableMenu, { Action } from '@/components/atoms/actions-table-menu';
 import BulkActionsBubble from '@/components/atoms/bulk-actions-bubble';
 import { DataTable } from '@/components/organisms/data-table/data-table';
-import { InventoryActionSlotPayload } from '@/features/inventory/hooks/use-inventory-table-columns';
 import { useSales } from '@/features/sales/hooks/query/use-sales';
-import { useSalesTableColumns } from '@/features/sales/hooks/use-sales-table-columns';
+import { SalesActionSlotPayload, useSalesTableColumns } from '@/features/sales/hooks/use-sales-table-columns';
 import { useDialog } from '@/hooks/use-dialog';
 import { useSelection } from '@/hooks/use-selection';
 import { useUrlPagination } from '@/hooks/use-url-pagination';
@@ -15,6 +15,7 @@ import { useUrlQuery } from '@/hooks/use-url-query';
 import { useUrlSort } from '@/hooks/use-url-sort';
 import { useI18n } from '@/locales/client';
 
+import RemoveSalesDialog from '../../organisms/dialogs/remove-sales-dialog';
 import RevertSalesDialog from '../../organisms/dialogs/revert-sales-dialog';
 
 const ClientInventory = () => {
@@ -28,9 +29,23 @@ const ClientInventory = () => {
 
   const { data: salesData } = useSales({ offset, limit, query, sortBy, sortDirection });
 
-  const [selectedProduct, setSelectedProduct] = useState<InventoryActionSlotPayload | null>(null);
+  const [selectedSale, setSelectedSale] = useState<SalesActionSlotPayload | null>(null);
 
-  const [isOpenRemoveProductDialog, handleOpenRemoveProductDialog, handleCloseRemoveProductDialog] = useDialog();
+  const [isOpenRevertSalesDialog, handleOpenRevertSalesDialog, handleCloseRevertSalesDialog] = useDialog();
+
+  const [isOpenRemoveSalesDialog, handleOpenRemoveSalesDialog, handleCloseRemoveSalesDialog] = useDialog();
+
+  const onCancelRevertSalesDialog = () => {
+    handleCloseRevertSalesDialog();
+    setSelectedSale(null);
+    handleClearSelected();
+  };
+
+  const onCancelRemoveSalesDialog = () => {
+    handleCloseRemoveSalesDialog();
+    setSelectedSale(null);
+    handleClearSelected();
+  };
 
   const [isOpenEditProductSheet, handleOpenEditProductSheet, handleCloseEditProductSheet] = useDialog();
 
@@ -44,35 +59,36 @@ const ClientInventory = () => {
     [handleChangeQuery],
   );
 
-  const actionsSlot = useCallback((payload: InventoryActionSlotPayload) => {
+  const actionsSlot = useCallback((payload: SalesActionSlotPayload) => {
     const actions: Action[] = [
       {
         key: 'edit',
         label: t('common.button.edit'),
         onClick: () => {
           handleOpenEditProductSheet();
-          setSelectedProduct(payload);
+          setSelectedSale(payload);
+        },
+      },
+      {
+        key: 'revert',
+        label: t('sales.revertSale'),
+        onClick: () => {
+          handleOpenRevertSalesDialog();
+          setSelectedSale(payload);
         },
       },
       {
         key: 'remove',
         label: t('common.button.remove'),
         onClick: () => {
-          handleOpenRemoveProductDialog();
-          setSelectedProduct(payload);
+          handleOpenRemoveSalesDialog();
+          setSelectedSale(payload);
         },
       },
     ];
 
     return <ActionsTableMenu actions={actions} />;
   }, []);
-
-  const [isOpenRevertSalesDialog, handleOpenRevertSalesDialog, handleCloseRevertSalesDialog] = useDialog();
-
-  const onCancelRevertSalesDialog = () => {
-    handleCloseRevertSalesDialog();
-    handleClearSelected();
-  };
 
   const columns = useSalesTableColumns(actionsSlot);
 
@@ -104,10 +120,15 @@ const ClientInventory = () => {
         actions={[
           {
             key: 'revert-sales',
-            label: t('sales.revertSales'),
-            onClick: () => {
-              handleOpenRevertSalesDialog();
-            },
+            label: t('sales.revertSale'),
+            onClick: handleOpenRevertSalesDialog,
+          },
+          {
+            key: 'remove-sales',
+            destructive: true,
+            icon: <TrashIcon />,
+            label: t('common.button.remove'),
+            onClick: handleOpenRemoveSalesDialog,
           },
         ]}
         selectedItemsCount={Object.keys(selectedRows).length}
@@ -115,7 +136,14 @@ const ClientInventory = () => {
       <RevertSalesDialog
         open={isOpenRevertSalesDialog}
         onClose={onCancelRevertSalesDialog}
-        selectedSalesIds={Object.keys(selectedRows).map(key => Number(key))}
+        selectedSalesIds={selectedSale ? [selectedSale.id] : Object.keys(selectedRows).map(key => Number(key))}
+        selectedProductName={selectedSale?.productName}
+      />
+      <RemoveSalesDialog
+        open={isOpenRemoveSalesDialog}
+        onClose={onCancelRemoveSalesDialog}
+        selectedSalesIds={selectedSale ? [selectedSale.id] : Object.keys(selectedRows).map(key => Number(key))}
+        selectedProductName={selectedSale?.productName}
       />
     </div>
   );
