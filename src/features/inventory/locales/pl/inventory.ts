@@ -30,8 +30,12 @@ export default {
   dialog: {
     remove: {
       title: 'Usuń produkt',
-      description: 'Czy na pewno chcesz usunąć ten produkt?',
-      success: 'Produkt został pomyślnie usunięty',
+      titleMultiple: 'Usuń produkty',
+      description: 'Czy na pewno chcesz usunąć produkt {productName}?',
+      descriptionMultiple: 'Czy na pewno chcesz usunąć wybrane produkty?',
+      confirmButton: 'Tak, usuń',
+      'success#one': 'Produkt został pomyślnie usunięty',
+      'success#other': 'Produkty zostały pomyślnie usunięte',
     },
     markAsSold: {
       title: 'Mark products as sold',

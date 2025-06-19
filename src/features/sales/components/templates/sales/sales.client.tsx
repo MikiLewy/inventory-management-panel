@@ -1,6 +1,6 @@
 'use client';
 
-import { TrashIcon } from 'lucide-react';
+import { TrashIcon, Undo2 } from 'lucide-react';
 import { useCallback, useState } from 'react';
 
 import ActionsTableMenu, { Action } from '@/components/atoms/actions-table-menu';
@@ -17,6 +17,7 @@ import { useI18n } from '@/locales/client';
 
 import RemoveSalesDialog from '../../organisms/dialogs/remove-sales-dialog';
 import RevertSalesDialog from '../../organisms/dialogs/revert-sales-dialog';
+import { EditSaleSheet } from '../../organisms/edit-sales-sheet/edit-sale-sheet';
 
 const ClientInventory = () => {
   const t = useI18n();
@@ -47,7 +48,7 @@ const ClientInventory = () => {
     handleClearSelected();
   };
 
-  const [isOpenEditProductSheet, handleOpenEditProductSheet, handleCloseEditProductSheet] = useDialog();
+  const [isOpenEditSaleSheet, handleOpenEditSaleSheet, handleCloseEditSaleSheet] = useDialog();
 
   const { selectedRows, setSelectedRows, handleClearSelected } = useSelection();
 
@@ -65,7 +66,7 @@ const ClientInventory = () => {
         key: 'edit',
         label: t('common.button.edit'),
         onClick: () => {
-          handleOpenEditProductSheet();
+          handleOpenEditSaleSheet();
           setSelectedSale(payload);
         },
       },
@@ -120,6 +121,7 @@ const ClientInventory = () => {
         actions={[
           {
             key: 'revert-sales',
+            icon: <Undo2 />,
             label: t('sales.revertSale'),
             onClick: handleOpenRevertSalesDialog,
           },
@@ -132,6 +134,11 @@ const ClientInventory = () => {
           },
         ]}
         selectedItemsCount={Object.keys(selectedRows).length}
+      />
+      <EditSaleSheet
+        open={isOpenEditSaleSheet}
+        onClose={handleCloseEditSaleSheet}
+        selectedSaleId={selectedSale?.id || 0}
       />
       <RevertSalesDialog
         open={isOpenRevertSalesDialog}

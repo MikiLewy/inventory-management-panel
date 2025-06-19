@@ -19,6 +19,7 @@ import { productStatusTranslations } from '../constants/product-status';
 
 export interface InventoryActionSlotPayload {
   id: number;
+  name: string;
 }
 
 export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionSlotPayload) => ReactNode) => {
@@ -248,6 +249,7 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
 
         return actionsSlot({
           id: product.id,
+          name: product.name,
         });
       },
     },

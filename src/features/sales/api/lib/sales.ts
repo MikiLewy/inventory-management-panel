@@ -3,6 +3,7 @@ import { SortDirection } from '@tanstack/react-table';
 import api from '@/api/clients/api';
 import { PaginatedResponse } from '@/types/interfaces/paginated-response';
 
+import { UpdateSalePayload } from '../../types/payload/update-sale';
 import { Sale } from '../types/sales';
 
 export const fetchSales = async (
@@ -25,13 +26,19 @@ export const fetchSales = async (
   return data;
 };
 
+export const fetchSale = async (id: number): Promise<Sale> => {
+  const { data } = await api.get(`/sales/${id}`);
+
+  return data;
+};
+
 export const createSale = async (sale: Sale) => {
   const { data } = await api.post('/sales', sale);
 
   return data;
 };
 
-export const updateSale = async (id: number, sale: Sale) => {
+export const updateSale = async (id: number, sale: UpdateSalePayload) => {
   const { data } = await api.patch(`/sales/${id}`, sale);
 
   return data;

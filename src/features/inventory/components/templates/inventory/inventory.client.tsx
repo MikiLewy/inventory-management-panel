@@ -79,6 +79,11 @@ const ClientInventory = () => {
     handleClearSelected();
   };
 
+  const onCancelRemoveProductDialog = () => {
+    handleCloseRemoveProductDialog();
+    handleClearSelected();
+  };
+
   const columns = useInventoryTableColumns(actionsSlot);
 
   return (
@@ -118,17 +123,16 @@ const ClientInventory = () => {
             icon: <Trash />,
             destructive: true,
             label: t('common.button.remove'),
-            onClick: () => {
-              handleOpenMarkAsSoldDialog();
-            },
+            onClick: handleOpenRemoveProductDialog,
           },
         ]}
         selectedItemsCount={Object.keys(selectedRows).length}
       />
       <RemoveProductDialog
         open={isOpenRemoveProductDialog}
-        onClose={handleCloseRemoveProductDialog}
-        selectedProductId={selectedProduct?.id || 0}
+        onClose={onCancelRemoveProductDialog}
+        selectedProductIds={selectedProduct ? [selectedProduct.id] : Object.keys(selectedRows).map(key => Number(key))}
+        selectedProductName={selectedProduct?.name}
       />
       <EditProductSheet
         open={isOpenEditProductSheet}

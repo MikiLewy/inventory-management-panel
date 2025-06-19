@@ -42,8 +42,12 @@ export const updateProduct = async (id: number, product: UpdateProductPayload) =
   await api.patch(`/products/${id}`, product);
 };
 
-export const removeProduct = async (id: number) => {
-  await api.delete(`/products/${id}`);
+export const removeProducts = async (productsIds: number[]) => {
+  await api.delete(`/products`, {
+    data: {
+      productsIds,
+    },
+  });
 };
 
 export const markAsSold = async (products: MarkProductsAsSoldPayload[]) => {

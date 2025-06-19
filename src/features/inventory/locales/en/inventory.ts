@@ -30,8 +30,12 @@ export default {
   dialog: {
     remove: {
       title: 'Remove product',
-      description: 'Are you sure you want to remove this product?',
-      success: 'Product removed successfully',
+      titleMultiple: 'Remove products',
+      description: 'Are you sure you want to remove product {productName}?',
+      descriptionMultiple: 'Are you sure you want to remove the selected products?',
+      confirmButton: 'Yes, remove',
+      'success#one': 'Product removed successfully',
+      'success#other': 'Products removed successfully',
     },
     markAsSold: {
       title: 'Mark products as sold',

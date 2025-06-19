@@ -5,29 +5,40 @@ import { useI18n } from '@/locales/client';
 import Dialog, { DialogActions } from '@components/organisms/dialog';
 
 interface Props extends DialogActions {
-  selectedProductId: number;
+  selectedProductIds: number[];
+  selectedProductName?: string;
 }
 
-const RemoveProductDialog = ({ open, onClose, selectedProductId }: Props) => {
+const RemoveProductDialog = ({ open, onClose, selectedProductIds, selectedProductName }: Props) => {
   const t = useI18n();
 
-  const { mutateAsync, isPending } = useRemoveProduct();
+  const isRemovingMultipleProducts = selectedProductIds.length > 1;
 
-  const onSubmit = async () => {
-    await mutateAsync(selectedProductId, { onSuccess: onClose });
+  const { mutate, isPending } = useRemoveProduct();
+
+  const onSubmit = () => {
+    mutate(selectedProductIds, { onSuccess: onClose });
   };
 
   return (
     <Dialog
-      title={t('inventory.dialog.remove.title')}
+      title={
+        isRemovingMultipleProducts ? t('inventory.dialog.remove.titleMultiple') : t('inventory.dialog.remove.title')
+      }
       open={open}
       onClose={onClose}
       onSubmit={onSubmit}
       isSubmitButtonLoading={isPending}
-      isSubmitButtonDisabled={!selectedProductId}
-      confirmButtonText={t('common.button.yesRemove')}
+      isSubmitButtonDisabled={selectedProductIds.length <= 0}
+      confirmButtonText={t('inventory.dialog.remove.confirmButton')}
       scrollable>
-      <p>{t('inventory.dialog.remove.description')}</p>
+      <p>
+        {isRemovingMultipleProducts
+          ? t('inventory.dialog.remove.descriptionMultiple')
+          : t('inventory.dialog.remove.description', {
+              productName: selectedProductName,
+            })}
+      </p>
     </Dialog>
   );
 };

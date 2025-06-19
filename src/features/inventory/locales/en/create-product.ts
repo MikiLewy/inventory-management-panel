@@ -12,6 +12,8 @@ export default {
       category: 'Category',
       categoryPlaceholder: 'Select category',
       brand: 'Brand',
+      status: 'Status',
+      statusPlaceholder: 'Select status',
       brandPlaceholder: 'Brand',
     },
     sizeAndPrice: {
