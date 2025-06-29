@@ -19,6 +19,7 @@ export default {
     edit: 'Edit',
     yesRemove: 'Yes, remove',
     submit: 'Submit',
+    search: 'Search',
   },
   clearFilters: 'Clear filters',
   sort: {

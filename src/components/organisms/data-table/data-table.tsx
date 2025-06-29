@@ -24,6 +24,7 @@ import { Table } from '@/components/organisms/table/table';
 import { TablePagination } from '@/components/organisms/table/table-pagination';
 import { TableViewOptions } from '@/components/organisms/table/table-view-options';
 import { Button } from '@/components/ui/button';
+import { useViewSettings, View } from '@/store/views-settings';
 
 type Pagination = {
   pageIndex: number;
@@ -70,6 +71,7 @@ interface TableProps<TData, TValue> {
   search?: Search;
   sortable?: Sortable;
   selectable?: Selectable;
+  view: View;
 }
 
 export function DataTable<TData extends { id: number | string }, TValue>({
@@ -79,10 +81,11 @@ export function DataTable<TData extends { id: number | string }, TValue>({
   search,
   sortable,
   selectable,
+  view,
 }: TableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const { viewsSettings, setHiddenColumn } = useViewSettings();
 
   const table = useReactTable({
     data,
@@ -97,7 +100,13 @@ export function DataTable<TData extends { id: number | string }, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
+    onColumnVisibilityChange: visibility => {
+      setHiddenColumn(
+        view,
+        // @ts-expect-error visibility is callable function but typescript does not know that
+        Object.keys(visibility())?.[0] || '',
+      );
+    },
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     onRowSelectionChange: selectable?.setRowSelection,
@@ -105,7 +114,10 @@ export function DataTable<TData extends { id: number | string }, TValue>({
     state: {
       sorting: sortable ? [{ id: sortable.sortBy, desc: sortable.sortDirection === 'desc' }] : [],
       columnFilters,
-      columnVisibility,
+      columnVisibility: viewsSettings[view].hiddenColumns.reduce((acc, column) => {
+        acc[column] = false;
+        return acc;
+      }, {} as VisibilityState),
       pagination: {
         pageIndex: pagination?.pageIndex ?? 0,
         pageSize: pagination?.pageSize ?? 10,

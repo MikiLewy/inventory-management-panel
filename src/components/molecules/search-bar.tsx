@@ -4,6 +4,7 @@ import { FocusEvent, useEffect, useState } from 'react';
 import { useRef } from 'react';
 
 import { useDebounce } from '@/hooks/use-debounce';
+import { useI18n } from '@/locales/client';
 
 import { Input, InputProps } from '../ui/input';
 
@@ -13,6 +14,8 @@ interface Props extends InputProps {
 }
 
 const SearchBar = ({ query, handleChangeQuery, ...other }: Props) => {
+  const t = useI18n();
+
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const [tempValue, setTempValue] = useState('');
@@ -57,7 +60,7 @@ const SearchBar = ({ query, handleChangeQuery, ...other }: Props) => {
 
   return (
     <Input
-      placeholder="Search"
+      placeholder={t('common.button.search')}
       {...other}
       value={tempValue}
       ref={inputRef}

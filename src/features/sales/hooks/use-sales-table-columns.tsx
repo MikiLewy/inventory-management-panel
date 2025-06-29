@@ -105,7 +105,7 @@ export const useSalesTableColumns = (actionsSlot: (payload: SalesActionSlotPaylo
       },
     },
     {
-      accessorKey: 'soldPrice',
+      accessorKey: 'sold_price',
       meta: t('sales.table.soldPrice'),
       header: ({ column }) => {
         return <TableColumnHeader column={column} title={t('sales.table.soldPrice')} />;
@@ -138,7 +138,7 @@ export const useSalesTableColumns = (actionsSlot: (payload: SalesActionSlotPaylo
       },
     },
     {
-      accessorKey: 'soldPlace',
+      accessorKey: 'sold_place',
       meta: t('sales.table.soldPlace'),
       enableSorting: false,
       header: ({ column }) => {

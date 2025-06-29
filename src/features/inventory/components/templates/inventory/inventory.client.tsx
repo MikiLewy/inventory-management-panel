@@ -1,7 +1,8 @@
 'use client';
 
+import { RowSelectionState } from '@tanstack/react-table';
 import { Tag, Trash } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import ActionsTableMenu, { Action } from '@/components/atoms/actions-table-menu';
 import BulkActionsBubble from '@/components/atoms/bulk-actions-bubble';
@@ -86,10 +87,15 @@ const ClientInventory = () => {
 
   const columns = useInventoryTableColumns(actionsSlot);
 
+  const isAllItemsFromCurrentPageSelected = useMemo(() => {
+    return productsData?.resources.every(product => selectedRows[product.id?.toString()]) ?? false;
+  }, [selectedRows, productsData]);
+
   return (
     <div>
       <DataTable
         columns={columns}
+        view="inventory"
         data={productsData?.resources ?? []}
         search={{ query, handleChangeQuery: onQueryChange }}
         pagination={{
@@ -111,6 +117,17 @@ const ClientInventory = () => {
       <BulkActionsBubble
         isOpen={Object.keys(selectedRows).length > 0}
         onClose={handleClearSelected}
+        onSelectAll={() =>
+          setSelectedRows(prev => ({
+            ...prev,
+            ...(productsData?.resources.reduce((acc, product) => {
+              acc[product.id?.toString()] = true;
+              return acc;
+            }, {} as RowSelectionState) || {}),
+          }))
+        }
+        isAllItemsSelected={isAllItemsFromCurrentPageSelected}
+        allItemsCount={productsData?.resources.length ?? 0}
         actions={[
           {
             key: 'mark-as-sold',

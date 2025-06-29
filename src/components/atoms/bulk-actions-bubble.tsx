@@ -23,13 +23,24 @@ export interface BulkAction {
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  onSelectAll: () => void;
+  isAllItemsSelected: boolean;
   actions: BulkAction[];
+  allItemsCount: number;
   selectedItemsCount: number;
 }
 
 const BULK_ACTIONS_BUBBLE_WIDTH_WITHOUT_PADDING = 649;
 
-const BulkActionsBubble = ({ isOpen, onClose, actions, selectedItemsCount }: Props) => {
+const BulkActionsBubble = ({
+  isOpen,
+  onClose,
+  actions,
+  selectedItemsCount,
+  onSelectAll,
+  allItemsCount,
+  isAllItemsSelected,
+}: Props) => {
   const t = useI18n();
 
   const actionsContainerRef = useRef<HTMLDivElement | null>(null);
@@ -93,17 +104,31 @@ const BulkActionsBubble = ({ isOpen, onClose, actions, selectedItemsCount }: Pro
               'py-3 fixed z-50 bottom-15 w-full box-border border dark:shadow-sm shadow-xs max-w-[690px] flex items-center justify-between bg-popover text-popover-foreground rounded-2xl',
               `px-5`,
             )}>
-            <div className="flex items-center gap-1 pr-6" ref={staticContainerRef}>
-              <X
-                onClick={onClose}
-                size={22}
-                className="text-popover-foreground hover:text-gray-500 transition-colors duration-150 cursor-pointer"
-              />
-              <p className="text-popover-foreground text-sm font-normal leading-6 min-w-max">
-                {t('common.bulkActionsBubble.selected', {
-                  count: selectedItemsCount,
-                })}
-              </p>
+            <div className="flex items-center gap-3 w-full  pr-6">
+              <div className="flex items-center gap-1" ref={staticContainerRef}>
+                <X
+                  onClick={onClose}
+                  size={18}
+                  className="text-popover-foreground hover:text-gray-500 transition-colors duration-150 cursor-pointer"
+                />
+                <p className="text-popover-foreground text-sm font-normal leading-6 min-w-max">
+                  {t('common.bulkActionsBubble.selected', {
+                    count: selectedItemsCount,
+                  })}
+                </p>
+              </div>
+              {!isAllItemsSelected ? (
+                <>
+                  <p className="text-gray-400 text-sm font-normal leading-6 min-w-max h-full">|</p>
+                  <p
+                    className="text-sm font-normal leading-6 min-w-max text-blue-400 cursor-pointer hover:text-blue-500 transition-colors duration-150"
+                    onClick={onSelectAll}>
+                    {t('common.bulkActionsBubble.selectAll', {
+                      count: allItemsCount,
+                    })}
+                  </p>
+                </>
+              ) : null}
             </div>
             {shouldDisplayScrollbar ? (
               <ScrollArea className="flex flex-1 flex-row overflow-y-auto p-0">{renderActions()}</ScrollArea>
