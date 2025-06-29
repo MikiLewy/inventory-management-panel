@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectValue, SelectTrigger, SelectItem } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { ProductStatus } from '@/features/inventory/api/types/enum/product-status';
+import { productStatusTranslations } from '@/features/inventory/constants/product-status';
 import { useEditProduct } from '@/features/inventory/hooks/mutation/use-update-product';
 import { useProduct } from '@/features/inventory/hooks/query/use-product';
 import { useCurrentLocale, useI18n } from '@/locales/client';
@@ -67,7 +68,7 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
   const form = useForm<z.infer<typeof validationSchema>>({
     resolver: zodResolver(validationSchema),
     defaultValues,
-    mode: 'onBlur',
+    mode: 'onChange',
   });
 
   const {
@@ -116,6 +117,7 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
         id: selectedProductId,
         payload: {
           ...values,
+          status: values.status as ProductStatus,
           categoryId: values.categoryId || 0,
         },
       },
@@ -143,47 +145,23 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
         <div className="mx-4 flex flex-col gap-4 grow">
           <FormProvider {...form}>
             <div className="flex flex-col gap-1">
+              <FormField
+                control={control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem className="w-full mb-3">
+                    <FormLabel>{t('createProduct.steps.productDetails.name')} *</FormLabel>
+                    <FormControl>
+                      <Input placeholder={t('createProduct.steps.productDetails.namePlaceholder')} {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
               <div className="flex gap-4 w-full">
-                <FormField
-                  control={control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel>{t('createProduct.steps.productDetails.name')} *</FormLabel>
-                      <FormControl>
-                        <Input placeholder={t('createProduct.steps.productDetails.namePlaceholder')} {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={control}
-                  name="sku"
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel>{t('createProduct.steps.productDetails.sku')} *</FormLabel>
-                      <FormControl>
-                        <Input placeholder={t('createProduct.steps.productDetails.skuPlaceholder')} {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="flex gap-4 w-full">
-                <div className="w-full">
-                  {errors?.name?.message ? <FormMessage>{errors?.name?.message}</FormMessage> : null}
-                </div>
-                <div className="w-full">
-                  {errors?.sku?.message ? <FormMessage>{errors?.sku?.message}</FormMessage> : null}
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-1">
-              <div className="flex gap-4">
                 <FormField
                   name="categoryId"
                   control={control}
-                  render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  render={({ field: { onChange, value } }) => (
                     <div className="flex flex-col gap-2 w-full">
                       <FormLabel>{t('createProduct.steps.productDetails.category')} *</FormLabel>
                       <Select
@@ -203,7 +181,56 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
                           ))}
                         </SelectContent>
                       </Select>
-                      {error?.message ? <FormMessage>{error?.message}</FormMessage> : null}
+                    </div>
+                  )}
+                />
+                <FormField
+                  control={control}
+                  name="sku"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>{t('createProduct.steps.productDetails.sku')} *</FormLabel>
+                      <FormControl>
+                        <Input placeholder={t('createProduct.steps.productDetails.skuPlaceholder')} {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="flex gap-4 w-full">
+                <div className="w-full">
+                  {errors?.categoryId?.message ? <FormMessage>{errors?.categoryId?.message}</FormMessage> : null}
+                </div>
+                <div className="w-full">
+                  {errors?.sku?.message ? <FormMessage>{errors?.sku?.message}</FormMessage> : null}
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col gap-1">
+              <div className="flex gap-4">
+                <FormField
+                  name="status"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <div className="flex flex-col gap-2 w-full">
+                      <FormLabel>{t('createProduct.steps.productDetails.status')} *</FormLabel>
+                      <Select
+                        value={value?.toString() || ''}
+                        defaultValue={value?.toString() || ''}
+                        onValueChange={e => {
+                          onChange(e);
+                        }}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder={t('createProduct.steps.productDetails.statusPlaceholder')} />
+                        </SelectTrigger>
+                        <SelectContent side="bottom">
+                          {Object.values(ProductStatus).map(status => (
+                            <SelectItem key={status} value={status}>
+                              {t(productStatusTranslations[status])}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   )}
                 />
@@ -223,7 +250,7 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
               </div>
               <div className="flex gap-4 w-full">
                 <div className="w-full">
-                  {errors?.categoryId?.message ? <FormMessage>{errors?.categoryId?.message}</FormMessage> : null}
+                  {errors?.status?.message ? <FormMessage>{errors?.status?.message}</FormMessage> : null}
                 </div>
                 <div className="w-full">
                   {errors?.brand?.message ? <FormMessage>{errors?.brand?.message}</FormMessage> : null}
@@ -259,10 +286,10 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
               </div>
               <div className="flex gap-4 w-full">
                 <div className="w-full">
-                  {errors?.name?.message ? <FormMessage>{errors?.name?.message}</FormMessage> : null}
+                  {errors?.purchasePrice?.message ? <FormMessage>{errors?.purchasePrice?.message}</FormMessage> : null}
                 </div>
                 <div className="w-full">
-                  {errors?.sku?.message ? <FormMessage>{errors?.sku?.message}</FormMessage> : null}
+                  {errors?.purchaseDate?.message ? <FormMessage>{errors?.purchaseDate?.message}</FormMessage> : null}
                 </div>
               </div>
             </div>
@@ -298,10 +325,10 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
               </div>
               <div className="flex gap-4 w-full">
                 <div className="w-full">
-                  {errors?.name?.message ? <FormMessage>{errors?.name?.message}</FormMessage> : null}
+                  {errors?.purchaseDate?.message ? <FormMessage>{errors?.purchaseDate?.message}</FormMessage> : null}
                 </div>
                 <div className="w-full">
-                  {errors?.sku?.message ? <FormMessage>{errors?.sku?.message}</FormMessage> : null}
+                  {errors?.purchasePrice?.message ? <FormMessage>{errors?.purchasePrice?.message}</FormMessage> : null}
                 </div>
               </div>
             </div>

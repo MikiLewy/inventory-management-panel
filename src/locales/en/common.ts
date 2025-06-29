@@ -19,6 +19,7 @@ export default {
     edit: 'Edit',
     yesRemove: 'Yes, remove',
     submit: 'Submit',
+    search: 'Search',
   },
   clearFilters: 'Clear filters',
   sort: {
@@ -41,4 +42,10 @@ export default {
   noDataAvailable: 'No data available',
   step: 'Step {step}',
   openMenu: 'Open menu',
+  bulkActionsBubble: {
+    selectAll: 'Select all ({count})',
+    previousSelection: 'Previous selection',
+    allSelected: 'All selected',
+    selected: '{count} selected',
+  },
 } as const;

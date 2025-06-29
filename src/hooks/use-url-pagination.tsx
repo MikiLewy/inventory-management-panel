@@ -22,6 +22,7 @@ export const useUrlPagination = (initialOffset: number = 0, initialLimit: number
 
   return {
     offset: calculatePaginationOffset(pageIndex, pageSize),
+    pageIndex,
     limit: pageSize,
     onPaginationChange: setPagination,
   };

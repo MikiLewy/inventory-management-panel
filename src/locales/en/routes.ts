@@ -1,4 +1,4 @@
 export default {
   inventory: 'Inventory',
-  sales: 'Sales',
+  sales: 'Sales ',
 } as const;

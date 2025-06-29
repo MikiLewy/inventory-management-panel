@@ -1,6 +1,7 @@
 export default {
   title: 'Magazyn',
   add: 'Dodaj przedmiot',
+  markAsSold: 'Oznacz jako sprzedane',
   table: {
     name: 'Nazwa',
     size: 'Rozmiar',
@@ -29,8 +30,22 @@ export default {
   dialog: {
     remove: {
       title: 'Usuń produkt',
-      description: 'Czy na pewno chcesz usunąć ten produkt?',
-      success: 'Produkt został pomyślnie usunięty',
+      titleMultiple: 'Usuń produkty',
+      description: 'Czy na pewno chcesz usunąć produkt {productName}?',
+      descriptionMultiple: 'Czy na pewno chcesz usunąć wybrane produkty?',
+      confirmButton: 'Tak, usuń',
+      'success#one': 'Produkt został pomyślnie usunięty',
+      'success#other': 'Produkty zostały pomyślnie usunięte',
+    },
+    markAsSold: {
+      title: 'Mark products as sold',
+      description: 'Fill out the form to mark the products as sold',
+      soldDate: 'Sold date',
+      soldPrice: 'Sold price',
+      soldPlace: 'Sold place',
+      'success#zero': 'Products marked as sold successfully',
+      'success#one': 'Product marked as sold successfully',
+      'success#other': 'Products marked as sold successfully',
     },
   },
 } as const;

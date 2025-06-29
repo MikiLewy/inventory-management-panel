@@ -12,11 +12,11 @@ interface Props {
 
 const Dashboard = ({ children }: Props) => {
   return (
-    <SidebarProvider className="w-full">
+    <SidebarProvider className="flex w-full h-full">
       <Sidebar variant="inset" />
       <SidebarInset>
         <Navbar />
-        <div className="">{children}</div>
+        <div className="w-full overflow-x-auto">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

@@ -5,7 +5,9 @@ import { ReactNode } from 'react';
 import { FormatDate } from '@/components/atoms/format-date';
 import { TableColumnHeader } from '@/components/organisms/table/table-column-header';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { dateFormats } from '@/constants/date-formats';
+import { useFormatPrice } from '@/hooks/use-format-price';
 import { useCurrentLocale, useI18n } from '@/locales/client';
 import { CategoryEnum } from '@/shared/api/types/enum/category';
 import { Language } from '@/types/enum/language';
@@ -17,14 +19,38 @@ import { productStatusTranslations } from '../constants/product-status';
 
 export interface InventoryActionSlotPayload {
   id: number;
+  name: string;
 }
 
 export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionSlotPayload) => ReactNode) => {
   const t = useI18n();
 
+  const { formatPrice } = useFormatPrice();
+
   const currentLocale = useCurrentLocale();
 
   const columns: ColumnDef<Product>[] = [
+    {
+      id: 'select',
+      header: ({ table }) => (
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
+          onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+          className="cursor-pointer"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={value => row.toggleSelected(!!value)}
+          aria-label="Select row"
+          className="cursor-pointer"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
     {
       accessorKey: 'name',
       meta: t('inventory.table.name'),
@@ -142,7 +168,7 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
       cell: ({ row }) => {
         const purchasePrice = row.original.purchasePrice;
 
-        return <p>{purchasePrice || '-'}</p>;
+        return <p>{formatPrice(purchasePrice) || '-'}</p>;
       },
     },
     {
@@ -223,6 +249,7 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
 
         return actionsSlot({
           id: product.id,
+          name: product.name,
         });
       },
     },

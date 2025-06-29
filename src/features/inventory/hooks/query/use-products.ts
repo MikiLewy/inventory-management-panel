@@ -10,15 +10,18 @@ export const useProducts = ({
   query,
   sortBy,
   sortDirection,
+  enabled,
 }: {
   offset: number;
   limit: number;
-  query: string;
-  sortBy: string;
-  sortDirection: SortDirection;
+  query?: string;
+  sortBy?: string;
+  sortDirection?: SortDirection;
+  enabled?: boolean;
 }) => {
   return useQuery({
     queryKey: productsKeys.list({ offset, limit, query, sortBy, sortDirection }),
     queryFn: () => fetchProducts(offset, limit, query, sortBy, sortDirection),
+    enabled,
   });
 };

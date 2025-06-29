@@ -11,6 +11,8 @@ export default {
       skuPlaceholder: 'SKU produktu',
       category: 'Kategoria',
       categoryPlaceholder: 'Wybierz kategorię',
+      status: 'Status',
+      statusPlaceholder: 'Wybierz status',
       brand: 'Marka',
       brandPlaceholder: 'Marka produktu',
     },

@@ -1,29 +1,34 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { RowSelectionState } from '@tanstack/react-table';
+import { Tag, Trash } from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
 
 import ActionsTableMenu, { Action } from '@/components/atoms/actions-table-menu';
+import BulkActionsBubble from '@/components/atoms/bulk-actions-bubble';
+import { DataTable } from '@/components/organisms/data-table/data-table';
 import { useProducts } from '@/features/inventory/hooks/query/use-products';
 import {
   InventoryActionSlotPayload,
   useInventoryTableColumns,
 } from '@/features/inventory/hooks/use-inventory-table-columns';
 import { useDialog } from '@/hooks/use-dialog';
+import { useSelection } from '@/hooks/use-selection';
 import { useUrlPagination } from '@/hooks/use-url-pagination';
 import { useUrlQuery } from '@/hooks/use-url-query';
 import { useUrlSort } from '@/hooks/use-url-sort';
 import { useI18n } from '@/locales/client';
 
+import MarkProductsAsSoldDialog from '../../organisms/dialogs/mark-products-as-sold/mark-products-as-sold';
 import RemoveProductDialog from '../../organisms/dialogs/remove-product-dialog';
 import { EditProductSheet } from '../../organisms/edit-product-sheet/edit-product-sheet';
-import { InventoryTable } from '../../organisms/inventory-table';
 
 const ClientInventory = () => {
   const t = useI18n();
 
   const { query, handleChangeQuery } = useUrlQuery();
 
-  const { offset, limit, onPaginationChange } = useUrlPagination();
+  const { offset, limit, pageIndex, onPaginationChange } = useUrlPagination();
 
   const { sortBy, sortDirection, onSortChange } = useUrlSort('updated_at', 'desc');
 
@@ -34,6 +39,8 @@ const ClientInventory = () => {
   const [isOpenRemoveProductDialog, handleOpenRemoveProductDialog, handleCloseRemoveProductDialog] = useDialog();
 
   const [isOpenEditProductSheet, handleOpenEditProductSheet, handleCloseEditProductSheet] = useDialog();
+
+  const { selectedRows, setSelectedRows, handleClearSelected } = useSelection();
 
   const onQueryChange = useCallback(
     (query: string) => {
@@ -66,16 +73,33 @@ const ClientInventory = () => {
     return <ActionsTableMenu actions={actions} />;
   }, []);
 
+  const [isOpenMarkAsSoldDialog, handleOpenMarkAsSoldDialog, handleCloseMarkAsSoldDialog] = useDialog();
+
+  const onCancelMarkAsSoldDialog = () => {
+    handleCloseMarkAsSoldDialog();
+    handleClearSelected();
+  };
+
+  const onCancelRemoveProductDialog = () => {
+    handleCloseRemoveProductDialog();
+    handleClearSelected();
+  };
+
   const columns = useInventoryTableColumns(actionsSlot);
+
+  const isAllItemsFromCurrentPageSelected = useMemo(() => {
+    return productsData?.resources.every(product => selectedRows[product.id?.toString()]) ?? false;
+  }, [selectedRows, productsData]);
 
   return (
     <div>
-      <InventoryTable
+      <DataTable
         columns={columns}
+        view="inventory"
         data={productsData?.resources ?? []}
         search={{ query, handleChangeQuery: onQueryChange }}
         pagination={{
-          pageIndex: offset,
+          pageIndex,
           pageSize: limit,
           totalItems: productsData?.total ?? 0,
           onPaginationChange,
@@ -85,16 +109,57 @@ const ClientInventory = () => {
           sortDirection,
           onSortChange,
         }}
+        selectable={{
+          rowSelection: selectedRows,
+          setRowSelection: setSelectedRows,
+        }}
+      />
+      <BulkActionsBubble
+        isOpen={Object.keys(selectedRows).length > 0}
+        onClose={handleClearSelected}
+        onSelectAll={() =>
+          setSelectedRows(prev => ({
+            ...prev,
+            ...(productsData?.resources.reduce((acc, product) => {
+              acc[product.id?.toString()] = true;
+              return acc;
+            }, {} as RowSelectionState) || {}),
+          }))
+        }
+        isAllItemsSelected={isAllItemsFromCurrentPageSelected}
+        allItemsCount={productsData?.resources.length ?? 0}
+        actions={[
+          {
+            key: 'mark-as-sold',
+            icon: <Tag />,
+            label: t('inventory.markAsSold'),
+            onClick: handleOpenMarkAsSoldDialog,
+          },
+          {
+            key: 'remove',
+            icon: <Trash />,
+            destructive: true,
+            label: t('common.button.remove'),
+            onClick: handleOpenRemoveProductDialog,
+          },
+        ]}
+        selectedItemsCount={Object.keys(selectedRows).length}
       />
       <RemoveProductDialog
         open={isOpenRemoveProductDialog}
-        onClose={handleCloseRemoveProductDialog}
-        selectedProductId={selectedProduct?.id || 0}
+        onClose={onCancelRemoveProductDialog}
+        selectedProductIds={selectedProduct ? [selectedProduct.id] : Object.keys(selectedRows).map(key => Number(key))}
+        selectedProductName={selectedProduct?.name}
       />
       <EditProductSheet
         open={isOpenEditProductSheet}
         onClose={handleCloseEditProductSheet}
         selectedProductId={selectedProduct?.id || 0}
+      />
+      <MarkProductsAsSoldDialog
+        open={isOpenMarkAsSoldDialog}
+        onClose={onCancelMarkAsSoldDialog}
+        selectedProductsIds={Object.keys(selectedRows)}
       />
     </div>
   );

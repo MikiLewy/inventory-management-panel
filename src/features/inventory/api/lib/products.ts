@@ -4,15 +4,16 @@ import api from '@/api/clients/api';
 import { PaginatedResponse } from '@/types/interfaces/paginated-response';
 
 import { CreateProductPayload } from '../../types/payload/create-product';
+import { MarkProductsAsSoldPayload } from '../../types/payload/mark-products-as-sold';
 import { UpdateProductPayload } from '../../types/payload/update-product';
 import { Product } from '../types/products';
 
 export const fetchProducts = async (
   offset: number,
   limit: number,
-  query: string,
-  sortBy: string,
-  sortDirection: SortDirection,
+  query?: string,
+  sortBy?: string,
+  sortDirection?: SortDirection,
 ): Promise<PaginatedResponse<Product>> => {
   const { data } = await api.get('/products', {
     params: {
@@ -34,19 +35,23 @@ export const fetchProduct = async (id: number): Promise<Product> => {
 };
 
 export const createProduct = async (product: CreateProductPayload) => {
-  const { data } = await api.post('/products', product);
-
-  return data;
+  await api.post('/products', product);
 };
 
 export const updateProduct = async (id: number, product: UpdateProductPayload) => {
-  const { data } = await api.patch(`/products/${id}`, product);
-
-  return data;
+  await api.patch(`/products/${id}`, product);
 };
 
-export const removeProduct = async (id: number) => {
-  const { data } = await api.delete(`/products/${id}`);
+export const removeProducts = async (productsIds: number[]) => {
+  await api.delete(`/products`, {
+    data: {
+      productsIds,
+    },
+  });
+};
 
-  return data;
+export const markAsSold = async (products: MarkProductsAsSoldPayload[]) => {
+  await api.post(`/products/mark-as-sold`, {
+    products,
+  });
 };

@@ -9,6 +9,8 @@ import {
   getFacetedUniqueValues,
   getFilteredRowModel,
   getSortedRowModel,
+  OnChangeFn,
+  RowSelectionState,
   SortDirection,
   useReactTable,
   VisibilityState,
@@ -22,6 +24,7 @@ import { Table } from '@/components/organisms/table/table';
 import { TablePagination } from '@/components/organisms/table/table-pagination';
 import { TableViewOptions } from '@/components/organisms/table/table-view-options';
 import { Button } from '@/components/ui/button';
+import { useViewSettings, View } from '@/store/views-settings';
 
 type Pagination = {
   pageIndex: number;
@@ -56,24 +59,33 @@ type Sortable = {
   ) => Promise<URLSearchParams>;
 };
 
+type Selectable = {
+  rowSelection: RowSelectionState;
+  setRowSelection: OnChangeFn<RowSelectionState>;
+};
+
 interface TableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   pagination?: Pagination;
   search?: Search;
   sortable?: Sortable;
+  selectable?: Selectable;
+  view: View;
 }
 
-export function InventoryTable<TData, TValue>({
+export function DataTable<TData extends { id: number | string }, TValue>({
   columns,
   data,
   pagination,
   search,
   sortable,
+  selectable,
+  view,
 }: TableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const { viewsSettings, setHiddenColumn } = useViewSettings();
 
   const table = useReactTable({
     data,
@@ -88,17 +100,29 @@ export function InventoryTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
+    onColumnVisibilityChange: visibility => {
+      setHiddenColumn(
+        view,
+        // @ts-expect-error visibility is callable function but typescript does not know that
+        Object.keys(visibility())?.[0] || '',
+      );
+    },
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    onRowSelectionChange: selectable?.setRowSelection,
+    getRowId: row => row.id.toString(),
     state: {
       sorting: sortable ? [{ id: sortable.sortBy, desc: sortable.sortDirection === 'desc' }] : [],
       columnFilters,
-      columnVisibility,
+      columnVisibility: viewsSettings[view].hiddenColumns.reduce((acc, column) => {
+        acc[column] = false;
+        return acc;
+      }, {} as VisibilityState),
       pagination: {
         pageIndex: pagination?.pageIndex ?? 0,
         pageSize: pagination?.pageSize ?? 10,
       },
+      rowSelection: selectable?.rowSelection,
     },
   });
 
