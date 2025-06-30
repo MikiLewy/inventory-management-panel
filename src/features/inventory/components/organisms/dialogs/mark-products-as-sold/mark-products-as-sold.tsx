@@ -18,7 +18,7 @@ import Dialog, { DialogActions } from '@components/organisms/dialog';
 import { useMarkAsSoldSchema } from './schema/mark-products-as-sold';
 
 interface Props extends DialogActions {
-  selectedProductsIds: string[];
+  selectedProductsIds: number[];
 }
 
 interface FormValues {
@@ -63,7 +63,7 @@ const MarkProductsAsSoldDialog = ({ open, onClose, selectedProductsIds }: Props)
   const { data: productsData } = useProducts({ limit: productData?.total || 10, offset: 0, enabled: open });
 
   const productToMarkAsSold = useMemo(() => {
-    return productsData?.resources.filter(product => selectedProductsIds.includes(product.id.toString()));
+    return productsData?.resources.filter(product => selectedProductsIds.includes(product.id));
   }, [productsData, selectedProductsIds]);
 
   const { fields, remove } = useFieldArray({
@@ -100,14 +100,18 @@ const MarkProductsAsSoldDialog = ({ open, onClose, selectedProductsIds }: Props)
     }
   }, [open, selectedProductsIds]);
 
+  const isMultiple = selectedProductsIds.length > 1;
+
   return (
     <Dialog
-      title={t('inventory.dialog.markAsSold.title')}
+      title={isMultiple ? t('inventory.dialog.markAsSold.titleMultiple') : t('inventory.dialog.markAsSold.title')}
       open={open}
       onClose={onClose}
       onSubmit={handleSubmit(onSubmit)}
       isSubmitButtonLoading={isPending}
-      description={t('inventory.dialog.markAsSold.description')}
+      description={
+        isMultiple ? t('inventory.dialog.markAsSold.descriptionMultiple') : t('inventory.dialog.markAsSold.description')
+      }
       isSubmitButtonDisabled={!isValid || !isDirty}
       confirmButtonText={t('common.button.submit')}
       scrollable>
@@ -150,9 +154,12 @@ const MarkProductsAsSoldDialog = ({ open, onClose, selectedProductsIds }: Props)
                   name={`products.${index}.soldDate`}
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>{t('inventory.dialog.markAsSold.soldDate')}</FormLabel>
                       <FormControl>
-                        <DatePicker value={new Date(field.value || new Date())} onChange={field.onChange} />
+                        <DatePicker
+                          label={t('inventory.dialog.markAsSold.soldDate')}
+                          value={new Date(field.value || new Date())}
+                          onChange={field.onChange}
+                        />
                       </FormControl>
                     </FormItem>
                   )}

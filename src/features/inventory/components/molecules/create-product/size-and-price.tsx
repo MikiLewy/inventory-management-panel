@@ -205,7 +205,11 @@ const SizeAndPrice = ({ send, onClose }: Props) => {
                   <FormItem className="w-full">
                     <FormLabel>{t('createProduct.steps.sizeAndPrice.price')} *</FormLabel>
                     <FormControl>
-                      <Input placeholder={t('createProduct.steps.sizeAndPrice.pricePlaceholder')} {...field} />
+                      <Input
+                        type="number"
+                        placeholder={t('createProduct.steps.sizeAndPrice.pricePlaceholder')}
+                        {...field}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -242,14 +246,19 @@ const SizeAndPrice = ({ send, onClose }: Props) => {
               <FormField
                 control={control}
                 name={`products.${index}.purchaseDate`}
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>{t('createProduct.steps.sizeAndPrice.purchaseDate')}</FormLabel>
-                    <FormControl>
-                      <DatePicker value={new Date(field.value || new Date())} onChange={field.onChange} />
-                    </FormControl>
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  return (
+                    <FormItem className="w-full">
+                      <FormControl>
+                        <DatePicker
+                          label={t('createProduct.steps.sizeAndPrice.purchaseDate')}
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  );
+                }}
               />
               <Button size="default" variant="ghost" onClick={() => remove(index)}>
                 <Trash className="w-4 h-4" />

@@ -36,6 +36,7 @@ export default {
   goToLastPage: 'Przejdź do ostatniej strony',
   selectedOfRows: '{count} z {total} wierszy wybranych',
   toggleColumns: 'Przełącz kolumny',
+  selectDate: 'Wybierz datę',
   view: 'Widok',
   noResultsFound: 'Brak wyników',
   selected: '{count} wybranych',

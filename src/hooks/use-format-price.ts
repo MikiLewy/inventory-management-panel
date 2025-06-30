@@ -10,10 +10,10 @@ export const useFormatPrice = (): ReturnType => {
     const formatter = new Intl.NumberFormat(language, {
       style: 'currency',
       currency,
-      maximumFractionDigits: 0,
+      maximumFractionDigits: 2,
     });
 
-    return formatter.format(amount);
+    return formatter.format(amount).replace(/\D00(?=\D*$)/, '');
   };
 
   return { formatPrice };

@@ -110,7 +110,7 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
       accessorKey: 'category',
       meta: t('inventory.table.category'),
       enableSorting: false,
-      enableHiding: false,
+      enableHiding: true,
       filterFn: (rows, columnId, filterValue) => {
         const category = rows.getValue(columnId) as { id: string; name: string; type: CategoryEnum };
 

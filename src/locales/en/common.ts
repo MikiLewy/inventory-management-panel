@@ -42,6 +42,7 @@ export default {
   noDataAvailable: 'No data available',
   step: 'Step {step}',
   openMenu: 'Open menu',
+  selectDate: 'Select date',
   bulkActionsBubble: {
     selectAll: 'Select all ({count})',
     previousSelection: 'Previous selection',

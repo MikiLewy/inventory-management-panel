@@ -217,7 +217,7 @@ export const useSalesTableColumns = (actionsSlot: (payload: SalesActionSlotPaylo
       accessorKey: 'category',
       meta: t('sales.table.category'),
       enableSorting: false,
-      enableHiding: false,
+      enableHiding: true,
       filterFn: (rows, columnId, filterValue) => {
         const category = rows.getValue(columnId) as { id: string; name: string; type: CategoryEnum };
 

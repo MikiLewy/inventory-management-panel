@@ -61,6 +61,14 @@ const ClientInventory = () => {
         },
       },
       {
+        key: 'mark-as-sold',
+        label: t('inventory.markAsSold'),
+        onClick: () => {
+          handleOpenMarkAsSoldDialog();
+          setSelectedProduct(payload);
+        },
+      },
+      {
         key: 'remove',
         label: t('common.button.remove'),
         onClick: () => {
@@ -159,7 +167,7 @@ const ClientInventory = () => {
       <MarkProductsAsSoldDialog
         open={isOpenMarkAsSoldDialog}
         onClose={onCancelMarkAsSoldDialog}
-        selectedProductsIds={Object.keys(selectedRows)}
+        selectedProductsIds={selectedProduct ? [selectedProduct.id] : Object.keys(selectedRows).map(key => Number(key))}
       />
     </div>
   );
