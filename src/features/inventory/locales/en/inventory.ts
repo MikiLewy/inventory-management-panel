@@ -38,8 +38,10 @@ export default {
       'success#other': 'Products removed successfully',
     },
     markAsSold: {
-      title: 'Mark products as sold',
-      description: 'Fill out the form to mark the products as sold',
+      title: 'Mark product as sold',
+      titleMultiple: 'Mark products as sold',
+      description: 'Fill out the form to mark the product as sold',
+      descriptionMultiple: 'Fill out the form to mark the selected products as sold',
       soldDate: 'Sold date',
       soldPrice: 'Sold price',
       soldPlace: 'Sold place',

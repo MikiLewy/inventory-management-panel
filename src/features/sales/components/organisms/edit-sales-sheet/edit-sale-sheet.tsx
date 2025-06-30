@@ -262,9 +262,12 @@ export function EditSaleSheet({ open, onClose, selectedSaleId }: Props) {
                     name="purchaseDate"
                     render={({ field }) => (
                       <FormItem className="w-full">
-                        <FormLabel>{t('createSale.purchaseDate')}</FormLabel>
                         <FormControl>
-                          <DatePicker value={new Date(field.value || new Date())} onChange={field.onChange} />
+                          <DatePicker
+                            label={t('createSale.purchaseDate')}
+                            value={new Date(field.value || new Date())}
+                            onChange={field.onChange}
+                          />
                         </FormControl>
                       </FormItem>
                     )}
@@ -341,9 +344,12 @@ export function EditSaleSheet({ open, onClose, selectedSaleId }: Props) {
                     name="soldDate"
                     render={({ field }) => (
                       <FormItem className="w-full">
-                        <FormLabel>{t('createSale.soldDate')}</FormLabel>
                         <FormControl>
-                          <DatePicker value={new Date(field.value || new Date())} onChange={field.onChange} />
+                          <DatePicker
+                            label={t('createSale.soldDate')}
+                            value={new Date(field.value || new Date())}
+                            onChange={field.onChange}
+                          />
                         </FormControl>
                       </FormItem>
                     )}

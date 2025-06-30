@@ -278,7 +278,11 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
                     <FormItem className="w-full">
                       <FormLabel>{t('createProduct.steps.sizeAndPrice.price')} *</FormLabel>
                       <FormControl>
-                        <Input placeholder={t('createProduct.steps.sizeAndPrice.pricePlaceholder')} {...field} />
+                        <Input
+                          type="number"
+                          placeholder={t('createProduct.steps.sizeAndPrice.pricePlaceholder')}
+                          {...field}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -315,9 +319,12 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
                   name="purchaseDate"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>{t('createProduct.steps.sizeAndPrice.purchaseDate')}</FormLabel>
                       <FormControl>
-                        <DatePicker value={new Date(field.value || new Date())} onChange={field.onChange} />
+                        <DatePicker
+                          label={t('createProduct.steps.sizeAndPrice.purchaseDate')}
+                          value={new Date(field.value || new Date())}
+                          onChange={field.onChange}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
