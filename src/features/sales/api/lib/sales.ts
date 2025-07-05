@@ -9,9 +9,9 @@ import { Sale } from '../types/sales';
 export const fetchSales = async (
   offset: number,
   limit: number,
-  query: string,
-  sortBy: string,
-  sortDirection: SortDirection,
+  query?: string,
+  sortBy?: string,
+  sortDirection?: SortDirection,
 ): Promise<PaginatedResponse<Sale>> => {
   const { data } = await api.get('/sales', {
     params: {

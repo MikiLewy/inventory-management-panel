@@ -6,6 +6,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { LoadingButton } from '@/components/atoms/loading-button';
+import { AutocompleteInput } from '@/components/molecules/autocomplete-input';
 import { DatePicker } from '@/components/molecules/date-picker';
 import { FormControl, FormMessage, FormLabel, FormItem } from '@/components/ui/form';
 import { FormField } from '@/components/ui/form';
@@ -15,7 +16,9 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import { useUpdateSale } from '@/features/sales/hooks/mutation/use-update-sale';
 import { useSale } from '@/features/sales/hooks/query/use-sale';
 import { useCurrentLocale, useI18n } from '@/locales/client';
+import { CategoryEnum } from '@/shared/api/types/enum/category';
 import { useCategories } from '@/shared/hooks/query/use-categories';
+import { useProductSuggestions } from '@/shared/hooks/query/use-product-suggestions';
 import { SizeUnit } from '@/types/enum/size-unit';
 
 import { useEditSalesSchema } from './schema/edit-sales-schema';
@@ -93,6 +96,7 @@ export function EditSaleSheet({ open, onClose, selectedSaleId }: Props) {
         form.reset(
           {
             ...saleData,
+            name: saleData.name || '',
             sizeUnit: saleData.sizeUnit as SizeUnit,
             purchaseDate: new Date(saleData.purchaseDate),
             soldDate: new Date(saleData.soldDate),
@@ -127,6 +131,46 @@ export function EditSaleSheet({ open, onClose, selectedSaleId }: Props) {
     );
   };
 
+  const name = form.watch('name');
+
+  const { data: productSuggestions, isLoading } = useProductSuggestions({ search: name, enabled: !!name });
+
+  const onAutocompleteValueSelect = (value: {
+    imageUrl: string;
+    title: string;
+    brand: string;
+    category: string;
+    id: number;
+    sku: string;
+  }) => {
+    const category = categoriesData?.find(category => category.type === (value.category as CategoryEnum));
+    form.setValue('name', value.title, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    form.setValue('sku', value.sku, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    form.setValue('brand', value.brand, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    form.setValue('categoryId', category?.id || 0, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    form.setValue('imageUrl', value.imageUrl, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+  };
+
   return (
     <Sheet
       open={open}
@@ -135,7 +179,7 @@ export function EditSaleSheet({ open, onClose, selectedSaleId }: Props) {
           onClose();
         }
       }}>
-      <SheetContent className="min-w-4xl flex flex-col">
+      <SheetContent onOpenAutoFocus={e => e.preventDefault()} className="min-w-4xl flex flex-col">
         <SheetHeader>
           <SheetTitle>{t('createSale.editTitle')}</SheetTitle>
           <SheetDescription>{t('createSale.editDescription')}</SheetDescription>
@@ -146,15 +190,39 @@ export function EditSaleSheet({ open, onClose, selectedSaleId }: Props) {
               <FormField
                 control={control}
                 name="name"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>{t('createSale.name')} *</FormLabel>
-                    <FormControl>
-                      <Input placeholder={t('createSale.namePlaceholder')} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field, fieldState }) => {
+                  const isInvalid = !field.value && fieldState.isTouched;
+
+                  return (
+                    <FormItem className="w-full mb-3">
+                      <FormControl>
+                        <AutocompleteInput
+                          {...field}
+                          name={field.name}
+                          aria-invalid={isInvalid}
+                          label={t('createSale.name')}
+                          required
+                          placeholder={t('createSale.namePlaceholder')}
+                          onSearchValueChange={field.onChange}
+                          onSelectedValueChange={onAutocompleteValueSelect}
+                          searchValue={field.value}
+                          isLoading={isLoading}
+                          errorMessage={t('validation.required')}
+                          items={
+                            productSuggestions?.resources.map(product => ({
+                              imageUrl: product?.image,
+                              title: product?.title,
+                              brand: product?.brand || '',
+                              category: product?.category as string,
+                              id: product?.id,
+                              sku: product?.sku,
+                            })) ?? []
+                          }
+                        />
+                      </FormControl>
+                    </FormItem>
+                  );
+                }}
               />
               <div className="flex flex-col gap-1">
                 <div className="flex gap-4 w-full">
@@ -322,8 +390,6 @@ export function EditSaleSheet({ open, onClose, selectedSaleId }: Props) {
                   </div>
                 </div>
               </div>
-
-              {/* <Separator className="my-2" /> */}
 
               <div className="flex flex-col gap-1">
                 <div className="flex gap-4 w-full">

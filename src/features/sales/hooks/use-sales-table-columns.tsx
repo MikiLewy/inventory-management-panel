@@ -56,19 +56,20 @@ export const useSalesTableColumns = (actionsSlot: (payload: SalesActionSlotPaylo
       header: ({ column }) => {
         return <TableColumnHeader column={column} title={t('sales.table.name')} />;
       },
-      cell: ({ getValue, row }) => {
+      cell: ({ row }) => {
+        const name = row.original.name;
         const imageUrl = row.original.imageUrl;
 
         return (
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 overflow-hidden">
             <Image
               src={imageUrl}
-              alt={''}
-              width={200}
-              height={200}
-              className="rounded-md object-cover min-w-10 min-h-10 max-w-10 max-h-10"
+              alt={name}
+              height={120}
+              width={120}
+              className="rounded-md border object-contain object-center bg-white min-w-[45px] min-h-[45px] max-w-[45px] max-h-[45px]"
             />
-            <p>{(getValue() as string) || '-'}</p>
+            <p>{name || '-'}</p>
           </div>
         );
       },

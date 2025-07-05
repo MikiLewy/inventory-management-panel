@@ -29,7 +29,7 @@ const ClientInventory = () => {
 
   const { sortBy, sortDirection, onSortChange } = useUrlSort('updated_at', 'desc');
 
-  const { data: salesData } = useSales({ offset, limit, query, sortBy, sortDirection });
+  const { data: salesData, isLoading } = useSales({ offset, limit, query, sortBy, sortDirection });
 
   const [selectedSale, setSelectedSale] = useState<SalesActionSlotPayload | null>(null);
 
@@ -105,6 +105,7 @@ const ClientInventory = () => {
         data={salesData?.resources ?? []}
         search={{ query, handleChangeQuery: onQueryChange }}
         view="sales"
+        isLoading={isLoading}
         pagination={{
           pageIndex,
           pageSize: limit,
