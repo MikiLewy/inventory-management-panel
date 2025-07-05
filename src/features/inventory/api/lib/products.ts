@@ -55,3 +55,7 @@ export const markAsSold = async (products: MarkProductsAsSoldPayload[]) => {
     products,
   });
 };
+
+export const duplicateProduct = async (productId: number) => {
+  await api.post(`/products/${productId}/duplicate`);
+};

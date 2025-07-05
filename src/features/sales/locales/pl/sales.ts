@@ -41,5 +41,9 @@ export default {
       'success#one': 'Sprzedaż została pomyślnie usunięta',
       'success#other': 'Sprzedaże zostały pomyślnie usunięte',
     },
+    duplicateSale: {
+      title: 'Duplikuj sprzedaż',
+      success: 'Sprzedaż została pomyślnie skopiowana',
+    },
   },
 } as const;

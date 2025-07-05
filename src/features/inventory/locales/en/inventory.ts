@@ -49,5 +49,9 @@ export default {
       'success#one': 'Product marked as sold successfully',
       'success#other': 'Products marked as sold successfully',
     },
+    duplicateProduct: {
+      title: 'Duplicate product',
+      success: 'Product duplicated successfully',
+    },
   },
 } as const;

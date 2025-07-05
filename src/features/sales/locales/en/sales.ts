@@ -41,5 +41,9 @@ export default {
       'success#one': 'Sale removed successfully',
       'success#other': 'Sales removed successfully',
     },
+    duplicateSale: {
+      title: 'Duplicate sale',
+      success: 'Sale duplicated successfully',
+    },
   },
 } as const;
