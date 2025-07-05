@@ -51,3 +51,7 @@ export const removeSales = async (salesIds: number[]) => {
 export const revertSales = async (saleIds: number[]) => {
   await api.post(`/sales/revert-sales`, { saleIds });
 };
+
+export const duplicateSale = async (saleId: number) => {
+  await api.post(`/sales/${saleId}/duplicate`);
+};

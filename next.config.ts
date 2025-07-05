@@ -14,6 +14,22 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'cdn.shopify.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'noiseplug.pl',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.myshoptet.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.stockx.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'aplug.pl',
+      },
     ],
   },
 };

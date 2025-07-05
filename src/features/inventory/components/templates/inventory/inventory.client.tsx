@@ -7,6 +7,7 @@ import { useCallback, useMemo, useState } from 'react';
 import ActionsTableMenu, { Action } from '@/components/atoms/actions-table-menu';
 import BulkActionsBubble from '@/components/atoms/bulk-actions-bubble';
 import { DataTable } from '@/components/organisms/data-table/data-table';
+import { useDuplicateProduct } from '@/features/inventory/hooks/mutation/use-duplicate-product';
 import { useProducts } from '@/features/inventory/hooks/query/use-products';
 import {
   InventoryActionSlotPayload,
@@ -50,6 +51,8 @@ const ClientInventory = () => {
     [handleChangeQuery],
   );
 
+  const { mutate: duplicateProduct } = useDuplicateProduct();
+
   const actionsSlot = useCallback((payload: InventoryActionSlotPayload) => {
     const actions: Action[] = [
       {
@@ -58,6 +61,13 @@ const ClientInventory = () => {
         onClick: () => {
           handleOpenEditProductSheet();
           setSelectedProduct(payload);
+        },
+      },
+      {
+        key: 'duplicate',
+        label: t('inventory.dialog.duplicateProduct.title'),
+        onClick: () => {
+          duplicateProduct(payload.id);
         },
       },
       {

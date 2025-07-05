@@ -7,6 +7,7 @@ import { useCallback, useMemo, useState } from 'react';
 import ActionsTableMenu, { Action } from '@/components/atoms/actions-table-menu';
 import BulkActionsBubble from '@/components/atoms/bulk-actions-bubble';
 import { DataTable } from '@/components/organisms/data-table/data-table';
+import { useDuplicateSale } from '@/features/sales/hooks/mutation/use-duplicate-sale';
 import { useSales } from '@/features/sales/hooks/query/use-sales';
 import { SalesActionSlotPayload, useSalesTableColumns } from '@/features/sales/hooks/use-sales-table-columns';
 import { useDialog } from '@/hooks/use-dialog';
@@ -61,6 +62,8 @@ const ClientInventory = () => {
     [handleChangeQuery],
   );
 
+  const { mutate: duplicateSale } = useDuplicateSale();
+
   const actionsSlot = useCallback((payload: SalesActionSlotPayload) => {
     const actions: Action[] = [
       {
@@ -69,6 +72,13 @@ const ClientInventory = () => {
         onClick: () => {
           handleOpenEditSaleSheet();
           setSelectedSale(payload);
+        },
+      },
+      {
+        key: 'duplicate',
+        label: t('sales.dialog.duplicateSale.title'),
+        onClick: () => {
+          duplicateSale(payload.id);
         },
       },
       {

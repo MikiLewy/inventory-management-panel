@@ -49,5 +49,9 @@ export default {
       'success#one': 'Produkt został pomyślnie oznaczony jako sprzedany',
       'success#other': 'Produkty zostały pomyślnie oznaczone jako sprzedane',
     },
+    duplicateProduct: {
+      title: 'Duplikuj produkt',
+      success: 'Produkt został pomyślnie skopiowany',
+    },
   },
 } as const;
