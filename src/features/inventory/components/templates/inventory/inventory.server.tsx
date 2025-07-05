@@ -1,6 +1,8 @@
 import Page from '@/components/organisms/page/page';
+import { prefetchProducts } from '@/features/inventory/api/lib/products.prefetch';
 import { getI18n } from '@/locales/server';
 import HydrationBoundaryProvider from '@/providers/hydration-boundary-provider';
+import { prefetchCategories } from '@/shared/api/lib/categories.prefetch';
 
 import InventoryPageHeaderActions from '../../organisms/inventory-page-header-actions';
 
@@ -15,7 +17,7 @@ const ServerInventory = async () => {
         <InventoryPageHeaderActions />
       </Page.Header>
       <Page.ContentContainer>
-        <HydrationBoundaryProvider prefetchDataFunctions={[]}>
+        <HydrationBoundaryProvider prefetchDataFunctions={[prefetchCategories, prefetchProducts]}>
           <ClientInventory />
         </HydrationBoundaryProvider>
       </Page.ContentContainer>

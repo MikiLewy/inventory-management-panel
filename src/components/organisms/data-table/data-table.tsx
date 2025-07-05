@@ -18,7 +18,6 @@ import {
 import { Options, ParserBuilder, SetValues } from 'nuqs';
 import { useState } from 'react';
 
-import ClientOnly from '@/components/molecules/client-only';
 import SearchBar from '@/components/molecules/search-bar';
 import { Table } from '@/components/organisms/table/table';
 import { TablePagination } from '@/components/organisms/table/table-pagination';
@@ -67,6 +66,7 @@ type Selectable = {
 interface TableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  isLoading: boolean;
   pagination?: Pagination;
   search?: Search;
   sortable?: Sortable;
@@ -82,6 +82,7 @@ export function DataTable<TData extends { id: number | string }, TValue>({
   sortable,
   selectable,
   view,
+  isLoading,
 }: TableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
@@ -142,10 +143,8 @@ export function DataTable<TData extends { id: number | string }, TValue>({
         </div>
         <TableViewOptions table={table} />
       </div>
-      <ClientOnly>
-        <Table columnsLength={columns.length} table={table} />
-        {pagination ? <TablePagination table={table} /> : null}
-      </ClientOnly>
+      <Table isLoading={isLoading} columnsLength={columns.length} table={table} />
+      {pagination ? <TablePagination table={table} /> : null}
     </div>
   );
 }

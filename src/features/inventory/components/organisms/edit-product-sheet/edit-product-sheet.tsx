@@ -6,7 +6,9 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { LoadingButton } from '@/components/atoms/loading-button';
+import { AutocompleteInput } from '@/components/molecules/autocomplete-input';
 import { DatePicker } from '@/components/molecules/date-picker';
+import { Badge } from '@/components/ui/badge';
 import { FormControl, FormMessage, FormLabel, FormItem } from '@/components/ui/form';
 import { FormField } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -17,7 +19,9 @@ import { productStatusTranslations } from '@/features/inventory/constants/produc
 import { useEditProduct } from '@/features/inventory/hooks/mutation/use-update-product';
 import { useProduct } from '@/features/inventory/hooks/query/use-product';
 import { useCurrentLocale, useI18n } from '@/locales/client';
+import { CategoryEnum } from '@/shared/api/types/enum/category';
 import { useCategories } from '@/shared/hooks/query/use-categories';
+import { useProductSuggestions } from '@/shared/hooks/query/use-product-suggestions';
 import { SizeUnit } from '@/types/enum/size-unit';
 
 import { useEditProductSchema } from './schema/edit-product-schema';
@@ -91,6 +95,7 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
         form.reset(
           {
             ...productData,
+            name: productData.name || '',
             brand: productData.brand || '',
             sizeUnit: productData.sizeUnit as SizeUnit,
             size: productData.size,
@@ -129,6 +134,46 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
     );
   };
 
+  const name = form.watch('name');
+
+  const { data: productSuggestions, isLoading } = useProductSuggestions({ search: name, enabled: !!name });
+
+  const onAutocompleteValueSelect = (value: {
+    imageUrl: string;
+    title: string;
+    brand: string;
+    category: string;
+    id: number;
+    sku: string;
+  }) => {
+    const category = categoriesData?.find(category => category.type === (value.category as CategoryEnum));
+    form.setValue('name', value.title, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    form.setValue('sku', value.sku, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    form.setValue('brand', value.brand, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    form.setValue('categoryId', category?.id || 0, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    form.setValue('imageUrl', value.imageUrl, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+  };
+
   return (
     <Sheet
       open={open}
@@ -137,7 +182,7 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
           onClose();
         }
       }}>
-      <SheetContent className="min-w-4xl flex flex-col">
+      <SheetContent onOpenAutoFocus={e => e.preventDefault()} className="min-w-4xl flex flex-col">
         <SheetHeader>
           <SheetTitle>{selectedProductId ? t('createProduct.editTitle') : t('createProduct.title')}</SheetTitle>
           <SheetDescription>{t('createProduct.editDescription')}</SheetDescription>
@@ -148,14 +193,39 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
               <FormField
                 control={control}
                 name="name"
-                render={({ field }) => (
-                  <FormItem className="w-full mb-3">
-                    <FormLabel>{t('createProduct.steps.productDetails.name')} *</FormLabel>
-                    <FormControl>
-                      <Input placeholder={t('createProduct.steps.productDetails.namePlaceholder')} {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
+                render={({ field, fieldState }) => {
+                  const isInvalid = !field.value && fieldState.isTouched;
+
+                  return (
+                    <FormItem className="w-full mb-3">
+                      <FormControl>
+                        <AutocompleteInput
+                          {...field}
+                          name={field.name}
+                          aria-invalid={isInvalid}
+                          label={t('createProduct.steps.productDetails.name')}
+                          required
+                          placeholder={t('createProduct.steps.productDetails.namePlaceholder')}
+                          onSearchValueChange={field.onChange}
+                          onSelectedValueChange={onAutocompleteValueSelect}
+                          searchValue={field.value}
+                          isLoading={isLoading}
+                          errorMessage={t('validation.required')}
+                          items={
+                            productSuggestions?.resources.map(product => ({
+                              imageUrl: product?.image,
+                              title: product?.title,
+                              brand: product?.brand || '',
+                              category: product?.category as string,
+                              id: product?.id,
+                              sku: product?.sku,
+                            })) ?? []
+                          }
+                        />
+                      </FormControl>
+                    </FormItem>
+                  );
+                }}
               />
               <div className="flex gap-4 w-full">
                 <FormField
@@ -226,7 +296,11 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
                         <SelectContent side="bottom">
                           {Object.values(ProductStatus).map(status => (
                             <SelectItem key={status} value={status}>
-                              {t(productStatusTranslations[status])}
+                              <Badge
+                                variant={status === ProductStatus.IN_STOCK ? 'success' : 'warning'}
+                                className="capitalize">
+                                {t(productStatusTranslations[status])}
+                              </Badge>
                             </SelectItem>
                           ))}
                         </SelectContent>

@@ -110,7 +110,7 @@ export function CreateProductSheet({ open, onClose }: Props) {
   }, [open]);
 
   return (
-    <SheetContent className="min-w-4xl flex flex-col">
+    <SheetContent onOpenAutoFocus={e => e.preventDefault()} className="min-w-4xl flex flex-col">
       <SheetHeader>
         <SheetTitle>{t('createProduct.title')}</SheetTitle>
         <SheetDescription>{t('createProduct.description')}</SheetDescription>
