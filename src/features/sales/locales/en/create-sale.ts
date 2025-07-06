@@ -1,7 +1,10 @@
 export default {
   title: 'Add sale',
+  addNew: 'Add new',
+  selectFromInventory: 'Select from inventory',
+  addFromInventory: 'Add from inventory',
   editTitle: 'Edit sale',
-  description: 'Add a new sale to your inventory.',
+  description: 'Add a new sale to your dashboard.',
   editDescription: 'Edit the sale details.',
   profit: 'Profit',
   profitPlaceholder: 'Enter profit',
@@ -33,4 +36,9 @@ export default {
   errorEdit: 'Failed to update sale',
   successCreate: 'Sale created successfully',
   errorCreate: 'Failed to create sale',
+  singleSale: {
+    productDetails: 'Product details',
+    purchaseDetails: 'Purchase details',
+    soldDetails: 'Sold details',
+  },
 } as const;

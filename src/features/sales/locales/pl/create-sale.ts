@@ -1,7 +1,10 @@
 export default {
   title: 'Dodaj sprzedaż',
+  addNew: 'Dodaj nową',
+  addFromInventory: 'Dodaj z magazynu',
+  selectFromInventory: 'Wybierz z magazynu',
   editTitle: 'Edytuj sprzedaż',
-  description: 'Dodaj nową sprzedaż do swojego magazynu.',
+  description: 'Dodaj nową sprzedaż do swojego panelu.',
   editDescription: 'Edytuj szczegóły sprzedaży.',
   profit: 'Profit',
   profitPlaceholder: 'Wprowadź profit',
