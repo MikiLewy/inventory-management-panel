@@ -40,7 +40,7 @@ const SelectFromInventory = ({ send, onClose, setSelectedRows }: Props) => {
 
   const products = watch('products');
 
-  const { mutate: markAsSold } = useMarkProductsAsSold();
+  const { mutate: markAsSold, isPending } = useMarkProductsAsSold();
 
   const onSubmit = (values: CreateSaleFromInventoryFormValues) => {
     const transformedProducts = values.products.map(product => ({
@@ -159,6 +159,7 @@ const SelectFromInventory = ({ send, onClose, setSelectedRows }: Props) => {
         onNext={handleSubmit(onSubmit)}
         onNextTitle={t('common.button.submit')}
         nextDisabled={nextButtonDisabled}
+        nextIsSubmitting={isPending}
       />
     </StepContent>
   );
