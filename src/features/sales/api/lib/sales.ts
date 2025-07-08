@@ -3,6 +3,7 @@ import { SortDirection } from '@tanstack/react-table';
 import api from '@/api/clients/api';
 import { PaginatedResponse } from '@/types/interfaces/paginated-response';
 
+import { CreateSaleFormValues } from '../../components/organisms/create-new-sale-sheet/create-new-sale-sheet';
 import { UpdateSalePayload } from '../../types/payload/update-sale';
 import { Sale } from '../types/sales';
 
@@ -32,7 +33,7 @@ export const fetchSale = async (id: number): Promise<Sale> => {
   return data;
 };
 
-export const createSale = async (sale: Sale) => {
+export const createSale = async (sale: CreateSaleFormValues) => {
   const { data } = await api.post('/sales', sale);
 
   return data;

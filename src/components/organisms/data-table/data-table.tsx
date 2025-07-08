@@ -16,7 +16,7 @@ import {
   VisibilityState,
 } from '@tanstack/react-table';
 import { Options, ParserBuilder, SetValues } from 'nuqs';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 
 import SearchBar from '@/components/molecules/search-bar';
 import { Table } from '@/components/organisms/table/table';
@@ -29,16 +29,18 @@ type Pagination = {
   pageIndex: number;
   pageSize: number;
   totalItems: number;
-  onPaginationChange: SetValues<{
-    pageIndex: Omit<ParserBuilder<number>, 'parseServerSide'> & {
-      readonly defaultValue: number;
-      parseServerSide(value: string | string[] | undefined): number;
-    };
-    pageSize: Omit<ParserBuilder<number>, 'parseServerSide'> & {
-      readonly defaultValue: number;
-      parseServerSide(value: string | string[] | undefined): number;
-    };
-  }>;
+  onPaginationChange:
+    | SetValues<{
+        pageIndex: Omit<ParserBuilder<number>, 'parseServerSide'> & {
+          readonly defaultValue: number;
+          parseServerSide(value: string | string[] | undefined): number;
+        };
+        pageSize: Omit<ParserBuilder<number>, 'parseServerSide'> & {
+          readonly defaultValue: number;
+          parseServerSide(value: string | string[] | undefined): number;
+        };
+      }>
+    | Dispatch<SetStateAction<{ pageIndex: number; pageSize: number }>>;
 };
 
 type Search = {
@@ -71,7 +73,7 @@ interface TableProps<TData, TValue> {
   search?: Search;
   sortable?: Sortable;
   selectable?: Selectable;
-  view: View;
+  view?: View;
 }
 
 export function DataTable<TData extends { id: number | string }, TValue>({
@@ -102,6 +104,7 @@ export function DataTable<TData extends { id: number | string }, TValue>({
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: visibility => {
+      if (!view) return;
       setHiddenColumn(
         view,
         // @ts-expect-error visibility is callable function but typescript does not know that
@@ -115,10 +118,12 @@ export function DataTable<TData extends { id: number | string }, TValue>({
     state: {
       sorting: sortable ? [{ id: sortable.sortBy, desc: sortable.sortDirection === 'desc' }] : [],
       columnFilters,
-      columnVisibility: viewsSettings[view].hiddenColumns.reduce((acc, column) => {
-        acc[column] = false;
-        return acc;
-      }, {} as VisibilityState),
+      columnVisibility: view
+        ? viewsSettings[view].hiddenColumns.reduce((acc, column) => {
+            acc[column] = false;
+            return acc;
+          }, {} as VisibilityState)
+        : {},
       pagination: {
         pageIndex: pagination?.pageIndex ?? 0,
         pageSize: pagination?.pageSize ?? 10,
@@ -141,7 +146,7 @@ export function DataTable<TData extends { id: number | string }, TValue>({
             </Button>
           ) : null}
         </div>
-        <TableViewOptions table={table} />
+        {view ? <TableViewOptions table={table} /> : null}
       </div>
       <Table isLoading={isLoading} columnsLength={columns.length} table={table} />
       {pagination ? <TablePagination table={table} /> : null}

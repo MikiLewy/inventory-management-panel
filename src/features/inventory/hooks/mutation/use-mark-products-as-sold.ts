@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 
+import { salesKeys } from '@/features/sales/api/query-keys/sales-keys';
 import { useI18n } from '@/locales/client';
 
 import { markAsSold } from '../../api/lib/products';
@@ -16,6 +17,7 @@ export const useMarkProductsAsSold = () => {
     mutationFn: (products: MarkProductsAsSoldPayload[]) => markAsSold(products),
     onSuccess: (_, products) => {
       queryClient.invalidateQueries({ queryKey: productsKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: salesKeys.lists() });
 
       toast.success(
         t('inventory.dialog.markAsSold.success', {
