@@ -14,7 +14,7 @@ export default {
     soldPrice: 'Cena sprzedaży',
     soldDate: 'Data sprzedaży',
     soldPlace: 'Miejsce sprzedaży',
-    profit: 'Profit',
+    profit: 'Zysk',
     createdAt: 'Data utworzenia',
     updatedAt: 'Data aktualizacji',
   },

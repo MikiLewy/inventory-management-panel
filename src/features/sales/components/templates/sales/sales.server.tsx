@@ -1,4 +1,5 @@
 import Page from '@/components/organisms/page/page';
+import { prefetchProducts } from '@/features/inventory/api/lib/products.prefetch';
 import { prefetchSales } from '@/features/sales/api/lib/sales.prefetch';
 import { getI18n } from '@/locales/server';
 import HydrationBoundaryProvider from '@/providers/hydration-boundary-provider';
@@ -17,7 +18,7 @@ const ServerSales = async () => {
         <SalesPageHeaderActions />
       </Page.Header>
       <Page.ContentContainer>
-        <HydrationBoundaryProvider prefetchDataFunctions={[prefetchSales, prefetchCategories]}>
+        <HydrationBoundaryProvider prefetchDataFunctions={[prefetchSales, prefetchProducts, prefetchCategories]}>
           <ClientSales />
         </HydrationBoundaryProvider>
       </Page.ContentContainer>
