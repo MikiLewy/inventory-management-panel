@@ -13,6 +13,12 @@ export const fetchSales = async (
   query?: string,
   sortBy?: string,
   sortDirection?: SortDirection,
+  filters?: {
+    dateRange?: {
+      from: Date;
+      to: Date;
+    };
+  },
 ): Promise<PaginatedResponse<Sale>> => {
   const { data } = await api.get('/sales', {
     params: {
@@ -21,6 +27,7 @@ export const fetchSales = async (
       search: query,
       sortBy,
       sortOrder: sortDirection,
+      filters: filters ? JSON.stringify(filters) : undefined,
     },
   });
 

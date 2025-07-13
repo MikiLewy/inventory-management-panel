@@ -16,7 +16,7 @@ const Dashboard = ({ children }: Props) => {
       <Sidebar variant="inset" />
       <SidebarInset>
         <Navbar />
-        <div className="w-full overflow-x-auto">{children}</div>
+        <div className="w-full overflow-x-auto h-full">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

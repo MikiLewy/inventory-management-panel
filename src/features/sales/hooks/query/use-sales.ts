@@ -10,15 +10,25 @@ export const useSales = ({
   query,
   sortBy,
   sortDirection,
+  filters,
+  enabled,
 }: {
   offset: number;
   limit: number;
-  query: string;
-  sortBy: string;
-  sortDirection: SortDirection;
+  query?: string;
+  sortBy?: string;
+  sortDirection?: SortDirection;
+  filters?: {
+    dateRange?: {
+      from: Date;
+      to: Date;
+    };
+  };
+  enabled?: boolean;
 }) => {
   return useQuery({
-    queryKey: salesKeys.list({ offset, limit, query, sortBy, sortDirection }),
-    queryFn: () => fetchSales(offset, limit, query, sortBy, sortDirection),
+    queryKey: salesKeys.list({ offset, limit, query, sortBy, sortDirection, filters }),
+    queryFn: () => fetchSales(offset, limit, query, sortBy, sortDirection, filters),
+    enabled,
   });
 };
