@@ -30,6 +30,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'aplug.pl',
       },
+      {
+        protocol: 'https',
+        hostname: 'www.hypeneedz.com',
+      },
     ],
   },
 };
