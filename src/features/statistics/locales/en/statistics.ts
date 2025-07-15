@@ -8,6 +8,7 @@ export default {
   profit: 'Profit',
   noSales: 'No sales found',
   totalSales: 'Total sales',
+  selectDate: 'Select a date',
   fromLastMonth: 'from last month',
   fromLastYear: 'from last year',
   fromLastWeek: 'from last week',

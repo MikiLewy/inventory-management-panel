@@ -1,7 +1,6 @@
 /* eslint-disable complexity */
 'use client';
 
-import { subDays } from 'date-fns';
 import { DollarSignIcon, PiggyBank, TrendingUp, Truck } from 'lucide-react';
 import { parseAsIsoDateTime, useQueryStates } from 'nuqs';
 
@@ -16,8 +15,8 @@ const Overview = () => {
   const t = useI18n();
 
   const [dateRange] = useQueryStates({
-    from: parseAsIsoDateTime.withDefault(subDays(new Date(), 30)),
-    to: parseAsIsoDateTime.withDefault(new Date()),
+    from: parseAsIsoDateTime,
+    to: parseAsIsoDateTime,
   });
 
   const { from, to } = dateRange;

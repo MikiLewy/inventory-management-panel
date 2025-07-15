@@ -1,6 +1,5 @@
 'use client';
 
-import { subDays } from 'date-fns';
 import { parseAsIsoDateTime, useQueryStates } from 'nuqs';
 
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,8 +13,8 @@ const Analytics = () => {
   const t = useI18n();
 
   const [dateRange] = useQueryStates({
-    from: parseAsIsoDateTime.withDefault(subDays(new Date(), 30)),
-    to: parseAsIsoDateTime.withDefault(new Date()),
+    from: parseAsIsoDateTime,
+    to: parseAsIsoDateTime,
   });
 
   const { from, to } = dateRange;
@@ -49,13 +48,13 @@ const Analytics = () => {
 
   return (
     <>
-      {isLoading || !salesData ? (
+      {isLoading ? (
         <div className="flex flex-col h-full w-full items-center gap-2 justify-center">
           {Array.from({ length: 10 }).map((_, index) => (
             <Skeleton key={index} className="h-full w-full" />
           ))}
         </div>
-      ) : salesData?.resources?.length !== 0 ? (
+      ) : salesData?.resources?.length !== 0 && !!salesData ? (
         <SalesChart data={salesData?.resources || []} />
       ) : (
         <UnavailableData message={t('statistics.noSales')} />
