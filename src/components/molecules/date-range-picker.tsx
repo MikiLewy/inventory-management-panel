@@ -1,6 +1,6 @@
 'use client';
 
-import { format, subDays } from 'date-fns';
+import { subDays } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { ParserBuilder, SetValues, Values } from 'nuqs';
 import * as React from 'react';
@@ -9,6 +9,9 @@ import { DateRange, SelectRangeEventHandler } from 'react-day-picker';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useCurrentLocale } from '@/locales/client';
+
+import { formatDate } from '../atoms/format-date';
 
 interface Props {
   value: Values<{ from: ParserBuilder<Date>; to: ParserBuilder<Date> }>;
@@ -16,6 +19,8 @@ interface Props {
 }
 
 export function DateRangePicker({ value, onChange }: Props) {
+  const locale = useCurrentLocale();
+
   const [date, setDate] = React.useState<DateRange>({
     from: value.from ? new Date(value.from || new Date()) : subDays(new Date(), 30),
     to: value.to ? new Date(value.to || new Date()) : new Date(),
@@ -44,7 +49,8 @@ export function DateRangePicker({ value, onChange }: Props) {
           <CalendarIcon />
           {date ? (
             <>
-              {date.from ? format(date.from, 'PPP') : ''} - {date.to ? format(date.to, 'PPP') : ''}
+              {date.from ? formatDate(date.from, 'PPP', locale) : ''} -{' '}
+              {date.to ? formatDate(date.to, 'PPP', locale) : ''}
             </>
           ) : (
             <span>Pick a date</span>

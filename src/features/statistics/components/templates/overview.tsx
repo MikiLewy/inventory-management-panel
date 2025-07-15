@@ -3,7 +3,7 @@
 
 import { subDays } from 'date-fns';
 import { DollarSignIcon, PiggyBank, TrendingUp, Truck } from 'lucide-react';
-import { parseAsIsoDate, useQueryStates } from 'nuqs';
+import { parseAsIsoDateTime, useQueryStates } from 'nuqs';
 
 import { useProducts } from '@/features/inventory/hooks/query/use-products';
 import { useSales } from '@/features/sales/hooks/query/use-sales';
@@ -16,8 +16,8 @@ const Overview = () => {
   const t = useI18n();
 
   const [dateRange] = useQueryStates({
-    from: parseAsIsoDate.withDefault(subDays(new Date(), 30)),
-    to: parseAsIsoDate.withDefault(new Date()),
+    from: parseAsIsoDateTime.withDefault(subDays(new Date(), 30)),
+    to: parseAsIsoDateTime.withDefault(new Date()),
   });
 
   const { from, to } = dateRange;
@@ -71,7 +71,7 @@ const Overview = () => {
         to: to || new Date(),
       },
     },
-    enabled: !!from && !!to,
+    enabled: !!saleData,
   });
 
   const inventoryValue = productsData?.resources?.reduce((acc, product) => acc + product.purchasePrice, 0) || 0;
@@ -81,8 +81,8 @@ const Overview = () => {
   const hasProducts = !!productsData && productsData?.total > 0;
   const hasSales = !!salesData && salesData?.total > 0;
 
-  const isLoadingSales = isSalesLoading || !hasSales;
-  const isLoadingProducts = isProductsLoading || !hasProducts;
+  const isLoadingSales = isSalesLoading && !hasSales;
+  const isLoadingProducts = isProductsLoading && !hasProducts;
 
   const overviewCards: {
     key: string;

@@ -5,6 +5,7 @@ import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
 import { formatDate } from '@/components/atoms/format-date';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Sale } from '@/features/sales/api/types/sales';
+import { useCurrentLocale } from '@/locales/client';
 
 const chartConfig = {
   totalPrice: {
@@ -17,26 +18,33 @@ interface Props {
 }
 
 export function SalesChart({ data }: Props) {
-  const salesTotalsByDate =
-    data?.reduce<
-      Record<
-        string,
-        {
-          totalPrice: number;
-        }
-      >
-    >((acc, sale) => {
-      acc[formatDate(new Date(sale.soldDate), 'MMM d, yyyy')] = {
-        ...acc[formatDate(new Date(sale.soldDate), 'MMM d, yyyy')],
-        totalPrice: (acc[formatDate(new Date(sale.soldDate), 'MMM d, yyyy')]?.totalPrice || 0) + sale.soldPrice,
-      };
+  const locale = useCurrentLocale();
 
-      return acc;
-    }, {}) || [];
+  const sortedData = data?.sort((a, b) => new Date(a.soldDate).getTime() - new Date(b.soldDate).getTime()) || [];
+
+  const salesTotalsByDate = sortedData.reduce<
+    Record<
+      string,
+      {
+        totalPrice: number;
+      }
+    >
+  >((acc, sale) => {
+    const formattedDate = formatDate(new Date(sale.soldDate), 'MMM d, yyyy', locale);
+
+    if (!acc[formattedDate]) {
+      acc[formattedDate] = {
+        totalPrice: 0,
+      };
+    }
+
+    acc[formattedDate].totalPrice += sale.soldPrice;
+    return acc;
+  }, {});
 
   const chartData = Object.entries(salesTotalsByDate).map(([date, salesTotals]) => ({
     date,
-    totalPrice: salesTotals?.totalPrice || 0,
+    totalPrice: salesTotals.totalPrice,
   }));
 
   return (

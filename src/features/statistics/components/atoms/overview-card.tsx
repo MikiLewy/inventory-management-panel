@@ -17,7 +17,7 @@ const OverviewCard = ({ title, icon, value, caption, loading }: Props) => {
         {icon}
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{loading ? <Skeleton className="h-2 w-1/4" /> : value}</div>
+        <div className="text-2xl font-bold">{loading ? <Skeleton className="h-4 w-1/4" /> : value}</div>
         {caption ? <p className="text-xs text-muted-foreground">{caption}</p> : null}
       </CardContent>
     </Card>

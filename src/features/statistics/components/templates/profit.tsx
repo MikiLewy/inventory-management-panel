@@ -1,7 +1,7 @@
 'use client';
 
 import { subDays } from 'date-fns';
-import { parseAsIsoDate, useQueryStates } from 'nuqs';
+import { parseAsIsoDateTime, useQueryStates } from 'nuqs';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSales } from '@/features/sales/hooks/query/use-sales';
@@ -11,8 +11,8 @@ import { ProfitChart } from '../organisms/profit-chart';
 
 const Profit = () => {
   const [dateRange] = useQueryStates({
-    from: parseAsIsoDate.withDefault(subDays(new Date(), 30)),
-    to: parseAsIsoDate.withDefault(new Date()),
+    from: parseAsIsoDateTime.withDefault(subDays(new Date(), 30)),
+    to: parseAsIsoDateTime.withDefault(new Date()),
   });
 
   const { from, to } = dateRange;

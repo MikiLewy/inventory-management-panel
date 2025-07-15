@@ -5,6 +5,7 @@ import { CartesianGrid, Line, LineChart, XAxis } from 'recharts';
 import { formatDate } from '@/components/atoms/format-date';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Sale } from '@/features/sales/api/types/sales';
+import { useCurrentLocale } from '@/locales/client';
 
 const chartConfig = {
   profit: {
@@ -17,26 +18,26 @@ interface Props {
 }
 
 export function ProfitChart({ data }: Props) {
-  const profitBasedOnSales =
-    data?.reduce<
-      Record<
-        string,
-        {
-          profit: number;
-        }
-      >
-    >((acc, sale) => {
-      acc[formatDate(new Date(sale.soldDate), 'MMM d, yyyy')] = {
-        ...acc[formatDate(new Date(sale.soldDate), 'MMM d, yyyy')],
-        profit: (acc[formatDate(new Date(sale.soldDate), 'MMM d, yyyy')]?.profit || 0) + sale.profit,
+  const locale = useCurrentLocale();
+
+  const sortedData = data?.sort((a, b) => new Date(a.soldDate).getTime() - new Date(b.soldDate).getTime()) || [];
+
+  const profitByDate = sortedData.reduce<Record<string, { profit: number }>>((acc, sale) => {
+    const formattedDate = formatDate(new Date(sale.soldDate), 'MMM d, yyyy', locale);
+
+    if (!acc[formattedDate]) {
+      acc[formattedDate] = {
+        profit: 0,
       };
+    }
 
-      return acc;
-    }, {}) || [];
+    acc[formattedDate].profit += sale.profit;
+    return acc;
+  }, {});
 
-  const chartData = Object.entries(profitBasedOnSales).map(([date, profit]) => ({
+  const chartData = Object.entries(profitByDate).map(([date, { profit }]) => ({
     date,
-    profit: profit?.profit || 0,
+    profit,
   }));
 
   return (
@@ -47,7 +48,7 @@ export function ProfitChart({ data }: Props) {
         className="h-full w-full"
         margin={{
           right: 12,
-          left: 30,
+          left: 40,
           top: 20,
         }}>
         <CartesianGrid vertical={false} />

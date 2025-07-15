@@ -10,27 +10,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { dateFormats } from '@/constants/date-formats';
-import { useI18n } from '@/locales/client';
+import { useCurrentLocale, useI18n } from '@/locales/client';
 
 import { formatDate } from '../atoms/format-date';
-
-function formatDateToInput(date: Date | undefined) {
-  if (!date) {
-    return '';
-  }
-  const formattedValue = formatDate(date, `${dateFormats.month} ${dateFormats.day} ${dateFormats.year}`)
-    .replace(/[^\d]/g, '')
-    .slice(0, 8);
-
-  if (formattedValue.length >= 4) {
-    const day = formattedValue.slice(0, 2);
-    const month = formattedValue.slice(2, 4);
-    const year = formattedValue.slice(4, 8);
-    const result = day + (month ? '/' + month : '') + (year ? '/' + year : '');
-
-    return result;
-  }
-}
 
 function isValidDate(date: Date | undefined) {
   if (!date) {
@@ -47,6 +29,25 @@ interface Props extends Omit<DayPickerProps, 'mode'> {
 
 export function DatePicker({ value, label, onChange }: Props) {
   const t = useI18n();
+  const locale = useCurrentLocale();
+
+  function formatDateToInput(date: Date | undefined) {
+    if (!date) {
+      return '';
+    }
+    const formattedValue = formatDate(date, `${dateFormats.month} ${dateFormats.day} ${dateFormats.year}`, locale)
+      .replace(/[^\d]/g, '')
+      .slice(0, 8);
+
+    if (formattedValue.length >= 4) {
+      const day = formattedValue.slice(0, 2);
+      const month = formattedValue.slice(2, 4);
+      const year = formattedValue.slice(4, 8);
+      const result = day + (month ? '/' + month : '') + (year ? '/' + year : '');
+
+      return result;
+    }
+  }
 
   const [open, setOpen] = React.useState(false);
 

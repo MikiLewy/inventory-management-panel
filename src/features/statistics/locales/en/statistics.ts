@@ -6,6 +6,8 @@ export default {
   inventoryValue: 'Inventory Value',
   overview: 'Overview',
   profit: 'Profit',
+  noSales: 'No sales found',
+  totalSales: 'Total sales',
   fromLastMonth: 'from last month',
   fromLastYear: 'from last year',
   fromLastWeek: 'from last week',
