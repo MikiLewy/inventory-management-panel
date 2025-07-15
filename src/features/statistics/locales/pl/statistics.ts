@@ -7,6 +7,7 @@ export default {
   overview: 'Przegląd',
   profit: 'Zysk',
   noSales: 'Brak sprzedaży',
+  selectDate: 'Wybierz datę',
   totalSales: 'Suma sprzedaży',
   noProducts: 'Brak przedmiotów',
   fromLastMonth: 'od ostatniego miesiąca',
