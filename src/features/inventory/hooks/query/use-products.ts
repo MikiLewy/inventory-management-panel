@@ -11,17 +11,24 @@ export const useProducts = ({
   sortBy,
   sortDirection,
   enabled,
+  filters,
 }: {
   offset: number;
   limit: number;
   query?: string;
   sortBy?: string;
+  filters?: {
+    dateRange?: {
+      from: Date;
+      to: Date;
+    };
+  };
   sortDirection?: SortDirection;
   enabled?: boolean;
 }) => {
   return useQuery({
-    queryKey: productsKeys.list({ offset, limit, query, sortBy, sortDirection }),
-    queryFn: () => fetchProducts(offset, limit, query, sortBy, sortDirection),
+    queryKey: productsKeys.list({ offset, limit, query, sortBy, sortDirection, filters }),
+    queryFn: () => fetchProducts(offset, limit, query, sortBy, sortDirection, filters),
     enabled,
   });
 };

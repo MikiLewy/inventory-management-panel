@@ -9,13 +9,20 @@ export const salesKeys = {
     query,
     sortBy,
     sortDirection,
+    filters,
   }: {
     offset: number;
     limit: number;
-    query: string;
-    sortBy: string;
-    sortDirection: SortDirection;
-  }) => [...salesKeys.lists(), { offset, limit, query, sortBy, sortDirection }],
+    query?: string;
+    sortBy?: string;
+    sortDirection?: SortDirection;
+    filters?: {
+      dateRange?: {
+        from: Date;
+        to: Date;
+      };
+    };
+  }) => [...salesKeys.lists(), { offset, limit, query, sortBy, sortDirection, filters }],
   details: (id: number) => [...salesKeys.lists(), 'detail', id],
   detail: (id: number) => [...salesKeys.details(id)],
 };

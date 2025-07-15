@@ -8,7 +8,7 @@ interface Props {
 }
 
 const Page = ({ children }: Props) => {
-  return <main className="flex flex-col grow py-3 px-6">{children}</main>;
+  return <main className="flex flex-col grow py-3 px-6 h-full">{children}</main>;
 };
 
 export default Page;

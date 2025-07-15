@@ -1,10 +1,14 @@
-import { Store, Warehouse } from 'lucide-react';
-
-import { Route } from '@/types/interfaces/route';
+import { ChartPie, Store, Warehouse } from 'lucide-react';
 
 import { RouteTitle } from '@/types/enum/route-title';
+import { Route } from '@/types/interfaces/route';
 
 export const routes: Route[] = [
+  {
+    title: RouteTitle.STATISTICS,
+    href: '/statistics',
+    icon: ChartPie,
+  },
   {
     title: RouteTitle.INVENTORY,
     href: '/inventory',
