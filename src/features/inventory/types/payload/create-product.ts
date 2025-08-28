@@ -10,7 +10,7 @@ export interface CreateProductPayload {
     quantity: number;
     purchasePrice: number;
     purchasePlace: string | undefined;
-    purchaseDate: Date | undefined;
+    purchaseDate: string | undefined;
   }[];
   status: ProductStatus;
   brand?: string;

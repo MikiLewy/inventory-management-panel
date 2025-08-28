@@ -9,7 +9,7 @@ import { dateFormats } from '@/constants/date-formats';
 import { useFormatPrice } from '@/hooks/use-format-price';
 import { cn } from '@/lib/utils';
 import { useCurrentLocale, useI18n } from '@/locales/client';
-import { CategoryEnum } from '@/shared/api/types/enum/category';
+import { CategoryType } from '@/server/db/types/enum/category-type';
 import { Language } from '@/types/enum/language';
 import { SizeUnit } from '@/types/enum/size-unit';
 
@@ -63,7 +63,7 @@ export const useSalesTableColumns = (actionsSlot: (payload: SalesActionSlotPaylo
         return (
           <div className="flex items-center gap-4 overflow-hidden">
             <Image
-              src={imageUrl}
+              src={imageUrl || ''}
               alt={name}
               height={120}
               width={120}
@@ -88,7 +88,7 @@ export const useSalesTableColumns = (actionsSlot: (payload: SalesActionSlotPaylo
 
         return (
           <p>
-            {category.type === CategoryEnum.SNEAKERS && sizeUnit !== SizeUnit.EU ? (
+            {category?.type === CategoryType.SNEAKERS && sizeUnit !== SizeUnit.EU ? (
               <span className="mr-0.5">{sizeUnit}</span>
             ) : null}
             {size}
@@ -220,7 +220,7 @@ export const useSalesTableColumns = (actionsSlot: (payload: SalesActionSlotPaylo
       enableSorting: false,
       enableHiding: true,
       filterFn: (rows, columnId, filterValue) => {
-        const category = rows.getValue(columnId) as { id: string; name: string; type: CategoryEnum };
+        const category = rows.getValue(columnId) as { id: string; name: string; type: CategoryType };
 
         return filterValue.includes(category.type.toString());
       },
@@ -228,7 +228,7 @@ export const useSalesTableColumns = (actionsSlot: (payload: SalesActionSlotPaylo
         return <TableColumnHeader column={column} title={t('sales.table.category')} />;
       },
       cell: ({ cell }) => {
-        const category = cell.getValue() as { id: string; translations: Record<Language, string>; type: CategoryEnum };
+        const category = cell.getValue() as { id: string; translations: Record<Language, string>; type: CategoryType };
 
         return <p>{category.translations?.[currentLocale] || '-'}</p>;
       },

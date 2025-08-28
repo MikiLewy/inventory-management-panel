@@ -3,7 +3,7 @@ import axios from 'axios';
 import { attachAccessToken } from '../interceptors/attach-access-token';
 
 const api = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_API_URL}`,
+  baseURL: `${process.env.NEXT_PUBLIC_APP_URL}/api`,
 });
 
 api.interceptors.request.use(attachAccessToken);

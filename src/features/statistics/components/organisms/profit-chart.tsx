@@ -20,10 +20,12 @@ interface Props {
 export function ProfitChart({ data }: Props) {
   const locale = useCurrentLocale();
 
-  const sortedData = data?.sort((a, b) => new Date(a.soldDate).getTime() - new Date(b.soldDate).getTime()) || [];
+  const sortedData =
+    data?.sort((a, b) => new Date(a.soldDate || new Date()).getTime() - new Date(b.soldDate || new Date()).getTime()) ||
+    [];
 
   const profitByDate = sortedData.reduce<Record<string, { profit: number }>>((acc, sale) => {
-    const formattedDate = formatDate(new Date(sale.soldDate), 'MMM d, yyyy', locale);
+    const formattedDate = formatDate(new Date(sale.soldDate || new Date()), 'MMM d, yyyy', locale);
 
     if (!acc[formattedDate]) {
       acc[formattedDate] = {

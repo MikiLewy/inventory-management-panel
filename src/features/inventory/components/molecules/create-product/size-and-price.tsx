@@ -18,7 +18,7 @@ import { useCreateProduct } from '@/features/inventory/hooks/mutation/use-create
 import { CreateProductEvent } from '@/features/inventory/utils/create-product-machine';
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/locales/client';
-import { CategoryEnum } from '@/shared/api/types/enum/category';
+import { CategoryType } from '@/server/db/types/enum/category-type';
 import { useCategories } from '@/shared/hooks/query/use-categories';
 import { SizeUnit } from '@/types/enum/size-unit';
 
@@ -52,11 +52,11 @@ const SizeAndPrice = ({ send, onClose }: Props) => {
 
   const products = watch('products');
 
-  const sizes = getSizesByCategories(category?.type || CategoryEnum.SNEAKERS, euSizingType);
+  const sizes = getSizesByCategories(category?.type || CategoryType.SNEAKERS, euSizingType);
 
   const sizesByUnit = sizes[sizeUnit];
 
-  const isSneakers = category?.type === CategoryEnum.SNEAKERS;
+  const isSneakers = category?.type === CategoryType.SNEAKERS;
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -71,7 +71,10 @@ const SizeAndPrice = ({ send, onClose }: Props) => {
         categoryId: values.categoryId ?? 0,
         name: values.name,
         sku: values.sku,
-        products: values.products,
+        products: values.products.map(product => ({
+          ...product,
+          purchaseDate: product.purchaseDate?.toISOString() || undefined,
+        })),
         status: values.status,
         sizeUnit: values.sizeUnit,
         brand: values.brand,

@@ -19,7 +19,6 @@ import { productStatusTranslations } from '@/features/inventory/constants/produc
 import { useEditProduct } from '@/features/inventory/hooks/mutation/use-update-product';
 import { useProduct } from '@/features/inventory/hooks/query/use-product';
 import { useCurrentLocale, useI18n } from '@/locales/client';
-import { CategoryEnum } from '@/shared/api/types/enum/category';
 import { useCategories } from '@/shared/hooks/query/use-categories';
 import { useProductSuggestions } from '@/shared/hooks/query/use-product-suggestions';
 import { SizeUnit } from '@/types/enum/size-unit';
@@ -67,7 +66,7 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
 
   const validationSchema = useEditProductSchema();
 
-  const { data: productData } = useProduct({ id: selectedProductId || 0, enabled: !!selectedProductId });
+  const { data: productData } = useProduct({ id: selectedProductId || 0, enabled: !!selectedProductId && open });
 
   const form = useForm<z.infer<typeof validationSchema>>({
     resolver: zodResolver(validationSchema),
@@ -95,13 +94,16 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
         form.reset(
           {
             ...productData,
-            name: productData.name || '',
-            brand: productData.brand || '',
+            name: productData.name,
+            brand: productData.brand || undefined,
             sizeUnit: productData.sizeUnit as SizeUnit,
             size: productData.size,
             purchasePrice: productData.purchasePrice,
-            purchasePlace: productData.purchasePlace,
-            purchaseDate: new Date(productData.purchaseDate),
+            status: productData.status as ProductStatus,
+            purchasePlace: productData.purchasePlace || undefined,
+            purchaseDate: new Date(productData.purchaseDate || new Date()),
+            categoryId: productData.categoryId || undefined,
+            imageUrl: productData.imageUrl || undefined,
           },
           {
             keepDirty: false,
@@ -146,7 +148,7 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
     id: number;
     sku: string;
   }) => {
-    const category = categoriesData?.find(category => category.type === (value.category as CategoryEnum));
+    const category = categoriesData?.find(category => category.type === value.category);
     form.setValue('name', value.title, {
       shouldDirty: true,
       shouldTouch: true,
@@ -212,8 +214,8 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
                           isLoading={isLoading}
                           errorMessage={t('validation.required')}
                           items={
-                            productSuggestions?.resources.map(product => ({
-                              imageUrl: product?.image,
+                            productSuggestions?.map(product => ({
+                              imageUrl: product?.image || '',
                               title: product?.title,
                               brand: product?.brand || '',
                               category: product?.category as string,

@@ -1,24 +1,14 @@
-import { ProductStatus } from '@/features/inventory/api/types/enum/product-status';
-import { CategoryEnum } from '@/shared/api/types/enum/category';
+import { InferResultType } from '@/types/infer-db-result-type';
 
-export interface Product {
-  id: number;
-  name: string;
-  sku: string;
-  purchasePrice: number;
-  purchaseDate: string;
-  status: ProductStatus;
-  brand: string;
-  categoryId: number;
-  category: {
-    id: number;
-    name: string;
-    type: CategoryEnum;
-  };
-  purchasePlace: string;
-  size: string;
-  sizeUnit: string;
-  imageUrl: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export type Product = InferResultType<
+  'products',
+  {
+    category: {
+      columns: {
+        id: true;
+        translations: true;
+        type: true;
+      };
+    };
+  }
+>;

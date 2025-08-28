@@ -16,7 +16,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import { useUpdateSale } from '@/features/sales/hooks/mutation/use-update-sale';
 import { useSale } from '@/features/sales/hooks/query/use-sale';
 import { useCurrentLocale, useI18n } from '@/locales/client';
-import { CategoryEnum } from '@/shared/api/types/enum/category';
+import { CategoryType } from '@/server/db/types/enum/category-type';
 import { useCategories } from '@/shared/hooks/query/use-categories';
 import { useProductSuggestions } from '@/shared/hooks/query/use-product-suggestions';
 import { SizeUnit } from '@/types/enum/size-unit';
@@ -68,7 +68,7 @@ export function EditSaleSheet({ open, onClose, selectedSaleId }: Props) {
 
   const validationSchema = useEditSalesSchema();
 
-  const { data: saleData } = useSale({ id: selectedSaleId || 0, enabled: !!selectedSaleId });
+  const { data: saleData } = useSale({ id: selectedSaleId || 0, enabled: !!selectedSaleId && open });
 
   const form = useForm<z.infer<typeof validationSchema>>({
     resolver: zodResolver(validationSchema),
@@ -96,10 +96,18 @@ export function EditSaleSheet({ open, onClose, selectedSaleId }: Props) {
         form.reset(
           {
             ...saleData,
-            name: saleData.name || '',
+            name: saleData.name,
             sizeUnit: saleData.sizeUnit as SizeUnit,
-            purchaseDate: new Date(saleData.purchaseDate),
-            soldDate: new Date(saleData.soldDate),
+            purchaseDate: new Date(saleData.purchaseDate || new Date()),
+            soldDate: new Date(saleData.soldDate || new Date()),
+            categoryId: saleData.categoryId || undefined,
+            imageUrl: saleData.imageUrl || undefined,
+            brand: saleData.brand || undefined,
+            size: saleData.size,
+            purchasePrice: saleData.purchasePrice,
+            purchasePlace: saleData.purchasePlace || undefined,
+            soldPrice: saleData.soldPrice,
+            soldPlace: saleData.soldPlace || undefined,
           },
           {
             keepDirty: false,
@@ -143,7 +151,7 @@ export function EditSaleSheet({ open, onClose, selectedSaleId }: Props) {
     id: number;
     sku: string;
   }) => {
-    const category = categoriesData?.find(category => category.type === (value.category as CategoryEnum));
+    const category = categoriesData?.find(category => category.type === (value.category as CategoryType));
     form.setValue('name', value.title, {
       shouldDirty: true,
       shouldTouch: true,
@@ -209,8 +217,8 @@ export function EditSaleSheet({ open, onClose, selectedSaleId }: Props) {
                           isLoading={isLoading}
                           errorMessage={t('validation.required')}
                           items={
-                            productSuggestions?.resources.map(product => ({
-                              imageUrl: product?.image,
+                            productSuggestions?.map(product => ({
+                              imageUrl: product?.image || '',
                               title: product?.title,
                               brand: product?.brand || '',
                               category: product?.category as string,

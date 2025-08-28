@@ -1,12 +1,3 @@
-import { CategoryEnum } from './enum/category';
+import { InferResultType } from '@/types/infer-db-result-type';
 
-export interface ProductSuggestion {
-  id: number;
-  title: string;
-  sku: string;
-  brand: string;
-  category: CategoryEnum;
-  image: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export type ProductSuggestion = InferResultType<'productSuggestions'>;

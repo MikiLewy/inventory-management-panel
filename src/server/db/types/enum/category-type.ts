@@ -1,4 +1,4 @@
-export enum CategoryEnum {
+export enum CategoryType {
   SNEAKERS = 'SNEAKERS',
   CLOTHING = 'CLOTHING',
   COLLECTIBLES = 'COLLECTIBLES',

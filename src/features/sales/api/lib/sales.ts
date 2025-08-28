@@ -4,6 +4,13 @@ import api from '@/api/clients/api';
 import { PaginatedResponse } from '@/types/interfaces/paginated-response';
 
 import { CreateSaleFormValues } from '../../components/organisms/create-new-sale-sheet/create-new-sale-sheet';
+import {
+  createSale as createSaleAction,
+  updateSale as updateSaleAction,
+  deleteSales as deleteSalesAction,
+  revertSale as revertSalesAction,
+  duplicateSale as duplicateSaleAction,
+} from '../../server/actions/sales';
 import { UpdateSalePayload } from '../../types/payload/update-sale';
 import { Sale } from '../types/sales';
 
@@ -41,25 +48,21 @@ export const fetchSale = async (id: number): Promise<Sale> => {
 };
 
 export const createSale = async (sale: CreateSaleFormValues) => {
-  const { data } = await api.post('/sales', sale);
-
-  return data;
+  return createSaleAction(sale);
 };
 
 export const updateSale = async (id: number, sale: UpdateSalePayload) => {
-  const { data } = await api.patch(`/sales/${id}`, sale);
-
-  return data;
+  return updateSaleAction(id, sale);
 };
 
 export const removeSales = async (salesIds: number[]) => {
-  await api.delete(`/sales`, { data: { salesIds } });
+  return deleteSalesAction(salesIds);
 };
 
 export const revertSales = async (saleIds: number[]) => {
-  await api.post(`/sales/revert-sales`, { saleIds });
+  return revertSalesAction(saleIds);
 };
 
 export const duplicateSale = async (saleId: number) => {
-  await api.post(`/sales/${saleId}/duplicate`);
+  return duplicateSaleAction(saleId);
 };

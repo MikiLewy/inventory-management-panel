@@ -3,6 +3,13 @@ import { SortDirection } from '@tanstack/react-table';
 import api from '@/api/clients/api';
 import { PaginatedResponse } from '@/types/interfaces/paginated-response';
 
+import {
+  createProduct as createProductAction,
+  deleteProducts,
+  updateProduct as updateProductAction,
+  markAsSold as markAsSoldAction,
+  duplicateProduct as duplicateProductAction,
+} from '../../server/actions/inventory';
 import { CreateProductPayload } from '../../types/payload/create-product';
 import { MarkProductsAsSoldPayload } from '../../types/payload/mark-products-as-sold';
 import { UpdateProductPayload } from '../../types/payload/update-product';
@@ -41,28 +48,22 @@ export const fetchProduct = async (id: number): Promise<Product> => {
   return data;
 };
 
-export const createProduct = async (product: CreateProductPayload) => {
-  await api.post('/products', product);
+export const createProduct = async (payload: CreateProductPayload) => {
+  await createProductAction(payload);
 };
 
-export const updateProduct = async (id: number, product: UpdateProductPayload) => {
-  await api.patch(`/products/${id}`, product);
+export const updateProduct = async (id: number, payload: UpdateProductPayload) => {
+  await updateProductAction(id, payload);
 };
 
 export const removeProducts = async (productsIds: number[]) => {
-  await api.delete(`/products`, {
-    data: {
-      productsIds,
-    },
-  });
+  await deleteProducts(productsIds);
 };
 
 export const markAsSold = async (products: MarkProductsAsSoldPayload[]) => {
-  await api.post(`/products/mark-as-sold`, {
-    products,
-  });
+  await markAsSoldAction(products);
 };
 
 export const duplicateProduct = async (productId: number) => {
-  await api.post(`/products/${productId}/duplicate`);
+  await duplicateProductAction(productId);
 };

@@ -5,7 +5,7 @@ import { TableColumnHeader } from '@/components/organisms/table/table-column-hea
 import { Checkbox } from '@/components/ui/checkbox';
 import { Product } from '@/features/inventory/api/types/products';
 import { useI18n } from '@/locales/client';
-import { CategoryEnum } from '@/shared/api/types/enum/category';
+import { CategoryType } from '@/server/db/types/enum/category-type';
 import { SizeUnit } from '@/types/enum/size-unit';
 
 export const useInventoryProductsTableColumns = () => {
@@ -48,7 +48,7 @@ export const useInventoryProductsTableColumns = () => {
         return (
           <div className="flex items-center gap-4 overflow-hidden">
             <Image
-              src={imageUrl}
+              src={imageUrl || ''}
               alt={name}
               height={120}
               width={120}
@@ -74,7 +74,7 @@ export const useInventoryProductsTableColumns = () => {
 
         return (
           <p>
-            {category.type === CategoryEnum.SNEAKERS && sizeUnit !== SizeUnit.EU ? (
+            {category?.type === CategoryType.SNEAKERS && sizeUnit !== SizeUnit.EU ? (
               <span className="mr-0.5">{sizeUnit}</span>
             ) : null}
             {size}
