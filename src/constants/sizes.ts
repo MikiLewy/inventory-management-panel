@@ -1,4 +1,4 @@
-import { CategoryEnum } from '@/shared/api/types/enum/category';
+import { CategoryType } from '@/server/db/types/enum/category-type';
 import { SizeUnit } from '@/types/enum/size-unit';
 
 export const sizeUnits = Object.values(SizeUnit);
@@ -167,17 +167,17 @@ const oneSizeByUnit: Record<SizeUnit, string[]> = {
 };
 
 export const sizesByCategories = {
-  [CategoryEnum.CLOTHING]: clothingSizes,
-  [CategoryEnum.COLLECTIBLES]: oneSizeByUnit,
-  [CategoryEnum.ACCESSORIES]: oneSizeByUnit,
-  [CategoryEnum.OTHER]: oneSizeByUnit,
+  [CategoryType.CLOTHING]: clothingSizes,
+  [CategoryType.COLLECTIBLES]: oneSizeByUnit,
+  [CategoryType.ACCESSORIES]: oneSizeByUnit,
+  [CategoryType.OTHER]: oneSizeByUnit,
 };
 
 export const getSizesByCategories = (
-  category: CategoryEnum,
+  category: CategoryType,
   type: 'adidas' | 'standard',
 ): Record<SizeUnit, string[]> => {
-  if (category === CategoryEnum.SNEAKERS) {
+  if (category === CategoryType.SNEAKERS) {
     return getSneakersSizesByUnit(type);
   }
 

@@ -20,7 +20,9 @@ interface Props {
 export function SalesChart({ data }: Props) {
   const locale = useCurrentLocale();
 
-  const sortedData = data?.sort((a, b) => new Date(a.soldDate).getTime() - new Date(b.soldDate).getTime()) || [];
+  const sortedData =
+    data?.sort((a, b) => new Date(a.soldDate || new Date()).getTime() - new Date(b.soldDate || new Date()).getTime()) ||
+    [];
 
   const salesTotalsByDate = sortedData.reduce<
     Record<
@@ -30,7 +32,7 @@ export function SalesChart({ data }: Props) {
       }
     >
   >((acc, sale) => {
-    const formattedDate = formatDate(new Date(sale.soldDate), 'MMM d, yyyy', locale);
+    const formattedDate = formatDate(new Date(sale.soldDate || new Date()), 'MMM d, yyyy', locale);
 
     if (!acc[formattedDate]) {
       acc[formattedDate] = {

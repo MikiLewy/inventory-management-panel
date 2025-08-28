@@ -28,6 +28,14 @@ export function DateRangePicker({ value, onChange }: Props) {
 
   const handleSelect: SelectRangeEventHandler = (nextRange, selectedDay) => {
     setDate(range => {
+      if (!nextRange && selectedDay) {
+        onChange({
+          from: new Date(selectedDay || new Date()),
+          to: new Date(selectedDay || new Date()),
+        });
+
+        return { from: new Date(selectedDay || new Date()), to: new Date(selectedDay || new Date()) };
+      }
       if (range?.from && range?.to) {
         return { from: selectedDay };
       }
@@ -61,7 +69,7 @@ export function DateRangePicker({ value, onChange }: Props) {
         <Calendar
           mode="range"
           numberOfMonths={2}
-          selected={date ? { from: date.from || undefined, to: date.to || undefined } : undefined}
+          selected={date ? { from: date?.from || undefined, to: date?.to || undefined } : undefined}
           showOutsideDays={false}
           onSelect={handleSelect}
         />

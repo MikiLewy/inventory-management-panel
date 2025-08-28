@@ -7,6 +7,6 @@ import { fetchCategories } from './categories';
 export const prefetchCategories = (queryClient: QueryClient) => {
   return queryClient.prefetchQuery({
     queryKey: categoriesKeys.lists(),
-    queryFn: () => fetchCategories(true),
+    queryFn: () => fetchCategories(),
   });
 };

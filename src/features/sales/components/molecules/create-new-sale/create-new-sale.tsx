@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectValue, SelectTrigger, SelectItem } from '@/components/ui/select';
 import { useCreateSale } from '@/features/sales/hooks/mutation/use-create-sale';
 import { useCurrentLocale, useI18n } from '@/locales/client';
-import { CategoryEnum } from '@/shared/api/types/enum/category';
+import { CategoryType } from '@/server/db/types/enum/category-type';
 import { useCategories } from '@/shared/hooks/query/use-categories';
 import { useProductSuggestions } from '@/shared/hooks/query/use-product-suggestions';
 
@@ -54,7 +54,7 @@ const CreateSingleSale = ({ onClose }: Props) => {
     id: number;
     sku: string;
   }) => {
-    const category = categoriesData?.find(category => category.type === (value.category as CategoryEnum));
+    const category = categoriesData?.find(category => category.type === (value.category as CategoryType));
     setValue('name', value.title, {
       shouldDirty: true,
       shouldTouch: true,
@@ -119,8 +119,8 @@ const CreateSingleSale = ({ onClose }: Props) => {
                         isDirty={fieldState.isDirty}
                         errorMessage={t('validation.required')}
                         items={
-                          productSuggestions?.resources?.map(product => ({
-                            imageUrl: product?.image,
+                          productSuggestions?.map(product => ({
+                            imageUrl: product?.image || '',
                             title: product?.title,
                             brand: product?.brand || '',
                             category: product?.category as string,

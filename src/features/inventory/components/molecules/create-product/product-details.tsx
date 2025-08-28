@@ -12,7 +12,6 @@ import { ProductStatus } from '@/features/inventory/api/types/enum/product-statu
 import { productStatusTranslations } from '@/features/inventory/constants/product-status';
 import { CreateProductEvent } from '@/features/inventory/utils/create-product-machine';
 import { useCurrentLocale, useI18n } from '@/locales/client';
-import { CategoryEnum } from '@/shared/api/types/enum/category';
 import { useCategories } from '@/shared/hooks/query/use-categories';
 import { useProductSuggestions } from '@/shared/hooks/query/use-product-suggestions';
 
@@ -55,7 +54,7 @@ const ProductDetails = ({ send }: Props) => {
     id: number;
     sku: string;
   }) => {
-    const category = categoriesData?.find(category => category.type === (value.category as CategoryEnum));
+    const category = categoriesData?.find(category => category.type === value.category);
     setValue('name', value.title, {
       shouldDirty: true,
       shouldTouch: true,
@@ -106,8 +105,8 @@ const ProductDetails = ({ send }: Props) => {
                     isDirty={fieldState.isDirty}
                     errorMessage={t('validation.required')}
                     items={
-                      productSuggestions?.resources.map(product => ({
-                        imageUrl: product?.image,
+                      productSuggestions?.map(product => ({
+                        imageUrl: product?.image || '',
                         title: product?.title,
                         brand: product?.brand || '',
                         category: product?.category as string,
@@ -153,7 +152,7 @@ const ProductDetails = ({ send }: Props) => {
                   <SelectContent side="bottom">
                     {categoriesData?.map(category => (
                       <SelectItem key={category.id} value={category.id?.toString()}>
-                        {category?.translations?.[currentLocale] || category?.translations?.en || '-'}
+                        {category?.translations?.[currentLocale as 'en' | 'pl'] || category?.translations?.en || '-'}
                       </SelectItem>
                     ))}
                   </SelectContent>
