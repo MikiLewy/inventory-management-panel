@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation';
 
 import { createClient } from '@/features/auth/utils/supabase/server';
-import { fetchCategories } from '@/shared/api/lib/categories';
 
 export default async function IndexPage() {
   const supabase = await createClient();
@@ -12,13 +11,14 @@ export default async function IndexPage() {
     return redirect('/login');
   }
 
-  await Promise.allSettled([fetchCategories()]).then(results => {
-    if (results?.[0]?.status === 'fulfilled') {
-      if (results?.[0]?.value.length > 0) {
-        return redirect('/inventory');
-      }
-    }
-  });
+  // await Promise.allSettled([fetchCategories()]).then(results => {
+  //   if (results?.[0]?.status === 'fulfilled') {
+  //     if (results?.[0]?.value.length > 0) {
+  //       return redirect('/inventory');
+  //     }
+  //   }
+  // });
+  return redirect('/inventory');
 
-  return redirect('/no-access');
+  // return redirect('/no-access');
 }
