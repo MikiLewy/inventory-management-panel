@@ -49,4 +49,8 @@ export default {
     allSelected: 'Zaznaczono wszystko',
     selected: 'Zaznaczono: {count}',
   },
+  home: {
+    title: 'Zarządzaj magazynem i śledź każdą sprzedaż bez trudu dzięki',
+    getStarted: 'Rozpocznij',
+  },
 } as const;
