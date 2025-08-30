@@ -46,7 +46,7 @@ const SignUpForm = () => {
     try {
       await executeServerAction(() => signUp(values.email, values.password));
 
-      router.push('/verify');
+      router.push('/statistics');
     } catch (error) {
       const supabaseError = error as SupabaseError;
 

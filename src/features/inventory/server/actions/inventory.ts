@@ -3,10 +3,10 @@ import 'server-only';
 
 import { and, eq } from 'drizzle-orm';
 
-import { createClient } from '@/features/auth/utils/supabase/server';
 import { db } from '@/server/db';
 import { products, sales } from '@/server/db/schema';
 import { ProductStatus } from '@/server/db/types/enum/product-status';
+import { getLoggedInUser } from '@/server/utils/get-logged-in-user';
 import { SizeUnit } from '@/types/enum/size-unit';
 
 import { CreateProductPayload } from '../../types/payload/create-product';
@@ -14,11 +14,11 @@ import { MarkProductsAsSoldPayload } from '../../types/payload/mark-products-as-
 import { UpdateProductPayload } from '../../types/payload/update-product';
 
 export const createProduct = async (payload: CreateProductPayload) => {
-  const supabase = await createClient();
+  const user = await getLoggedInUser();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error('Unauthorized');
+  }
 
   const { name, sku, categoryId, products: createdProducts, status, brand, sizeUnit, imageUrl } = payload;
 
@@ -37,34 +37,39 @@ export const createProduct = async (payload: CreateProductPayload) => {
       purchaseDate?: string;
     }[],
   );
+  try {
+    return Promise.allSettled(
+      mappedProducts.map(async product => {
+        await db.insert(products).values({
+          name,
+          sku,
+          size: product.size,
+          categoryId,
+          purchasePrice: product.purchasePrice,
+          purchaseDate: new Date(product.purchaseDate || new Date()),
+          status,
+          brand,
+          sizeUnit,
+          imageUrl,
+          purchasePlace: product.purchasePlace,
+          createdAt: new Date(),
+          userId: user?.id || '',
+        });
+      }),
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unexpected error';
 
-  return Promise.allSettled(
-    mappedProducts.map(async product => {
-      await db.insert(products).values({
-        name,
-        sku,
-        size: product.size,
-        categoryId,
-        purchasePrice: product.purchasePrice,
-        purchaseDate: new Date(product.purchaseDate || new Date()),
-        status,
-        brand,
-        sizeUnit,
-        imageUrl,
-        purchasePlace: product.purchasePlace,
-        createdAt: new Date(),
-        userId: user?.id || '',
-      });
-    }),
-  );
+    throw new Error(message);
+  }
 };
 
 export const updateProduct = async (id: number, payload: UpdateProductPayload) => {
-  const supabase = await createClient();
+  const user = await getLoggedInUser();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error('Unauthorized');
+  }
 
   const { name, sku, categoryId, purchasePrice, size, purchaseDate, purchasePlace, status, brand, imageUrl, sizeUnit } =
     payload;
@@ -77,88 +82,108 @@ export const updateProduct = async (id: number, payload: UpdateProductPayload) =
     throw new Error('Product not found');
   }
 
-  return db
-    .update(products)
-    .set({
-      name,
-      sku,
-      categoryId,
-      purchasePrice,
-      purchaseDate: new Date(purchaseDate || new Date()),
-      status,
-      brand,
-      size,
-      sizeUnit,
-      imageUrl,
-      purchasePlace,
-      updatedAt: new Date(),
-    })
-    .where(and(eq(products.id, Number(id)), eq(products.userId, user?.id || '')));
+  try {
+    return db
+      .update(products)
+      .set({
+        name,
+        sku,
+        categoryId,
+        purchasePrice,
+        purchaseDate: new Date(purchaseDate || new Date()),
+        status,
+        brand,
+        size,
+        sizeUnit,
+        imageUrl,
+        purchasePlace,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(products.id, Number(id)), eq(products.userId, user?.id || '')));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unexpected error';
+
+    throw new Error(message);
+  }
 };
 
 export const deleteProducts = async (productsIds: number[]) => {
-  const supabase = await createClient();
+  const user = await getLoggedInUser();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error('Unauthorized');
+  }
 
-  return Promise.allSettled(
-    productsIds.map(async productId => {
-      await db.delete(products).where(and(eq(products.id, productId), eq(products.userId, user?.id || '')));
-    }),
-  );
+  try {
+    return Promise.allSettled(
+      productsIds.map(async productId => {
+        await db.delete(products).where(and(eq(products.id, productId), eq(products.userId, user?.id || '')));
+      }),
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unexpected error';
+
+    throw new Error(message);
+  }
 };
 
 export const markAsSold = async (productsToMarkAsSold: MarkProductsAsSoldPayload[]) => {
-  const supabase = await createClient();
+  const user = await getLoggedInUser();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error('Unauthorized');
+  }
 
-  return Promise.allSettled(
-    productsToMarkAsSold.map(async product => {
-      const foundProduct = await db.query.products.findFirst({
-        where: and(eq(products.id, Number(product.id)), eq(products.userId, user?.id || '')),
-      });
-
-      if (!foundProduct) {
-        throw new Error('Product not found');
-      }
-
-      const profit = product.soldPrice - (foundProduct?.purchasePrice || 0);
-
-      return await db.transaction(async tx => {
-        await tx.insert(sales).values({
-          name: foundProduct?.name || '',
-          sku: foundProduct?.sku || '',
-          purchasePrice: foundProduct?.purchasePrice || 0,
-          size: foundProduct?.size || '',
-          profit,
-          sizeUnit: foundProduct?.sizeUnit,
-          imageUrl: foundProduct?.imageUrl,
-          brand: foundProduct?.brand,
-          categoryId: foundProduct?.categoryId,
-          purchasePlace: foundProduct?.purchasePlace,
-          purchaseDate: foundProduct?.purchaseDate || new Date(),
-          soldPrice: product.soldPrice,
-          soldDate: new Date(product.soldDate || new Date()),
-          soldPlace: product.soldPlace,
-          userId: user?.id || '',
+  try {
+    return Promise.allSettled(
+      productsToMarkAsSold.map(async product => {
+        const foundProduct = await db.query.products.findFirst({
+          where: and(eq(products.id, Number(product.id)), eq(products.userId, user?.id || '')),
         });
-        await tx.delete(products).where(and(eq(products.id, Number(product.id)), eq(products.userId, user?.id || '')));
-      });
-    }),
-  );
+
+        if (!foundProduct) {
+          throw new Error('Product not found');
+        }
+
+        const profit = product.soldPrice - (foundProduct?.purchasePrice || 0);
+
+        return await db.transaction(async tx => {
+          await tx.insert(sales).values({
+            name: foundProduct?.name || '',
+            sku: foundProduct?.sku || '',
+            purchasePrice: foundProduct?.purchasePrice || 0,
+            size: foundProduct?.size || '',
+            profit,
+            sizeUnit: foundProduct?.sizeUnit,
+            imageUrl: foundProduct?.imageUrl,
+            brand: foundProduct?.brand,
+            categoryId: foundProduct?.categoryId,
+            purchasePlace: foundProduct?.purchasePlace,
+            purchaseDate: foundProduct?.purchaseDate || new Date(),
+            soldPrice: product.soldPrice,
+            soldDate: new Date(product.soldDate || new Date()),
+            soldPlace: product.soldPlace,
+            userId: user?.id || '',
+          });
+          await tx
+            .delete(products)
+            .where(and(eq(products.id, Number(product.id)), eq(products.userId, user?.id || '')));
+        });
+      }),
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unexpected error';
+
+    throw new Error(message);
+  }
 };
 
 export const duplicateProduct = async (id: number) => {
-  const supabase = await createClient();
+  const user = await getLoggedInUser();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error('Unauthorized');
+  }
 
   const product = await db.query.products.findFirst({
     where: and(eq(products.id, Number(id)), eq(products.userId, user?.id || '')),
@@ -168,19 +193,25 @@ export const duplicateProduct = async (id: number) => {
     throw new Error('Product not found');
   }
 
-  return db.insert(products).values({
-    name: product?.name || '',
-    sku: product?.sku || '',
-    size: product?.size || '',
-    categoryId: product?.categoryId || 0,
-    purchasePrice: product?.purchasePrice || 0,
-    purchaseDate: new Date(product?.purchaseDate || new Date()),
-    status: product?.status || ProductStatus.IN_STOCK,
-    brand: product?.brand || '',
-    sizeUnit: product?.sizeUnit || SizeUnit.EU,
-    imageUrl: product?.imageUrl || '',
-    purchasePlace: product?.purchasePlace,
-    createdAt: new Date(),
-    userId: user?.id || '',
-  });
+  try {
+    return db.insert(products).values({
+      name: product?.name || '',
+      sku: product?.sku || '',
+      size: product?.size || '',
+      categoryId: product?.categoryId || 0,
+      purchasePrice: product?.purchasePrice || 0,
+      purchaseDate: new Date(product?.purchaseDate || new Date()),
+      status: product?.status || ProductStatus.IN_STOCK,
+      brand: product?.brand || '',
+      sizeUnit: product?.sizeUnit || SizeUnit.EU,
+      imageUrl: product?.imageUrl || '',
+      purchasePlace: product?.purchasePlace,
+      createdAt: new Date(),
+      userId: user?.id || '',
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unexpected error';
+
+    throw new Error(message);
+  }
 };

@@ -7,7 +7,6 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
-import api from '@/api/clients/api';
 import { PasswordInput } from '@/components/atoms/password-input';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -50,11 +49,9 @@ const LoginForm = () => {
 
   const onSubmit = async (values: FormValues) => {
     try {
-      const accessToken = await executeServerAction(() => login(values.email, values.password));
+      await executeServerAction(() => login(values.email, values.password));
 
-      api.defaults.headers.common.Authorization = `${accessToken}`;
-
-      router.push('/verify');
+      router.push('/statistics');
     } catch (error) {
       const supabaseError = error as SupabaseError;
 

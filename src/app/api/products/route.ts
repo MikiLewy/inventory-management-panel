@@ -1,17 +1,17 @@
 import { and, asc, between, desc, eq, ilike, or, sql } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { createClient } from '@/features/auth/utils/supabase/server';
 import { db } from '@/server/db';
 import { products } from '@/server/db/schema';
 import { ProductStatus } from '@/server/db/types/enum/product-status';
+import { getLoggedInUser } from '@/server/utils/get-logged-in-user';
 
 export async function GET(request: NextRequest) {
-  const supabase = await createClient();
+  const user = await getLoggedInUser();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
   const searchParams = request.nextUrl.searchParams;
 
@@ -42,32 +42,38 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const data = await db.query.products.findMany({
-    extras: {
-      total: db.$count(products, and(...where, eq(products.userId, user?.id || ''))).as('total'),
-    },
-    limit: Number(limit),
-    offset: Number(offset),
-    orderBy:
-      sortBy && sortOrder
-        ? sortOrder === 'asc'
-          ? asc(sql.identifier(sortBy))
-          : desc(sql.identifier(sortBy))
-        : undefined,
-    where: and(...where, eq(products.userId, user?.id || '')),
-    with: {
-      category: {
-        columns: {
-          id: true,
-          translations: true,
-          type: true,
+  try {
+    const data = await db.query.products.findMany({
+      extras: {
+        total: db.$count(products, and(...where, eq(products.userId, user?.id || ''))).as('total'),
+      },
+      limit: Number(limit),
+      offset: Number(offset),
+      orderBy:
+        sortBy && sortOrder
+          ? sortOrder === 'asc'
+            ? asc(sql.identifier(sortBy))
+            : desc(sql.identifier(sortBy))
+          : undefined,
+      where: and(...where, eq(products.userId, user?.id || '')),
+      with: {
+        category: {
+          columns: {
+            id: true,
+            translations: true,
+            type: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  return NextResponse.json({
-    resources: data,
-    total: data?.[0]?.total,
-  });
+    return NextResponse.json({
+      resources: data,
+      total: data?.[0]?.total,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unexpected error';
+
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }
