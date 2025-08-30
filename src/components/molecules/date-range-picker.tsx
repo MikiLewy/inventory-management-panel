@@ -36,7 +36,7 @@ export function DateRangePicker({ value, onChange }: Props) {
 
         return { from: new Date(selectedDay || new Date()), to: new Date(selectedDay || new Date()) };
       }
-      if (range?.from && range?.to) {
+      if (range?.from && range?.to && range?.from !== range?.to) {
         return { from: selectedDay };
       }
       onChange({

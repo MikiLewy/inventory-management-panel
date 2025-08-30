@@ -26,7 +26,7 @@ const StatisticsLayout = async ({
       <Page.Header title={t('statistics.title')}>
         <StatisticsPageHeaderActions />
       </Page.Header>
-      <div className="flex flex-col grow gap-8 lg:gap-4">
+      <div className="flex flex-col grow gap-4 lg:gap-4">
         {children}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-8 grow">
           {analytics}

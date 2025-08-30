@@ -5,7 +5,7 @@ import HydrationBoundaryProvider from '@/providers/hydration-boundary-provider';
 
 export default function StatisticsPage() {
   return (
-    <div className="grid gap-4 lg:gap-6 max-h-32 grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 lg:gap-6 sm:grid-cols-2 lg:grid-cols-4">
       <HydrationBoundaryProvider prefetchDataFunctions={[prefetchProducts, prefetchSales]}>
         <Overview />
       </HydrationBoundaryProvider>
