@@ -1,31 +1,37 @@
 import { and, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
-import { createClient } from '@/features/auth/utils/supabase/server';
 import { db } from '@/server/db';
 import { sales } from '@/server/db/schema';
+import { getLoggedInUser } from '@/server/utils/get-logged-in-user';
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  const supabase = await createClient();
+  const user = await getLoggedInUser();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
-  const data = await db.query.sales.findFirst({
-    where: and(eq(sales.id, Number(id)), eq(sales.userId, user?.id || '')),
-    with: {
-      category: {
-        columns: {
-          id: true,
-          translations: true,
-          type: true,
+  try {
+    const data = await db.query.sales.findFirst({
+      where: and(eq(sales.id, Number(id)), eq(sales.userId, user?.id || '')),
+      with: {
+        category: {
+          columns: {
+            id: true,
+            translations: true,
+            type: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  return NextResponse.json(data);
+    return NextResponse.json(data);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unexpected error';
+
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }
