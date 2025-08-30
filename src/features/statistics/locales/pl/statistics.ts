@@ -1,0 +1,17 @@
+export default {
+  title: 'Statystyki',
+  totalRevenue: 'Przychód',
+  newItems: 'Nowe przedmioty',
+  sales: 'Sprzedaże',
+  inventoryValue: 'Wartość magazynu',
+  overview: 'Przegląd',
+  profit: 'Zysk',
+  noSales: 'Brak sprzedaży',
+  selectDate: 'Wybierz datę',
+  totalSales: 'Suma sprzedaży',
+  noProducts: 'Brak przedmiotów',
+  fromLastMonth: 'od ostatniego miesiąca',
+  fromLastYear: 'od ostatniego roku',
+  fromLastWeek: 'od ostatniego tygodnia',
+  fromLastDay: 'od ostatniego dnia',
+} as const;
