@@ -22,7 +22,7 @@ export default {
   },
   login: {
     title: 'Witaj!',
-    subtitle: 'Zaloguj się na swoje konto Acme Inc',
+    subtitle: 'Zaloguj się na swoje konto Stoqio',
     forgotYourPassword: 'Zapomniałeś hasła?',
     loginButton: 'Zaloguj się',
     dontHaveAccount: 'Nie masz konta?',
@@ -46,7 +46,7 @@ export default {
   },
   setUpPassword: {
     title: 'Ustaw hasło',
-    subtitle: 'Wprowadź hasło, aby zalogować się na swoje konto Acme Inc',
+    subtitle: 'Wprowadź hasło, aby zalogować się na swoje konto Stoqio',
     setPassword: 'Ustaw',
     passwordResetError: 'Resetowanie hasła',
     redirectMessage: 'Niestety link do ustawienia hasła wygasł lub e-mail jest nieprawidłowy.',
@@ -56,7 +56,7 @@ export default {
   },
   resetPassword: {
     title: 'Zresetuj hasło',
-    content: 'Wprowadź nowe hasło, aby zalogować się na swoje konto Acme Inc',
+    content: 'Wprowadź nowe hasło, aby zalogować się na swoje konto Stoqio',
     resetPassword: 'Resetuj',
     passwordResetError: 'Resetowanie hasła',
     redirectMessage: 'Niestety link do resetowania hasła wygasł lub e-mail jest nieprawidłowy.',

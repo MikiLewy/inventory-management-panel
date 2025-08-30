@@ -22,7 +22,7 @@ export default {
   },
   login: {
     title: 'Hello!',
-    subtitle: 'Login to your Acme Inc account',
+    subtitle: 'Login to your Stoqio account',
     forgotYourPassword: 'Forgot your password?',
     loginButton: 'Login',
     dontHaveAccount: 'Don’t have an account?',
@@ -46,7 +46,7 @@ export default {
   },
   setUpPassword: {
     title: 'Set up a password',
-    subtitle: 'Enter a password to login into your Acme Inc account',
+    subtitle: 'Enter a password to login into your Stoqio account',
     setPassword: 'Set up',
     passwordResetError: 'Password reset',
     redirectMessage: 'Unfortunately your set up password link is expired or your email is invalid.',
@@ -56,7 +56,7 @@ export default {
   },
   resetPassword: {
     title: 'Reset password',
-    content: 'Enter a new password to login into your Acme Inc account',
+    content: 'Enter a new password to login into your Stoqio account',
     resetPassword: 'Reset',
     passwordResetError: 'Password reset',
     redirectMessage: 'Unfortunately your reset password link is expired or your email is invalid.',

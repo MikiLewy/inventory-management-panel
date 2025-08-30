@@ -49,4 +49,8 @@ export default {
     allSelected: 'All selected',
     selected: '{count} selected',
   },
+  home: {
+    title: 'Manage inventory and track every sale effortlessly with',
+    getStarted: 'Get Started',
+  },
 } as const;
