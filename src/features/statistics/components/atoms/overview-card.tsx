@@ -16,7 +16,7 @@ const OverviewCard = ({ title, icon, value, caption, loading }: Props) => {
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         {icon}
       </CardHeader>
-      <CardContent>
+      <CardContent className="mt-auto">
         <div className="text-2xl font-bold">{loading ? <Skeleton className="h-4 w-1/4" /> : value}</div>
         {caption ? <p className="text-xs text-muted-foreground">{caption}</p> : null}
       </CardContent>
