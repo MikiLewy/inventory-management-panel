@@ -3,6 +3,7 @@ import { SortDirection } from '@tanstack/react-table';
 
 import { fetchProducts } from '@/features/inventory/api/lib/products';
 import { productsKeys } from '@/features/inventory/api/query-keys/products-keys';
+import { ProductStatus } from '@/server/db/types/enum/product-status';
 
 export const useProducts = ({
   offset,
@@ -18,6 +19,7 @@ export const useProducts = ({
   query?: string;
   sortBy?: string;
   filters?: {
+    status?: ProductStatus[];
     dateRange?: {
       from: Date;
       to: Date;

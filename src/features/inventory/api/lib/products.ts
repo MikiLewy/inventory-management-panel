@@ -1,6 +1,7 @@
 import { SortDirection } from '@tanstack/react-table';
 
 import api from '@/api/clients/api';
+import { ProductStatus } from '@/server/db/types/enum/product-status';
 import { PaginatedResponse } from '@/types/interfaces/paginated-response';
 
 import {
@@ -22,6 +23,7 @@ export const fetchProducts = async (
   sortBy?: string,
   sortDirection?: SortDirection,
   filters?: {
+    status?: ProductStatus[];
     dateRange?: {
       from: Date;
       to: Date;

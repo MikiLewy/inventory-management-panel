@@ -1,6 +1,8 @@
 export default {
   title: 'Sales',
   revertSale: 'Revert sale',
+  profitPositive: 'Positive',
+  profitNegative: 'Negative',
   table: {
     name: 'Name',
     size: 'Size',
