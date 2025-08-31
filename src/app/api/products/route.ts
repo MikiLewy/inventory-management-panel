@@ -1,10 +1,17 @@
-import { and, asc, between, desc, eq, ilike, or, sql } from 'drizzle-orm';
+import { and, asc, between, desc, eq, ilike, inArray, or, sql } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/server/db';
 import { products } from '@/server/db/schema';
 import { ProductStatus } from '@/server/db/types/enum/product-status';
 import { getLoggedInUser } from '@/server/utils/get-logged-in-user';
+
+const getStatusWhere = (status: ProductStatus[]) => {
+  if (status.includes(ProductStatus.IN_STOCK) || status.includes(ProductStatus.IN_DELIVERY)) {
+    return inArray(products.status, status);
+  }
+  return undefined;
+};
 
 export async function GET(request: NextRequest) {
   const user = await getLoggedInUser();
@@ -28,12 +35,12 @@ export async function GET(request: NextRequest) {
     where.push(or(ilike(products.name, `%${search}%`), ilike(products.sku, `%${search}%`)));
   }
 
-  const parsedFilters: { status?: ProductStatus; dateRange?: { from: string; to: string } } | undefined = filters
+  const parsedFilters: { status?: ProductStatus[]; dateRange?: { from: string; to: string } } | undefined = filters
     ? JSON.parse(filters)
     : undefined;
 
-  if (parsedFilters?.status) {
-    where.push(eq(products.status, parsedFilters.status));
+  if (parsedFilters?.status && parsedFilters?.status?.length > 0) {
+    where.push(getStatusWhere(parsedFilters.status));
   }
 
   if (parsedFilters?.dateRange) {

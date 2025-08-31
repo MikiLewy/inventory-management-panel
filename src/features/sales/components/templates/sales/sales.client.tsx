@@ -12,6 +12,7 @@ import { useSales } from '@/features/sales/hooks/query/use-sales';
 import { SalesActionSlotPayload, useSalesTableColumns } from '@/features/sales/hooks/use-sales-table-columns';
 import { useDialog } from '@/hooks/use-dialog';
 import { useSelection } from '@/hooks/use-selection';
+import { useUrlFilters } from '@/hooks/use-url-filters';
 import { useUrlPagination } from '@/hooks/use-url-pagination';
 import { useUrlQuery } from '@/hooks/use-url-query';
 import { useUrlSort } from '@/hooks/use-url-sort';
@@ -30,7 +31,9 @@ const ClientInventory = () => {
 
   const { sortBy, sortDirection, onSortChange } = useUrlSort('updated_at', 'desc');
 
-  const { data: salesData, isLoading } = useSales({ offset, limit, query, sortBy, sortDirection });
+  const { filters } = useUrlFilters();
+
+  const { data: salesData, isLoading } = useSales({ offset, limit, query, sortBy, sortDirection, filters });
 
   const [selectedSale, setSelectedSale] = useState<SalesActionSlotPayload | null>(null);
 
@@ -108,6 +111,23 @@ const ClientInventory = () => {
     return salesData?.resources.every(sale => selectedRows[sale.id?.toString()]) ?? false;
   }, [selectedRows, salesData]);
 
+  const facetedFilters = [
+    {
+      id: 'profitPositive',
+      title: t('sales.table.profit'),
+      options: [
+        {
+          label: t('sales.profitPositive'),
+          value: true,
+        },
+        {
+          label: t('sales.profitNegative'),
+          value: false,
+        },
+      ],
+    },
+  ];
+
   return (
     <div>
       <DataTable
@@ -116,6 +136,7 @@ const ClientInventory = () => {
         search={{ query, handleChangeQuery: onQueryChange }}
         view="sales"
         isLoading={isLoading}
+        facetedFilters={facetedFilters}
         pagination={{
           pageIndex,
           pageSize: limit,

@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       where: and(...where),
     });
 
-    return NextResponse.json({ data });
+    return NextResponse.json(data);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unexpected error';
 

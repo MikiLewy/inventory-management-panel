@@ -7,6 +7,7 @@ import { useCallback, useMemo, useState } from 'react';
 import ActionsTableMenu, { Action } from '@/components/atoms/actions-table-menu';
 import BulkActionsBubble from '@/components/atoms/bulk-actions-bubble';
 import { DataTable } from '@/components/organisms/data-table/data-table';
+import { ProductStatus } from '@/features/inventory/api/types/enum/product-status';
 import { useDuplicateProduct } from '@/features/inventory/hooks/mutation/use-duplicate-product';
 import { useProducts } from '@/features/inventory/hooks/query/use-products';
 import {
@@ -15,6 +16,7 @@ import {
 } from '@/features/inventory/hooks/use-inventory-table-columns';
 import { useDialog } from '@/hooks/use-dialog';
 import { useSelection } from '@/hooks/use-selection';
+import { useUrlFilters } from '@/hooks/use-url-filters';
 import { useUrlPagination } from '@/hooks/use-url-pagination';
 import { useUrlQuery } from '@/hooks/use-url-query';
 import { useUrlSort } from '@/hooks/use-url-sort';
@@ -33,7 +35,9 @@ const ClientInventory = () => {
 
   const { sortBy, sortDirection, onSortChange } = useUrlSort('updated_at', 'desc');
 
-  const { data: productsData, isLoading } = useProducts({ offset, limit, query, sortBy, sortDirection });
+  const { filters } = useUrlFilters();
+
+  const { data: productsData, isLoading } = useProducts({ offset, limit, query, sortBy, sortDirection, filters });
 
   const [selectedProduct, setSelectedProduct] = useState<InventoryActionSlotPayload | null>(null);
 
@@ -103,6 +107,23 @@ const ClientInventory = () => {
     handleClearSelected();
   };
 
+  const facetedFilters = [
+    {
+      id: 'status',
+      title: t('inventory.table.status'),
+      options: [
+        {
+          label: t('inventory.productStatus.inStock'),
+          value: ProductStatus.IN_STOCK,
+        },
+        {
+          label: t('inventory.productStatus.inDelivery'),
+          value: ProductStatus.IN_DELIVERY,
+        },
+      ],
+    },
+  ];
+
   const columns = useInventoryTableColumns(actionsSlot);
 
   const isAllItemsFromCurrentPageSelected = useMemo(() => {
@@ -117,6 +138,7 @@ const ClientInventory = () => {
         data={productsData?.resources ?? []}
         isLoading={isLoading}
         search={{ query, handleChangeQuery: onQueryChange }}
+        facetedFilters={facetedFilters}
         pagination={{
           pageIndex,
           pageSize: limit,
