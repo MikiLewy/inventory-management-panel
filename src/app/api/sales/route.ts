@@ -1,10 +1,24 @@
-import { and, asc, between, desc, eq, ilike, or, sql } from 'drizzle-orm';
+import { and, asc, between, desc, eq, gt, ilike, lt, or, sql } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/server/db';
 import { sales } from '@/server/db/schema';
 import { getLoggedInUser } from '@/server/utils/get-logged-in-user';
 
+const getProfitWhere = (profitPositive: boolean[]) => {
+  if (profitPositive?.length === 1) {
+    if (profitPositive[0] === true) {
+      return gt(sales.profit, 0);
+    } else if (profitPositive[0] === false) {
+      return lt(sales.profit, 0);
+    }
+  } else if (profitPositive?.length === 2) {
+    return or(gt(sales.profit, 0), lt(sales.profit, 0));
+  }
+  return undefined;
+};
+
+// eslint-disable-next-line complexity
 export async function GET(request: NextRequest) {
   const user = await getLoggedInUser();
 
@@ -27,10 +41,16 @@ export async function GET(request: NextRequest) {
     where.push(or(ilike(sales.name, `%${search}%`), ilike(sales.sku, `%${search}%`)));
   }
 
-  const parsedFilters: { dateRange?: { from: Date; to: Date } } | undefined = filters ? JSON.parse(filters) : undefined;
+  const parsedFilters: { dateRange?: { from: Date; to: Date }; profitPositive?: boolean[] } | undefined = filters
+    ? JSON.parse(filters)
+    : undefined;
 
   if (parsedFilters?.dateRange) {
     where.push(between(sales.soldDate, new Date(parsedFilters.dateRange.from), new Date(parsedFilters.dateRange.to)));
+  }
+
+  if (parsedFilters?.profitPositive && parsedFilters?.profitPositive?.length > 0) {
+    where.push(getProfitWhere(parsedFilters?.profitPositive));
   }
 
   try {

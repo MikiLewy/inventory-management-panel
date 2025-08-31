@@ -1,6 +1,8 @@
 export default {
   title: 'Sprzedaże',
   revertSale: 'Cofnij sprzedaż',
+  profitPositive: 'Dodatni',
+  profitNegative: 'Ujemny',
   table: {
     name: 'Nazwa',
     size: 'Rozmiar',

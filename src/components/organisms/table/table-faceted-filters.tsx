@@ -1,6 +1,5 @@
 'use client';
 
-import { Column } from '@tanstack/react-table';
 import { Check, PlusCircle } from 'lucide-react';
 import * as React from 'react';
 
@@ -13,27 +12,29 @@ import {
   CommandList,
   CommandSeparator,
 } from '@/components/ui/command';
+import { FilterValue, useUrlFilters } from '@/hooks/use-url-filters';
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/locales/client';
 import { Badge } from '@components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@components/ui/popover';
 import { Separator } from '@components/ui/separator';
 
-interface TableFacetedFilterProps<TData, TValue> {
-  column?: Column<TData, TValue>;
-  title?: string;
+interface Props {
+  id: string;
+  title: string;
   options: {
     label: string;
-    value: string;
+    value: FilterValue;
     icon?: React.ComponentType<{ className?: string }>;
   }[];
 }
 
-export function TableFacetedFilter<TData, TValue>({ column, title, options }: TableFacetedFilterProps<TData, TValue>) {
+export function TableFacetedFilter({ id, title, options }: Props) {
   const t = useI18n();
 
-  const facets = column?.getFacetedUniqueValues();
-  const selectedValues = new Set(column?.getFilterValue() as string[]);
+  const { filters, setFilters } = useUrlFilters();
+
+  const selectedValues = new Set(filters[id]?.map(value => value));
 
   return (
     <Popover>
@@ -56,7 +57,7 @@ export function TableFacetedFilter<TData, TValue>({ column, title, options }: Ta
                   options
                     .filter(option => selectedValues.has(option.value))
                     .map(option => (
-                      <Badge variant="secondary" key={option.value} className="rounded-sm px-1 font-normal">
+                      <Badge variant="secondary" key={option.value.toString()} className="rounded-sm px-1 font-normal">
                         {option.label}
                       </Badge>
                     ))
@@ -76,15 +77,21 @@ export function TableFacetedFilter<TData, TValue>({ column, title, options }: Ta
 
                 return (
                   <CommandItem
-                    key={option.value}
+                    key={option.value.toString()}
                     onSelect={() => {
                       if (isSelected) {
                         selectedValues.delete(option.value);
+                        setFilters({
+                          ...filters,
+                          [id]: filters[id]?.filter(filter => filter !== option.value),
+                        });
                       } else {
                         selectedValues.add(option.value);
+                        setFilters({
+                          ...filters,
+                          [id]: [...(filters[id] || []), option.value],
+                        });
                       }
-                      const filterValues = Array.from(selectedValues);
-                      column?.setFilterValue(filterValues.length ? filterValues : undefined);
                     }}>
                     <div
                       className={cn(
@@ -95,11 +102,6 @@ export function TableFacetedFilter<TData, TValue>({ column, title, options }: Ta
                     </div>
                     {option.icon && <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />}
                     <span>{option.label}</span>
-                    {facets?.get(option.value) && (
-                      <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
-                        {facets.get(option.value)}
-                      </span>
-                    )}
                   </CommandItem>
                 );
               })}
@@ -109,7 +111,12 @@ export function TableFacetedFilter<TData, TValue>({ column, title, options }: Ta
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem
-                    onSelect={() => column?.setFilterValue(undefined)}
+                    onSelect={() => {
+                      const newFilters = { ...filters };
+                      delete newFilters[id];
+
+                      setFilters(newFilters);
+                    }}
                     className="justify-center text-center">
                     {t('common.clearFilters')}
                   </CommandItem>
