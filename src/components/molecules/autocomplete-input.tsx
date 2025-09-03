@@ -35,7 +35,6 @@ export function AutocompleteInput<T extends { id: number; [key: string]: string 
   label,
   isLoading,
   required,
-  isDirty,
   emptyMessage,
   placeholder,
   errorMessage,
@@ -101,6 +100,7 @@ export function AutocompleteInput<T extends { id: number; [key: string]: string 
               <Input
                 {...props}
                 name={name}
+                aria-label={label}
                 value={value}
                 autoFocus={false}
                 aria-invalid={isInvalid}
@@ -119,7 +119,6 @@ export function AutocompleteInput<T extends { id: number; [key: string]: string 
               </p>
             ) : null}
           </div>
-          {!open && <CommandList aria-hidden="true" className="hidden" />}
           <PopoverContent
             asChild
             onOpenAutoFocus={e => e.preventDefault()}
