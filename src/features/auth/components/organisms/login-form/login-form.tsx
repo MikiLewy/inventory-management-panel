@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { useRouter } from 'nextjs-toploader/app';
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useUser } from '@/features/auth/providers/auth-providers';
 import { SupabaseError } from '@/features/auth/types/supabase-error';
-import { useCurrentLocale, useI18n } from '@/locales/client';
+import { useI18n } from '@/locales/client';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@components/ui/form';
 
 import { login } from '../../../api/actions/auth';
@@ -34,8 +34,6 @@ const LoginForm = () => {
   const t = useI18n();
 
   const user = useUser();
-
-  const currentLocale = useCurrentLocale();
 
   const router = useRouter();
 
@@ -61,9 +59,9 @@ const LoginForm = () => {
 
   useEffect(() => {
     if (user) {
-      router.push(`/${currentLocale}/inventory`);
+      router.push(`/inventory`);
     }
-  }, [user, form.formState.errors.root?.message, currentLocale]);
+  }, [user, form.formState.errors.root?.message]);
 
   return (
     <Form {...form}>
