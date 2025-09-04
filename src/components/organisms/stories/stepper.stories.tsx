@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, within } from 'storybook/test';
 
-import { I18nProviderClient } from '@/locales/client';
-
 import Stepper from '../stepper';
 
 const meta = {
@@ -21,11 +19,7 @@ const meta = {
     ],
     context: { step: '1', content: 'Test Content' },
   },
-  render: args => (
-    <I18nProviderClient locale="en">
-      <Stepper {...args} />
-    </I18nProviderClient>
-  ),
+  render: args => <Stepper {...args} />,
 } satisfies Meta<typeof Stepper>;
 
 export default meta;
@@ -34,8 +28,8 @@ type Story = StoryObj<typeof meta>;
 
 export const Default = {
   play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
     await step('Stepper should be in the document', async () => {
-      const canvas = within(canvasElement);
       const activeIndicator = canvas.getByTestId('active-indicator');
       const step = canvas.getByText('2');
 
@@ -50,15 +44,14 @@ export const Complete = {
     context: { step: '2', content: 'Test Content' },
   },
   play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
     await step('First step should be complete', async () => {
-      const canvas = within(canvasElement);
       const completeIndicator = canvas.getByTestId('complete-indicator');
 
       expect(completeIndicator).toBeInTheDocument();
     });
 
     await step('Second step should be active', async () => {
-      const canvas = within(canvasElement);
       const activeIndicator = canvas.getByTestId('active-indicator');
 
       expect(activeIndicator).toBeInTheDocument();

@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button } from '@/components/ui/button';
-import { I18nProviderClient } from '@/locales/client';
 
 import Dialog from '../dialog';
 
@@ -17,11 +16,7 @@ const meta = {
     description: 'Test Description',
     children: <div>Test Children</div>,
   },
-  render: args => (
-    <I18nProviderClient locale="en">
-      <Dialog {...args} />
-    </I18nProviderClient>
-  ),
+  render: args => <Dialog {...args} />,
 } satisfies Meta<typeof Dialog>;
 
 export default meta;
@@ -30,9 +25,9 @@ type Story = StoryObj<typeof meta>;
 
 export const Default = {
   play: async ({ canvasElement, step, args }) => {
-    await step('Dialog should be in the document', async () => {
-      const canvas = within(canvasElement.parentElement!);
+    const canvas = within(canvasElement.parentElement!);
 
+    await step('Dialog should be in the document', async () => {
       await waitFor(() => {
         const dialog = canvas.getByText(args.title ?? '');
         expect(dialog).toBeInTheDocument();
@@ -40,32 +35,27 @@ export const Default = {
     });
 
     await step('Dialog should have description', async () => {
-      const canvas = within(canvasElement.parentElement!);
       const dialog = canvas.getByText(args.description ?? '');
 
       expect(dialog).toBeInTheDocument();
     });
 
     await step('Dialog should have children', async () => {
-      const canvas = within(canvasElement.parentElement!);
       const dialog = canvas.getByText(/Test Children/i);
       expect(dialog).toBeInTheDocument();
     });
 
     await step('Dialog should have close button', async () => {
-      const canvas = within(canvasElement.parentElement!);
       const dialog = canvas.getByRole('button', { name: /Close/i });
       expect(dialog).toBeInTheDocument();
     });
 
     await step('Dialog should have confirm button', async () => {
-      const canvas = within(canvasElement.parentElement!);
       const dialog = canvas.getByRole('button', { name: /confirm/i });
       expect(dialog).toBeInTheDocument();
     });
 
     await step('Should call onClose when close button is clicked', async () => {
-      const canvas = within(canvasElement.parentElement!);
       const dialog = canvas.getByRole('button', { name: /Close/i });
       await userEvent.click(dialog);
       expect(args.onClose).toHaveBeenCalled();

@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, within } from 'storybook/test';
 
 import { Button } from '@/components/ui/button';
-import { I18nProviderClient } from '@/locales/client';
 
 import PageHeader from '../page/page-header';
 
@@ -10,11 +9,7 @@ const meta = {
   title: 'Organisms/PageHeader',
   component: PageHeader,
   args: { title: 'Test Title', description: 'Test Description' },
-  render: args => (
-    <I18nProviderClient locale="en">
-      <PageHeader {...args} />
-    </I18nProviderClient>
-  ),
+  render: args => <PageHeader {...args} />,
 } satisfies Meta<typeof PageHeader>;
 
 export default meta;
@@ -23,17 +18,13 @@ type Story = StoryObj<typeof meta>;
 
 export const Default = {
   play: async ({ canvasElement, step, args }) => {
+    const canvas = within(canvasElement);
+    const pageHeader = canvas.getByText(args.title ?? '');
     await step('Page header should be in the document', async () => {
-      const canvas = within(canvasElement);
-      const pageHeader = canvas.getByText(args.title ?? '');
-
       expect(pageHeader).toBeInTheDocument();
     });
 
     await step('Page header should have description', async () => {
-      const canvas = within(canvasElement);
-      const pageHeader = canvas.getByText(args.description ?? '');
-
       expect(pageHeader).toBeInTheDocument();
     });
   },

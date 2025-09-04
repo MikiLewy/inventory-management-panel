@@ -1,19 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { I18nProviderClient } from '@/locales/client';
-
 import { LoadingButton } from '../loading-button';
 
 const meta = {
   title: 'Atoms/LoadingButton',
   component: LoadingButton,
   args: { onClick: fn(), loading: false, children: 'Button' },
-  render: args => (
-    <I18nProviderClient locale="en">
-      <LoadingButton {...args}>Button</LoadingButton>
-    </I18nProviderClient>
-  ),
+  render: args => <LoadingButton {...args}>Button</LoadingButton>,
 } satisfies Meta<typeof LoadingButton>;
 
 export default meta;
@@ -21,21 +15,17 @@ type Story = StoryObj<typeof meta>;
 
 export const Default = {
   play: async ({ canvasElement, step, args }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button');
     step('Button should be in the document', async () => {
-      const canvas = within(canvasElement);
-      const button = canvas.getByRole('button');
       expect(button).toBeInTheDocument();
     });
 
     step('Button should be clickable', async () => {
-      const canvas = within(canvasElement);
-      const button = canvas.getByRole('button');
       expect(button).toBeEnabled();
     });
 
     step('Should call onClick', async () => {
-      const canvas = within(canvasElement);
-      const button = canvas.getByRole('button');
       await userEvent.click(button);
 
       expect(args.onClick).toHaveBeenCalled();

@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { I18nProviderClient } from '@/locales/client';
-
 import { StepNavigatorButtons } from '../step-navigator-buttons';
 
 const meta = {
@@ -18,11 +16,9 @@ const meta = {
     buttonSize: 'default',
   },
   render: args => (
-    <I18nProviderClient locale="en">
-      <div className="w-full h-full flex justify-start">
-        <StepNavigatorButtons {...args} />
-      </div>
-    </I18nProviderClient>
+    <div className="w-full h-full flex justify-start">
+      <StepNavigatorButtons {...args} />
+    </div>
   ),
 } satisfies Meta<typeof StepNavigatorButtons>;
 
@@ -32,27 +28,21 @@ type Story = StoryObj<typeof meta>;
 
 export const Default = {
   play: async ({ canvasElement, step, args }) => {
+    const canvas = within(canvasElement);
+    const nextButton = canvas.getByRole('button', { name: args.onNextTitle ?? 'Next' });
+    const backButton = canvas.getByRole('button', { name: /Previous/i });
     await step('Step navigator buttons should be in the document', async () => {
-      const canvas = within(canvasElement);
-
-      const nextButton = canvas.getByRole('button', { name: args.onNextTitle ?? 'Next' });
-      const backButton = canvas.getByRole('button', { name: /Previous/i });
-
       expect(nextButton).toBeInTheDocument();
       expect(backButton).toBeInTheDocument();
     });
 
     await step('Next button should be clickable', async () => {
-      const canvas = within(canvasElement);
-      const nextButton = canvas.getByRole('button', { name: args.onNextTitle ?? 'Next' });
       await userEvent.click(nextButton);
 
       expect(args.onNext).toHaveBeenCalled();
     });
 
     await step('Back button should be clickable', async () => {
-      const canvas = within(canvasElement);
-      const backButton = canvas.getByRole('button', { name: /Previous/i });
       await userEvent.click(backButton);
 
       expect(args.onBack).toHaveBeenCalled();
