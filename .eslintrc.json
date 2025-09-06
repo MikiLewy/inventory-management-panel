@@ -10,18 +10,34 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@tanstack/eslint-plugin-query/recommended",
-    "prettier"
+    "prettier",
+    "plugin:storybook/recommended"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": ["./tsconfig.json"]
+    "project": [
+      "./tsconfig.json"
+    ]
   },
-  "plugins": ["import", "unused-imports", "@typescript-eslint", "@tanstack/query"],
+  "plugins": [
+    "import",
+    "unused-imports",
+    "@typescript-eslint",
+    "@tanstack/query"
+  ],
   "settings": {
     "import/resolver": {
       "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"],
-        "moduleDirectory": ["node_modules", "src/"]
+        "extensions": [
+          ".js",
+          ".jsx",
+          ".ts",
+          ".tsx"
+        ],
+        "moduleDirectory": [
+          "node_modules",
+          "src/"
+        ]
       }
     }
   },
@@ -46,7 +62,19 @@
     "import/order": [
       "warn",
       {
-        "groups": [["builtin", "external"], "internal", "parent", ["sibling", "index"], "object"],
+        "groups": [
+          [
+            "builtin",
+            "external"
+          ],
+          "internal",
+          "parent",
+          [
+            "sibling",
+            "index"
+          ],
+          "object"
+        ],
         "newlines-between": "always",
         "alphabetize": {
           "order": "asc",
@@ -55,7 +83,9 @@
       }
     ],
     "complexity": "warn",
-    "no-console": ["warn"],
+    "no-console": [
+      "warn"
+    ],
     "import/newline-after-import": [
       "error",
       {
