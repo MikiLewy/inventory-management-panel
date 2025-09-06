@@ -3,16 +3,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useRouter } from 'nextjs-toploader/app';
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
+import { LoadingButton } from '@/components/atoms/loading-button';
 import { PasswordInput } from '@/components/atoms/password-input';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useUser } from '@/features/auth/providers/auth-providers';
 import { SupabaseError } from '@/features/auth/types/supabase-error';
-import { useCurrentLocale, useI18n } from '@/locales/client';
+import { useI18n } from '@/locales/client';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@components/ui/form';
 
 import { login } from '../../../api/actions/auth';
@@ -32,10 +30,6 @@ const defaultValues: FormValues = {
 
 const LoginForm = () => {
   const t = useI18n();
-
-  const user = useUser();
-
-  const currentLocale = useCurrentLocale();
 
   const router = useRouter();
 
@@ -58,12 +52,6 @@ const LoginForm = () => {
       toast.error(supabaseError.message);
     }
   };
-
-  useEffect(() => {
-    if (user) {
-      router.push(`/${currentLocale}/inventory`);
-    }
-  }, [user, form.formState.errors.root?.message, currentLocale]);
 
   return (
     <Form {...form}>
@@ -110,9 +98,9 @@ const LoginForm = () => {
               )}
             />
           </div>
-          <Button type="submit" className="w-full">
+          <LoadingButton type="submit" loading={form.formState.isSubmitting} className="w-full">
             {t('auth.login.loginButton')}
-          </Button>
+          </LoadingButton>
           <div className="text-center text-sm">
             {t('auth.login.dontHaveAccount')}
             <Link href="/sign-up" className="underline underline-offset-4 ml-1">
