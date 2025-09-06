@@ -123,6 +123,7 @@ export function DataTable<TData extends { id: number | string }, TValue>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
     onRowSelectionChange: selectable?.setRowSelection,
     getRowId: row => row.id.toString(),
+    enableRowSelection: !!selectable,
     state: {
       sorting: sortable ? [{ id: sortable.sortBy, desc: sortable.sortDirection === 'desc' }] : [],
       columnVisibility: view
@@ -135,7 +136,7 @@ export function DataTable<TData extends { id: number | string }, TValue>({
         pageIndex: pagination?.pageIndex ?? 0,
         pageSize: pagination?.pageSize ?? 10,
       },
-      rowSelection: selectable?.rowSelection,
+      rowSelection: selectable?.rowSelection || {},
     },
   });
 

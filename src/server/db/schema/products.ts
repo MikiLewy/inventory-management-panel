@@ -5,6 +5,7 @@ import { ProductStatus } from '../types/enum/product-status';
 import { SizeUnit } from '../types/enum/size-unit';
 
 import { categories } from './categories';
+import { warehouses } from './warehouse';
 
 export const productStatusEnum = pgEnum('status', ProductStatus);
 
@@ -26,13 +27,22 @@ export const products = pgTable('products', {
     'https://uwjszqyssojnwfikscsx.supabase.co/storage/v1/object/public/products//placeholder.png',
   ),
   createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  updatedAt: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => new Date()),
   userId: text('user_id').notNull(),
+  warehouseId: integer('warehouse_id')
+    .default(1)
+    .references(() => warehouses.id, { onDelete: 'set null', onUpdate: 'cascade' }),
 });
 
 export const productsRelations = relations(products, ({ one }) => ({
   category: one(categories, {
     fields: [products.categoryId],
     references: [categories.id],
+  }),
+  warehouse: one(warehouses, {
+    fields: [products.warehouseId],
+    references: [warehouses.id],
   }),
 }));

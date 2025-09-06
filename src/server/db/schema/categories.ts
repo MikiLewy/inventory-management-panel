@@ -13,7 +13,9 @@ export const categories = pgTable('categories', {
   translations: jsonb('translations'),
   type: categoryTypeEnum('type').default(CategoryType.SNEAKERS),
   createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  updatedAt: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
 export const categoriesRelations = relations(categories, ({ many }) => ({

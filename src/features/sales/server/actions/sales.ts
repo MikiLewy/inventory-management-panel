@@ -36,7 +36,7 @@ export const createSale = async (payload: CreateSaleFormValues) => {
   } = payload;
 
   try {
-    db.insert(sales).values({
+    return db.insert(sales).values({
       name,
       sku,
       size,
@@ -133,7 +133,7 @@ export const deleteSales = async (salesIds: number[]) => {
   try {
     return Promise.allSettled(
       salesIds.map(async saleId => {
-        await db.delete(sales).where(and(eq(sales.id, saleId), eq(sales.userId, user?.id || '')));
+        return db.delete(sales).where(and(eq(sales.id, saleId), eq(sales.userId, user?.id || '')));
       }),
     );
   } catch (error) {
