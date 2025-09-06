@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import { ReactNode } from 'react';
 
 import { I18nProviderClient } from '@/locales/client';
 import { Providers } from '@/providers/providers';
@@ -8,7 +8,7 @@ export default async function SubLayout({
   children,
 }: {
   params: Promise<{ locale: string }>;
-  children: ReactElement;
+  children: ReactNode;
 }) {
   const { locale } = await params;
 
