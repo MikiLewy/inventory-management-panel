@@ -14,6 +14,7 @@ import {
   InventoryActionSlotPayload,
   useInventoryTableColumns,
 } from '@/features/inventory/hooks/use-inventory-table-columns';
+import { useWarehouses } from '@/features/warehouse/hooks/query/use-warehouses';
 import { useDialog } from '@/hooks/use-dialog';
 import { useSelection } from '@/hooks/use-selection';
 import { useUrlFilters } from '@/hooks/use-url-filters';
@@ -36,6 +37,8 @@ const ClientInventory = () => {
   const { sortBy, sortDirection, onSortChange } = useUrlSort('updated_at', 'desc');
 
   const { filters } = useUrlFilters();
+
+  const { data: warehousesData } = useWarehouses();
 
   const { data: productsData, isLoading } = useProducts({ offset, limit, query, sortBy, sortDirection, filters });
 
@@ -121,6 +124,15 @@ const ClientInventory = () => {
           value: ProductStatus.IN_DELIVERY,
         },
       ],
+    },
+    {
+      id: 'warehouse',
+      title: t('inventory.table.warehouse'),
+      options:
+        warehousesData?.map(warehouse => ({
+          label: warehouse.name || '',
+          value: warehouse.id || '',
+        })) || [],
     },
   ];
 

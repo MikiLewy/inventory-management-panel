@@ -19,7 +19,7 @@ import { useUrlSort } from '@/hooks/use-url-sort';
 import { useI18n } from '@/locales/client';
 
 import RemoveSalesDialog from '../../organisms/dialogs/remove-sales-dialog';
-import RevertSalesDialog from '../../organisms/dialogs/revert-sales-dialog';
+import RevertSalesDialog from '../../organisms/dialogs/revert-sales-dialog/revert-sales-dialog';
 import { EditSaleSheet } from '../../organisms/edit-sales-sheet/edit-sale-sheet';
 
 const ClientInventory = () => {

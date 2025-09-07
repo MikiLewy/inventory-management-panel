@@ -17,4 +17,5 @@ export interface CreateProductPayload {
   categoryId: number;
   sizeUnit: SizeUnit;
   imageUrl?: string;
+  warehouseId: number;
 }

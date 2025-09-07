@@ -12,8 +12,9 @@ export const useRevertSales = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (salesIds: number[]) => revertSales(salesIds),
-    onSuccess: (_, salesIds) => {
+    mutationFn: ({ salesIds, warehouseId }: { salesIds: number[]; warehouseId: number }) =>
+      revertSales(salesIds, warehouseId),
+    onSuccess: (_, { salesIds }) => {
       queryClient.invalidateQueries({ queryKey: salesKeys.lists() });
 
       toast.success(

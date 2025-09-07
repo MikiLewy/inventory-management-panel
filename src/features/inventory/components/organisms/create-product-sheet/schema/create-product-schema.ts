@@ -16,6 +16,7 @@ export const useCreateProductSchema = () => {
     categoryId: z.coerce.number({ invalid_type_error: t('validation.required') }).min(1, t('validation.required')),
     sizeUnit: z.nativeEnum(SizeUnit),
     imageUrl: z.string().optional(),
+    warehouseId: z.coerce.number({ invalid_type_error: t('validation.required') }).min(1, t('validation.required')),
     products: z.array(
       z.object({
         size: z.string().min(1, t('validation.required')),

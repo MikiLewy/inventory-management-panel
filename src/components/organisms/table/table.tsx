@@ -16,7 +16,7 @@ export function Table<TData>({ columnsLength, table, isLoading }: TableProps<TDa
   const t = useI18n();
 
   return (
-    <div className="rounded-md border">
+    <div className={`rounded-md border`}>
       {isLoading ? (
         <div className="flex flex-col gap-2 p-4">
           {Array.from({ length: 10 }).map((_, index) => (
@@ -24,7 +24,7 @@ export function Table<TData>({ columnsLength, table, isLoading }: TableProps<TDa
           ))}
         </div>
       ) : (
-        <DataTable>
+        <DataTable className={`${table.getRowModel().rows?.length ? 'border-collapse' : 'border-separate'}`}>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id}>

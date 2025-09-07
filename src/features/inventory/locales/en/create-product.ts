@@ -12,6 +12,8 @@ export default {
       category: 'Category',
       categoryPlaceholder: 'Select category',
       brand: 'Brand',
+      warehouse: 'Warehouse',
+      warehousePlaceholder: 'Select warehouse',
       status: 'Status',
       statusPlaceholder: 'Select status',
       brandPlaceholder: 'Brand',

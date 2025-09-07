@@ -20,7 +20,7 @@ export const createProduct = async (payload: CreateProductPayload) => {
     throw new Error('Unauthorized');
   }
 
-  const { name, sku, categoryId, products: createdProducts, status, brand, sizeUnit, imageUrl } = payload;
+  const { name, sku, categoryId, products: createdProducts, status, brand, sizeUnit, imageUrl, warehouseId } = payload;
 
   const mappedProducts = createdProducts.reduce(
     (acc, product) => {
@@ -54,6 +54,7 @@ export const createProduct = async (payload: CreateProductPayload) => {
           purchasePlace: product.purchasePlace,
           createdAt: new Date(),
           userId: user?.id || '',
+          warehouseId,
         });
       }),
     );
@@ -71,8 +72,20 @@ export const updateProduct = async (id: number, payload: UpdateProductPayload) =
     throw new Error('Unauthorized');
   }
 
-  const { name, sku, categoryId, purchasePrice, size, purchaseDate, purchasePlace, status, brand, imageUrl, sizeUnit } =
-    payload;
+  const {
+    name,
+    sku,
+    categoryId,
+    purchasePrice,
+    size,
+    purchaseDate,
+    purchasePlace,
+    status,
+    brand,
+    imageUrl,
+    sizeUnit,
+    warehouseId,
+  } = payload;
 
   const existingProduct = await db.query.products.findFirst({
     where: eq(products.id, Number(id)),
@@ -97,6 +110,7 @@ export const updateProduct = async (id: number, payload: UpdateProductPayload) =
         sizeUnit,
         imageUrl,
         purchasePlace,
+        warehouseId,
         updatedAt: new Date(),
       })
       .where(and(eq(products.id, Number(id)), eq(products.userId, user?.id || '')));
