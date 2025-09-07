@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import DashboardTemplate from '@/components/templates/dashboard';
+import { Dashboard as DashboardTemplate } from '@/components/templates/dashboard';
 
 interface Props {
   children: ReactNode;

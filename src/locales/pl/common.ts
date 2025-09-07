@@ -53,4 +53,8 @@ export default {
     title: 'Zarządzaj magazynem i śledź każdą sprzedaż bez trudu dzięki',
     getStarted: 'Rozpocznij',
   },
+  onboarding: {
+    addWarehouseDescription: 'Dodaj magazyn, w którym będziesz przechowywać swoje produkty.',
+    addWarehouseButton: 'Dodaj magazyn',
+  },
 } as const;
