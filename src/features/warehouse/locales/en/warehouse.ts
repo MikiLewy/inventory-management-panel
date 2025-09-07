@@ -46,7 +46,11 @@ export default {
     },
     remove: {
       title: 'Remove warehouse',
-      description: 'Are you sure you want to remove warehouse {warehouseName}?',
+      description:
+        'Are you sure you want to remove warehouse {warehouseName}? All products from this warehouse will be moved to another warehouse.',
+      selectWarehouse: 'Select warehouse to which the products will be moved.',
+      warehousePlaceholder: 'Select warehouse',
+      warehouse: 'Warehouse *',
       success: 'Warehouse removed successfully',
       error: 'Failed to remove warehouse',
       confirmButton: 'Yes, remove',

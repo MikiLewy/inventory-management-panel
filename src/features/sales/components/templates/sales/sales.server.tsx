@@ -1,6 +1,7 @@
 import Page from '@/components/organisms/page/page';
 import { prefetchProducts } from '@/features/inventory/api/lib/products.prefetch';
 import { prefetchSales } from '@/features/sales/api/lib/sales.prefetch';
+import { prefetchWarehouses } from '@/features/warehouse/api/lib/warehouse.prefetch';
 import { getI18n } from '@/locales/server';
 import HydrationBoundaryProvider from '@/providers/hydration-boundary-provider';
 import { prefetchCategories } from '@/shared/api/lib/categories.prefetch';
@@ -18,7 +19,8 @@ const ServerSales = async () => {
         <SalesPageHeaderActions />
       </Page.Header>
       <Page.ContentContainer>
-        <HydrationBoundaryProvider prefetchDataFunctions={[prefetchSales, prefetchProducts, prefetchCategories]}>
+        <HydrationBoundaryProvider
+          prefetchDataFunctions={[prefetchSales, prefetchProducts, prefetchCategories, prefetchWarehouses]}>
           <ClientSales />
         </HydrationBoundaryProvider>
       </Page.ContentContainer>

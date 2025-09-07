@@ -14,7 +14,7 @@ import { useDialog } from '@/hooks/use-dialog';
 import { useI18n } from '@/locales/client';
 
 import { CreateWarehouseSheet } from '../../organisms/create-warehouse-sheet/create-warehouse-sheet';
-import RemoveWarehouseDialog from '../../organisms/dialogs/remove-warehouse-dialog';
+import RemoveWarehouseDialog from '../../organisms/dialogs/remove-warehouse-dialog/remove-warehouse-dialog';
 
 const ClientWarehouses = () => {
   const t = useI18n();

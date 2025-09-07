@@ -33,7 +33,7 @@ export const products = pgTable('products', {
   userId: text('user_id').notNull(),
   warehouseId: integer('warehouse_id')
     .default(1)
-    .references(() => warehouses.id, { onDelete: 'set null', onUpdate: 'cascade' }),
+    .references(() => warehouses.id, { onUpdate: 'cascade' }),
 });
 
 export const productsRelations = relations(products, ({ one }) => ({

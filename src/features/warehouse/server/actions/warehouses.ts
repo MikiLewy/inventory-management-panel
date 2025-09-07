@@ -4,7 +4,7 @@
 import { and, eq } from 'drizzle-orm';
 
 import { db } from '@/server/db';
-import { warehouses } from '@/server/db/schema';
+import { products, warehouses } from '@/server/db/schema';
 import { getLoggedInUser } from '@/server/utils/get-logged-in-user';
 
 import { CreateWarehousePayload } from '../../types/payload/create-warehouse';
@@ -72,7 +72,7 @@ export const updateWarehouse = async (id: number, payload: CreateWarehousePayloa
   }
 };
 
-export const deleteWarehouse = async (warehouseId: number) => {
+export const deleteWarehouse = async (warehouseId: number, warehouseIdToMoveProducts: number | undefined) => {
   const user = await getLoggedInUser();
 
   if (!user) {
@@ -80,7 +80,17 @@ export const deleteWarehouse = async (warehouseId: number) => {
   }
 
   try {
-    return db.delete(warehouses).where(and(eq(warehouses.id, warehouseId), eq(warehouses.userId, user?.id || '')));
+    if (warehouseIdToMoveProducts) {
+      return db.transaction(async tx => {
+        await tx
+          .update(products)
+          .set({ warehouseId: warehouseIdToMoveProducts })
+          .where(and(eq(products.warehouseId, warehouseId), eq(products.userId, user?.id || '')));
+        await tx.delete(warehouses).where(and(eq(warehouses.id, warehouseId), eq(warehouses.userId, user?.id || '')));
+      });
+    } else {
+      return db.delete(warehouses).where(and(eq(warehouses.id, warehouseId), eq(warehouses.userId, user?.id || '')));
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unexpected error';
 

@@ -46,7 +46,11 @@ export default {
     },
     remove: {
       title: 'Usuń magazyn',
-      description: 'Czy na pewno chcesz usunąć magazyn {warehouseName}?',
+      description:
+        'Czy na pewno chcesz usunąć magazyn {warehouseName}? Wszystkie produkty z tego magazynu zostaną przeniesione do innego magazynu.',
+      selectWarehouse: 'Wybierz magazyn, do którego produkty zostaną przeniesione.',
+      warehousePlaceholder: 'Wybierz magazyn',
+      warehouse: 'Magazyn *',
       success: 'Magazyn został usunięty pomyślnie',
       error: 'Nie udało się usunąć magazynu',
       confirmButton: 'Tak, usuń',

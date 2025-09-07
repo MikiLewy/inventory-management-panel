@@ -59,8 +59,8 @@ export const removeSales = async (salesIds: number[]) => {
   return deleteSalesAction(salesIds);
 };
 
-export const revertSales = async (saleIds: number[]) => {
-  return revertSalesAction(saleIds);
+export const revertSales = async (saleIds: number[], warehouseId: number) => {
+  return revertSalesAction(saleIds, warehouseId);
 };
 
 export const duplicateSale = async (saleId: number) => {

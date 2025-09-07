@@ -13,6 +13,7 @@ const getStatusWhere = (status: ProductStatus[]) => {
   return undefined;
 };
 
+// eslint-disable-next-line complexity
 export async function GET(request: NextRequest) {
   const user = await getLoggedInUser();
 
@@ -35,9 +36,9 @@ export async function GET(request: NextRequest) {
     where.push(or(ilike(products.name, `%${search}%`), ilike(products.sku, `%${search}%`)));
   }
 
-  const parsedFilters: { status?: ProductStatus[]; dateRange?: { from: string; to: string } } | undefined = filters
-    ? JSON.parse(filters)
-    : undefined;
+  const parsedFilters:
+    | { status?: ProductStatus[]; warehouse?: string[]; dateRange?: { from: string; to: string } }
+    | undefined = filters ? JSON.parse(filters) : undefined;
 
   if (parsedFilters?.status && parsedFilters?.status?.length > 0) {
     where.push(getStatusWhere(parsedFilters.status));
@@ -47,6 +48,10 @@ export async function GET(request: NextRequest) {
     where.push(
       between(products.purchaseDate, new Date(parsedFilters.dateRange.from), new Date(parsedFilters.dateRange.to)),
     );
+  }
+
+  if (parsedFilters?.warehouse && parsedFilters?.warehouse?.length > 0) {
+    where.push(inArray(products.warehouseId, parsedFilters.warehouse.map(Number)));
   }
 
   try {

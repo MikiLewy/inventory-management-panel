@@ -19,5 +19,6 @@ export const useEditProductSchema = () => {
     purchasePrice: z.coerce.number({ invalid_type_error: t('validation.required') }).min(0, t('validation.positive')),
     purchasePlace: z.string().optional(),
     purchaseDate: z.date().optional(),
+    warehouseId: z.coerce.number({ invalid_type_error: t('validation.required') }).min(1, t('validation.required')),
   });
 };

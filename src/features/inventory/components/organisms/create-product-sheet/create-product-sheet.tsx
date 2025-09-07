@@ -31,6 +31,7 @@ export interface CreateProductFormValues {
   sizeUnit: SizeUnit;
   brand: string | undefined;
   imageUrl: string | undefined;
+  warehouseId: number | undefined;
   products: {
     size: string;
     quantity: number;
@@ -49,6 +50,7 @@ const defaultValues: CreateProductFormValues = {
   sizeUnit: SizeUnit.EU,
   brand: '',
   products: [],
+  warehouseId: undefined,
   imageUrl: undefined,
 };
 

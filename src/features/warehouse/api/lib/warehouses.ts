@@ -20,6 +20,12 @@ export const fetchWarehouse = async (id: number): Promise<Warehouse> => {
   return data;
 };
 
+export const fetchWarehouseHasProducts = async (id: number): Promise<boolean> => {
+  const { data } = await api.get(`/warehouses/${id}/has-products`);
+
+  return data;
+};
+
 export const createWarehouse = async (warehouse: CreateWarehousePayload) => {
   return createWarehouseAction(warehouse);
 };
@@ -28,6 +34,6 @@ export const updateWarehouse = async (id: number, warehouse: CreateWarehousePayl
   return updateWarehouseAction(id, warehouse);
 };
 
-export const removeWarehouse = async (warehouseId: number) => {
-  return deleteWarehouseAction(warehouseId);
+export const removeWarehouse = async (warehouseId: number, warehouseIdToMoveProducts: number | undefined) => {
+  return deleteWarehouseAction(warehouseId, warehouseIdToMoveProducts);
 };

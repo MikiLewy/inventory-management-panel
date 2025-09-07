@@ -143,7 +143,7 @@ export const deleteSales = async (salesIds: number[]) => {
   }
 };
 
-export const revertSale = async (saleIds: number[]) => {
+export const revertSale = async (saleIds: number[], warehouseId: number) => {
   const user = await getLoggedInUser();
 
   if (!user) {
@@ -177,6 +177,7 @@ export const revertSale = async (saleIds: number[]) => {
             status: ProductStatus.IN_STOCK,
             updatedAt: new Date(),
             userId: user?.id || '',
+            warehouseId,
           });
         });
       }),

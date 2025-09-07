@@ -12,7 +12,13 @@ export const useRemoveWarehouse = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (warehouseId: number) => removeWarehouse(warehouseId),
+    mutationFn: ({
+      warehouseId,
+      warehouseIdToMoveProducts,
+    }: {
+      warehouseId: number;
+      warehouseIdToMoveProducts: number | undefined;
+    }) => removeWarehouse(warehouseId, warehouseIdToMoveProducts),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: warehousesKeys.lists() });
 
