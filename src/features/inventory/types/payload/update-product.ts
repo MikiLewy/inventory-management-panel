@@ -14,4 +14,5 @@ export interface UpdateProductPayload {
   categoryId: number;
   sizeUnit: SizeUnit;
   imageUrl?: string;
+  warehouseId: number;
 }

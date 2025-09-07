@@ -13,6 +13,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 
+import SidebarFooter from '../molecules/sidebar-footer';
 import { SidebarItems } from '../molecules/sidebar-items';
 import { Separator } from '../ui/separator';
 
@@ -41,6 +42,7 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarCompone
           <SidebarItems />
         </SidebarContent>
       </SidebarGroup>
+      <SidebarFooter />
     </SidebarComponent>
   );
 }

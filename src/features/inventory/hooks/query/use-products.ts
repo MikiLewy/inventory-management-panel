@@ -20,6 +20,7 @@ export const useProducts = ({
   sortBy?: string;
   filters?: {
     status?: ProductStatus[];
+    warehouse?: string[];
     dateRange?: {
       from: Date;
       to: Date;

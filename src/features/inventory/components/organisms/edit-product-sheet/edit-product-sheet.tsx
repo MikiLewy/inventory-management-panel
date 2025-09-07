@@ -18,6 +18,7 @@ import { ProductStatus } from '@/features/inventory/api/types/enum/product-statu
 import { productStatusTranslations } from '@/features/inventory/constants/product-status';
 import { useEditProduct } from '@/features/inventory/hooks/mutation/use-update-product';
 import { useProduct } from '@/features/inventory/hooks/query/use-product';
+import { useWarehouses } from '@/features/warehouse/hooks/query/use-warehouses';
 import { useCurrentLocale, useI18n } from '@/locales/client';
 import { useCategories } from '@/shared/hooks/query/use-categories';
 import { useProductSuggestions } from '@/shared/hooks/query/use-product-suggestions';
@@ -37,6 +38,7 @@ export interface FormValues {
   purchasePrice: number;
   purchasePlace?: string | undefined;
   purchaseDate?: Date | undefined;
+  warehouseId: number | undefined;
 }
 
 const defaultValues: FormValues = {
@@ -51,6 +53,7 @@ const defaultValues: FormValues = {
   purchasePrice: 0,
   purchasePlace: undefined,
   purchaseDate: undefined,
+  warehouseId: undefined,
 };
 
 interface Props {
@@ -81,6 +84,10 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
 
   const { data: categoriesData } = useCategories();
 
+  const { data: warehousesData } = useWarehouses(open);
+
+  const hasMoreThanOneWarehouse = warehousesData?.length && warehousesData?.length > 1;
+
   useEffect(() => {
     if (!open) {
       form.reset(defaultValues, {
@@ -104,6 +111,7 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
             purchaseDate: new Date(productData.purchaseDate || new Date()),
             categoryId: productData.categoryId || undefined,
             imageUrl: productData.imageUrl || undefined,
+            warehouseId: productData.warehouseId || undefined,
           },
           {
             keepDirty: false,
@@ -126,6 +134,7 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
           ...values,
           status: values.status as ProductStatus,
           categoryId: values.categoryId || 0,
+          warehouseId: values.warehouseId || 0,
         },
       },
       {
@@ -415,6 +424,43 @@ export function EditProductSheet({ open, onClose, selectedProductId }: Props) {
                 </div>
               </div>
             </div>
+            {hasMoreThanOneWarehouse ? (
+              <div className="flex flex-col gap-1">
+                <div className="flex gap-4">
+                  <FormField
+                    name="warehouseId"
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <div className="flex flex-col gap-2 w-full">
+                        <FormLabel>{t('createProduct.steps.productDetails.warehouse')} *</FormLabel>
+                        <Select
+                          value={value?.toString() || ''}
+                          defaultValue={value?.toString() || ''}
+                          onValueChange={onChange}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder={t('createProduct.steps.productDetails.warehousePlaceholder')} />
+                          </SelectTrigger>
+                          <SelectContent side="bottom">
+                            {warehousesData?.map(warehouse => (
+                              <SelectItem key={warehouse.id} value={warehouse.id?.toString()}>
+                                {warehouse.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  />
+                  <div className="w-full" />
+                </div>
+                <div className="flex gap-4 w-full">
+                  <div className="w-full">
+                    {errors?.warehouseId?.message ? <FormMessage>{errors?.warehouseId?.message}</FormMessage> : null}
+                  </div>
+                  <div className="w-full"></div>
+                </div>
+              </div>
+            ) : null}
           </FormProvider>
         </div>
         <div className="flex justify-end gap-2 mt-auto mb-6 mx-4">

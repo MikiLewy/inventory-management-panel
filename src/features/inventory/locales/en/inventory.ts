@@ -10,6 +10,7 @@ export default {
     category: 'Category',
     status: 'Status',
     brand: 'Brand',
+    warehouse: 'Warehouse',
     purchasePrice: 'Purchase price',
     purchaseDate: 'Purchase date',
     purchasePlace: 'Purchase place',

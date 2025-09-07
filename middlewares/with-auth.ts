@@ -17,6 +17,10 @@ export function withAuthMiddleware(middleware: CustomMiddleware) {
       return NextResponse.redirect(new URL('/en/login', request.url));
     }
 
+    if ((user && request.nextUrl.pathname === '/en/login') || request.nextUrl.pathname === '/pl/login') {
+      return NextResponse.redirect(new URL('/en/statistics', request.url));
+    }
+
     return middleware(request, event, response);
   };
 }

@@ -10,6 +10,7 @@ export default {
     category: 'Kategoria',
     status: 'Status',
     brand: 'Marka',
+    warehouse: 'Magazyn',
     purchasePrice: 'Cena zakupu',
     purchaseDate: 'Data zakupu',
     purchasePlace: 'Miejsce zakupu',

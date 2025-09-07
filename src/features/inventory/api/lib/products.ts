@@ -24,6 +24,7 @@ export const fetchProducts = async (
   sortDirection?: SortDirection,
   filters?: {
     status?: ProductStatus[];
+    warehouse?: string[];
     dateRange?: {
       from: Date;
       to: Date;

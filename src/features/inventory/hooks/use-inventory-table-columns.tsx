@@ -7,6 +7,7 @@ import { TableColumnHeader } from '@/components/organisms/table/table-column-hea
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { dateFormats } from '@/constants/date-formats';
+import { useWarehouses } from '@/features/warehouse/hooks/query/use-warehouses';
 import { useFormatPrice } from '@/hooks/use-format-price';
 import { useCurrentLocale, useI18n } from '@/locales/client';
 import { CategoryType } from '@/server/db/types/enum/category-type';
@@ -28,6 +29,8 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
   const { formatPrice } = useFormatPrice();
 
   const currentLocale = useCurrentLocale();
+
+  const { data: warehousesData } = useWarehouses();
 
   const columns: ColumnDef<Product>[] = [
     {
@@ -161,6 +164,21 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
       },
     },
     {
+      accessorKey: 'warehouseId',
+      meta: t('inventory.table.warehouse'),
+      enableHiding: true,
+      enableSorting: false,
+      header: ({ column }) => {
+        return <TableColumnHeader column={column} title={t('inventory.table.warehouse')} />;
+      },
+      cell: ({ getValue }) => {
+        const warehouseId = getValue() as number;
+        const warehouse = warehousesData?.find(warehouse => warehouse.id === warehouseId);
+
+        return <p>{warehouse?.name || '-'}</p>;
+      },
+    },
+    {
       accessorKey: 'purchase_price',
       meta: t('inventory.table.purchasePrice'),
       header: ({ column }) => {
@@ -204,6 +222,7 @@ export const useInventoryTableColumns = (actionsSlot: (payload: InventoryActionS
         );
       },
     },
+
     {
       accessorKey: 'created_at',
       meta: t('inventory.table.createdAt'),

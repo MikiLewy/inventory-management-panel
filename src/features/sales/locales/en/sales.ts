@@ -28,6 +28,7 @@ export default {
         'Are you sure you want to revert sale of {productName}? All information about the sale will be lost and the product will be added back to the inventory.',
       descriptionMultiple:
         'Are you sure you want to revert the selected sales? All information about the sales will be lost and the products will be added back to the inventory.',
+      selectWarehouse: 'Select warehouse to which the product will be added back to the inventory.',
       confirmButton: 'Yes, revert',
       'success#one': 'Sale reverted successfully',
       'success#other': 'Sales reverted successfully',

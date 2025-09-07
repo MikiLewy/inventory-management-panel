@@ -79,6 +79,7 @@ const SizeAndPrice = ({ send, onClose }: Props) => {
         sizeUnit: values.sizeUnit,
         brand: values.brand,
         imageUrl: values.imageUrl,
+        warehouseId: values.warehouseId ?? 0,
       },
       {
         onSuccess: () => {

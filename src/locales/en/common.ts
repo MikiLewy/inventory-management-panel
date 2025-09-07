@@ -53,4 +53,8 @@ export default {
     title: 'Manage inventory and track every sale effortlessly with',
     getStarted: 'Get Started',
   },
+  onboarding: {
+    addWarehouseDescription: 'Add a warehouse in which you will store your inventory.',
+    addWarehouseButton: 'Add warehouse',
+  },
 } as const;

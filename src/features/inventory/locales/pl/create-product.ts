@@ -12,6 +12,8 @@ export default {
       category: 'Kategoria',
       categoryPlaceholder: 'Wybierz kategorię',
       status: 'Status',
+      warehouse: 'Magazyn',
+      warehousePlaceholder: 'Wybierz magazyn',
       statusPlaceholder: 'Wybierz status',
       brand: 'Marka',
       brandPlaceholder: 'Marka produktu',

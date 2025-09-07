@@ -28,6 +28,7 @@ export default {
         'Czy na pewno chcesz cofnąć sprzedaż produktu {productName}? Wszystkie informacje o sprzedaży zostaną utracone i produkt zostanie dodany z powrotem do magazynu.',
       descriptionMultiple:
         'Czy na pewno chcesz cofnąć wybrane sprzedaże? Wszystkie informacje o sprzedaży zostaną utracone i produkty zostaną dodane z powrotem do magazynu.',
+      selectWarehouse: 'Wybierz magazyn, do którego produkt zostanie dodany z powrotem do magazynu.',
       confirmButton: 'Tak, cofnij',
       'success#one': 'Sprzedaż została pomyślnie cofnięta',
       'success#other': 'Sprzedaże zostały pomyślnie cofnięte',
