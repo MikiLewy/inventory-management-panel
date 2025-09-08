@@ -222,6 +222,8 @@ export const duplicateProduct = async (id: number) => {
       purchasePlace: product?.purchasePlace,
       createdAt: new Date(),
       userId: user?.id || '',
+      warehouseId: product?.warehouseId || 0,
+      updatedAt: new Date(),
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unexpected error';
