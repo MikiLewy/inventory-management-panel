@@ -1,11 +1,13 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { getI18n } from '@/locales/server';
+import { getCurrentLocale, getI18n } from '@/locales/server';
 
 const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
   const t = await getI18n();
+  const locale = await getCurrentLocale();
 
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
@@ -26,8 +28,8 @@ const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
             </CardContent>
           </Card>
           <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-            {t('auth.byClickingContinue')} <a href="#">{t('auth.termsOfService')}</a> {t('auth.and')}{' '}
-            <a href="#">{t('auth.privacyPolicy')}</a>.
+            {t('auth.byClickingContinue')} <Link href={`/${locale}/terms-of-service`}>{t('auth.termsOfService')}</Link>{' '}
+            {t('auth.and')} <Link href={`/${locale}/privacy-policy`}>{t('auth.privacyPolicy')}</Link>.
           </div>
         </div>
       </div>

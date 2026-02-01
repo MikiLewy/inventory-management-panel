@@ -19,10 +19,14 @@ export const Footer = () => {
           </Link>
 
           <div className="flex items-center gap-6">
-            <Link href="#" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+            <Link
+              href={`/${locale}/privacy-policy`}
+              className="text-sm text-muted-foreground transition-colors hover:text-foreground">
               {t('home.footer.privacy')}
             </Link>
-            <Link href="#" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+            <Link
+              href={`/${locale}/terms-of-service`}
+              className="text-sm text-muted-foreground transition-colors hover:text-foreground">
               {t('home.footer.terms')}
             </Link>
           </div>
