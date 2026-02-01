@@ -1,0 +1,395 @@
+---
+description: Internationalization (i18n) patterns using next-international library
+globs: src/locales/**/*.ts, src/features/**/locales/**/*.ts, src/app/[locale]/**/*.tsx
+alwaysApply: false
+---
+
+# Internationalization (i18n)
+
+## Overview
+
+This project uses `next-international` for internationalization with support for:
+- **English (en)** - Default locale
+- **Polish (pl)**
+
+## Configuration Files
+
+### Client-side Setup
+```typescript
+// src/locales/client.ts
+'use client';
+
+import { createI18nClient } from 'next-international/client';
+
+export const {
+  useI18n,           // Get translation function
+  useScopedI18n,     // Get scoped translation function
+  I18nProviderClient, // Provider component
+  useCurrentLocale,  // Get current locale
+  useChangeLocale,   // Change locale function
+} = createI18nClient({
+  en: () => import('./en'),
+  pl: () => import('./pl'),
+});
+```
+
+### Server-side Setup
+```typescript
+// src/locales/server.ts
+import { createI18nServer } from 'next-international/server';
+
+export const {
+  getI18n,          // Get translation function (async)
+  getScopedI18n,    // Get scoped translation function (async)
+  getCurrentLocale, // Get current locale
+  getStaticParams,  // For static generation
+} = createI18nServer({
+  en: () => import('./en'),
+  pl: () => import('./pl'),
+});
+```
+
+### Middleware Setup
+```typescript
+// middlewares/with-internationalization.ts
+const I18nMiddleware = createI18nMiddleware({
+  locales: ['en', 'pl'],
+  defaultLocale: 'en',
+});
+```
+
+## Translation File Structure
+
+### Global Translations
+
+Located in `src/locales/{lang}/`:
+
+```
+src/locales/
+├── client.ts                 # Client-side i18n exports
+├── server.ts                 # Server-side i18n exports
+├── en/
+│   ├── index.ts             # Aggregates all EN translations
+│   ├── common.ts            # Common UI strings (buttons, pagination, etc.)
+│   ├── validation.ts        # Form validation messages
+│   └── routes.ts            # Navigation route labels
+└── pl/
+    ├── index.ts             # Aggregates all PL translations
+    ├── common.ts            # Common UI strings (Polish)
+    ├── validation.ts        # Validation messages (Polish)
+    └── routes.ts            # Route labels (Polish)
+```
+
+### Main Locale Index
+
+The main index file aggregates global and feature translations:
+
+```typescript
+// src/locales/en/index.ts
+import auth from '@features/auth/index.client';
+import inventory from '@features/inventory/index.client';
+import sales from '@features/sales/index.client';
+import statistics from '@features/statistics/index.client';
+import warehouse from '@features/warehouse/index.client';
+
+import common from './common';
+import routes from './routes';
+import validation from './validation';
+
+export default {
+  validation,
+  common,
+  routes,
+  ...auth.locales.en,
+  ...inventory.locales.en,
+  ...sales.locales.en,
+  ...statistics.locales.en,
+  ...warehouse.locales.en,
+} as const;
+```
+
+### Feature Translations
+
+Each feature module manages its own translations in `src/features/{feature}/locales/`:
+
+```
+src/features/{feature}/
+└── locales/
+    ├── en/
+    │   ├── index.ts         # Aggregates feature EN translations
+    │   └── {feature}.ts     # Feature-specific translations
+    └── pl/
+        ├── index.ts         # Aggregates feature PL translations
+        └── {feature}.ts     # Feature-specific translations (Polish)
+```
+
+#### Feature Locale Export Pattern
+
+```typescript
+// src/features/{feature}/locales/en/index.ts
+import featureName from './feature-name';
+import otherModule from './other-module';
+
+export default {
+  featureName,
+  otherModule,
+} as const;
+```
+
+#### Feature Client Export with Locales
+
+```typescript
+// src/features/{feature}/index.client.ts
+import en from './locales/en';
+import pl from './locales/pl';
+
+export default {
+  locales: {
+    en,
+    pl,
+  },
+} as const;
+```
+
+## Usage Patterns
+
+### Server Components
+
+```typescript
+// In async server components
+import { getI18n } from '@/locales/server';
+
+export default async function ServerComponent() {
+  const t = await getI18n();
+
+  return (
+    <div>
+      <h1>{t('common.home.title')}</h1>
+      <button>{t('common.button.submit')}</button>
+    </div>
+  );
+}
+```
+
+### Client Components
+
+```typescript
+// In client components
+'use client';
+
+import { useI18n } from '@/locales/client';
+
+export function ClientComponent() {
+  const t = useI18n();
+
+  return (
+    <div>
+      <h1>{t('inventory.title')}</h1>
+      <button>{t('common.button.submit')}</button>
+    </div>
+  );
+}
+```
+
+### Language Switching
+
+```typescript
+'use client';
+
+import { useChangeLocale, useCurrentLocale } from '@/locales/client';
+
+export function LanguageSwitcher() {
+  const changeLocale = useChangeLocale({ preserveSearchParams: true });
+  const currentLocale = useCurrentLocale();
+
+  return (
+    <button onClick={() => changeLocale(currentLocale === 'en' ? 'pl' : 'en')}>
+      {currentLocale === 'en' ? 'Polski' : 'English'}
+    </button>
+  );
+}
+```
+
+## Translation Key Patterns
+
+### Basic Strings
+
+```typescript
+export default {
+  title: 'Inventory',
+  add: 'Add product',
+} as const;
+```
+
+### Nested Objects
+
+```typescript
+export default {
+  button: {
+    submit: 'Submit',
+    cancel: 'Cancel',
+    loading: 'Loading...',
+  },
+  table: {
+    name: 'Name',
+    price: 'Price',
+  },
+} as const;
+```
+
+### Parameter Interpolation
+
+Use `{paramName}` syntax for dynamic values:
+
+```typescript
+// Translation file
+export default {
+  selectedOfRows: '{count} of {total} rows selected',
+  greeting: 'Hello, {name}!',
+  step: 'Step {step}',
+} as const;
+
+// Usage
+t('common.selectedOfRows', { count: 5, total: 10 }); // "5 of 10 rows selected"
+t('common.greeting', { name: 'John' }); // "Hello, John!"
+```
+
+### Pluralization
+
+Use `#one`, `#few`, `#other` suffixes for plural forms:
+
+```typescript
+// Translation file (supports Polish plural rules)
+export default {
+  dialog: {
+    remove: {
+      'success#one': 'Product removed successfully',
+      'success#few': 'Products removed successfully',  // Polish: 2-4 items
+      'success#other': 'Products removed successfully',
+    },
+  },
+  'minLength#one': 'Minimum length is {count} character',
+  'minLength#few': 'Minimum length is {count} characters',
+  'minLength#other': 'Minimum length is {count} characters',
+} as const;
+
+// Usage (library selects correct form based on count)
+t('inventory.dialog.remove.success', { count: 1 }); // "Product removed successfully"
+t('inventory.dialog.remove.success', { count: 5 }); // "Products removed successfully"
+```
+
+**Plural suffixes:**
+- `#one` - Singular (1 item)
+- `#few` - Few items (Polish: 2-4, varies by language)
+- `#other` - Many items (5+, or default)
+- `#zero` - Zero items (optional)
+
+## Adding New Translations
+
+### 1. Add Global Translation
+
+Edit `src/locales/en/common.ts` (or appropriate file):
+
+```typescript
+export default {
+  // ... existing translations
+  newSection: {
+    title: 'New Section',
+    description: 'This is a new section',
+  },
+} as const;
+```
+
+Then add the Polish version in `src/locales/pl/common.ts`.
+
+### 2. Add Feature Translation
+
+Create or edit `src/features/{feature}/locales/en/{feature}.ts`:
+
+```typescript
+export default {
+  title: 'Feature Title',
+  actions: {
+    create: 'Create Item',
+    edit: 'Edit Item',
+    delete: 'Delete Item',
+  },
+} as const;
+```
+
+Update the feature locale index:
+
+```typescript
+// src/features/{feature}/locales/en/index.ts
+import featureName from './feature-name';
+
+export default {
+  featureName,
+} as const;
+```
+
+### 3. Add Validation Message
+
+Edit `src/locales/en/validation.ts`:
+
+```typescript
+export default {
+  // ... existing validations
+  customValidation: 'Custom validation message',
+} as const;
+```
+
+## i18n in Zod Schemas
+
+Validation schemas use hooks to access translations:
+
+```typescript
+// schema/create-product-schema.ts
+import { useI18n } from '@/locales/client';
+import { z } from 'zod';
+
+export const useCreateProductSchema = () => {
+  const t = useI18n();
+
+  return z.object({
+    name: z.string().min(1, t('validation.required')),
+    email: z.string().email(t('validation.email')),
+    price: z.coerce.number().min(0, t('validation.positive')),
+  });
+};
+```
+
+## Layout Provider Setup
+
+The i18n provider wraps the app in the locale layout:
+
+```typescript
+// src/app/[locale]/layout.tsx
+import { I18nProviderClient } from '@/locales/client';
+
+export default async function LocaleLayout({
+  params,
+  children,
+}: {
+  params: Promise<{ locale: string }>;
+  children: ReactNode;
+}) {
+  const { locale } = await params;
+
+  return (
+    <I18nProviderClient locale={locale}>
+      {children}
+    </I18nProviderClient>
+  );
+}
+```
+
+## Best Practices
+
+1. **Always use `as const`** on translation objects for type safety
+2. **Keep translations organized** by domain (common, validation, routes, features)
+3. **Use semantic keys** like `button.submit` not `submitButtonText`
+4. **Add both languages** when adding new translations
+5. **Use parameter interpolation** for dynamic content, not string concatenation
+6. **Use pluralization** for countable items
+7. **Keep feature translations in features** not in global locales

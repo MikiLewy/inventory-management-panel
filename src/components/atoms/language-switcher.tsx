@@ -8,8 +8,7 @@ import { useChangeLocale, useCurrentLocale, useI18n } from '@/locales/client';
 import { Language } from '@/types/enum/language';
 
 import { Button } from '../ui/button';
-import { DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
-import { DropdownMenu } from '../ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 
 export default function LanguageSwitcher() {
   const t = useI18n();
@@ -26,7 +25,7 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon">
           <Image

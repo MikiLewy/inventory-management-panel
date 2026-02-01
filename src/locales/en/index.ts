@@ -1,4 +1,5 @@
 import auth from '@features/auth/index.client';
+import home from '@features/home/index.client';
 import inventory from '@features/inventory/index.client';
 import sales from '@features/sales/index.client';
 import statistics from '@features/statistics/index.client';
@@ -13,6 +14,7 @@ export default {
   common,
   routes,
   ...auth.locales.en,
+  ...home.locales.en,
   ...inventory.locales.en,
   ...sales.locales.en,
   ...statistics.locales.en,
