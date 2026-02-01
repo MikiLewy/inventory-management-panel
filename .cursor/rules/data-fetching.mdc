@@ -1,0 +1,274 @@
+---
+description: TanStack Query patterns, server actions, API routes, and data fetching conventions
+globs: src/features/**/api/**/*.ts, src/features/**/hooks/**/*.ts, src/features/**/server/**/*.ts, src/app/api/**/*.ts
+alwaysApply: false
+---
+
+# Data Fetching Patterns
+
+## Overview
+
+This project uses a layered data fetching architecture:
+
+1. **API Routes** (`src/app/api/`) - REST endpoints
+2. **API Client** (`src/api/clients/api.ts`) - Axios instance with interceptors
+3. **Fetch Functions** (`src/features/*/api/lib/`) - Type-safe API calls
+4. **Query Hooks** (`src/features/*/hooks/query/`) - TanStack Query wrappers
+5. **Mutation Hooks** (`src/features/*/hooks/mutation/`) - Mutation wrappers
+6. **Server Actions** (`src/features/*/server/actions/`) - Direct DB operations
+7. **Prefetch Functions** (`src/features/*/api/lib/*.prefetch.ts`) - SSR data loading
+
+## Data Flow Diagram
+
+```
+Server Component (.server.tsx)
+  ↓ prefetch
+HydrationBoundaryProvider
+  ↓ hydrate
+Client Component (.client.tsx)
+  ↓ useQuery/useMutation
+React Query Hook
+  ↓ fetch
+API Client (axios)
+  ↓ request
+API Route (/api/*)
+  ↓ query
+Server Action / Database (Drizzle ORM)
+```
+
+## Query Keys
+
+Define query keys in `features/{feature}/api/query-keys/`:
+
+```typescript
+// warehouses-keys.ts
+export const warehousesKeys = {
+  all: ['warehouses'] as const,
+  list: () => [...warehousesKeys.all, 'list'] as const,
+  detail: (id: number) => [...warehousesKeys.all, 'detail', id] as const,
+  // Add more key factories as needed
+};
+```
+
+**Rules:**
+- Always use `as const` for type inference
+- Use factory functions for dynamic keys
+- Keep keys hierarchical for easy invalidation
+
+## Query Hooks
+
+Define in `features/{feature}/hooks/query/`:
+
+```typescript
+// use-warehouses.ts
+import { useQuery } from '@tanstack/react-query';
+
+import { warehousesKeys } from '../../api/query-keys/warehouses-keys';
+import { fetchWarehouses } from '../../api/lib/warehouses';
+
+export const useWarehouses = (enabled: boolean = true) => {
+  return useQuery({
+    queryKey: warehousesKeys.list(),
+    queryFn: () => fetchWarehouses(),
+    enabled,
+  });
+};
+```
+
+**Rules:**
+- Always provide `enabled` parameter for conditional fetching
+- Use query key factories from the feature's query-keys file
+- Return the entire query result (don't destructure in the hook)
+
+## Mutation Hooks
+
+Define in `features/{feature}/hooks/mutation/`:
+
+```typescript
+// use-create-warehouse.ts
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+
+import { warehousesKeys } from '../../api/query-keys/warehouses-keys';
+import { createWarehouse } from '../../api/lib/warehouses';
+
+export const useCreateWarehouse = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createWarehouse,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: warehousesKeys.all });
+      toast.success('Warehouse created successfully');
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to create warehouse');
+    },
+  });
+};
+```
+
+**Rules:**
+- Always invalidate relevant queries on success
+- Use `toast` for user feedback
+- Handle errors gracefully
+
+## Server Actions
+
+Define in `features/{feature}/server/actions/`:
+
+```typescript
+// warehouses.ts
+'use server';
+
+import 'server-only';
+
+import { db } from '@server/db';
+import { warehouses } from '@server/db/schema';
+import { getLoggedInUser } from '@server/utils/get-logged-in-user';
+
+export async function createWarehouse(data: CreateWarehouseData) {
+  const user = await getLoggedInUser();
+  
+  if (!user) {
+    throw new Error('Unauthorized');
+  }
+
+  const [warehouse] = await db
+    .insert(warehouses)
+    .values({
+      ...data,
+      userId: user.id,
+    })
+    .returning();
+
+  return warehouse;
+}
+```
+
+**Rules:**
+- Always add `'use server'` and `import 'server-only'` at the top
+- Always check authentication with `getLoggedInUser()`
+- Return typed results
+- Use Drizzle ORM for database operations
+
+## API Routes
+
+Define in `src/app/api/{resource}/route.ts`:
+
+```typescript
+// src/app/api/warehouses/route.ts
+import { NextResponse } from 'next/server';
+
+import { getLoggedInUser } from '@server/utils/get-logged-in-user';
+import { getWarehouses } from '@features/warehouse/server/actions/warehouses';
+
+export async function GET() {
+  const user = await getLoggedInUser();
+
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const warehouses = await getWarehouses();
+
+  return NextResponse.json(warehouses);
+}
+```
+
+**Rules:**
+- Always check authentication first
+- Return proper HTTP status codes
+- Use NextResponse.json() for responses
+- Dynamic routes use `[id]` folder pattern
+
+## Fetch Functions
+
+Define in `features/{feature}/api/lib/`:
+
+```typescript
+// warehouses.ts
+import { api } from '@/api/clients/api';
+import type { Warehouse } from '../../types';
+
+export const fetchWarehouses = async (): Promise<Warehouse[]> => {
+  const { data } = await api.get<Warehouse[]>('/api/warehouses');
+  return data;
+};
+
+export const fetchWarehouse = async (id: number): Promise<Warehouse> => {
+  const { data } = await api.get<Warehouse>(`/api/warehouses/${id}`);
+  return data;
+};
+
+// For mutations that use server actions directly
+export { createWarehouse, updateWarehouse, removeWarehouse } from '../../server/actions/warehouses';
+```
+
+## Prefetch Functions
+
+Define in `features/{feature}/api/lib/*.prefetch.ts`:
+
+```typescript
+// warehouse.prefetch.ts
+import { QueryClient } from '@tanstack/react-query';
+
+import { warehousesKeys } from '../query-keys/warehouses-keys';
+import { fetchWarehouses } from './warehouses';
+
+export const prefetchWarehouses = async () => {
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery({
+    queryKey: warehousesKeys.list(),
+    queryFn: () => fetchWarehouses(),
+  });
+
+  return queryClient;
+};
+```
+
+**Usage in server components:**
+
+```typescript
+// warehouses.server.tsx
+import { HydrationBoundaryProvider } from '@/providers/hydration-boundary-provider';
+import { prefetchWarehouses } from '../api/lib/warehouse.prefetch';
+import { WarehousesClientTemplate } from './warehouses.client';
+
+export const WarehousesTemplate = async () => {
+  const queryClient = await prefetchWarehouses();
+
+  return (
+    <HydrationBoundaryProvider queryClient={queryClient}>
+      <WarehousesClientTemplate />
+    </HydrationBoundaryProvider>
+  );
+};
+```
+
+## URL State Management
+
+Use `nuqs` hooks from `src/hooks/` for URL-based state:
+
+```typescript
+import { useUrlFilters } from '@hooks/use-url-filters';
+import { useUrlPagination } from '@hooks/use-url-pagination';
+import { useUrlSort } from '@hooks/use-url-sort';
+import { useUrlQuery } from '@hooks/use-url-query';
+
+// In component
+const { filters, setFilter } = useUrlFilters();
+const { page, pageSize, setPage } = useUrlPagination();
+const { sortBy, sortOrder, setSort } = useUrlSort();
+const { query, setQuery } = useUrlQuery();
+```
+
+## API Client Configuration
+
+The Axios client (`src/api/clients/api.ts`) includes:
+- Base URL configuration
+- Access token attachment via interceptor
+- Error handling
+
+Access token is attached automatically via `src/api/interceptors/attach-access-token.ts`.

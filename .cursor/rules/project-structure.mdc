@@ -1,0 +1,120 @@
+---
+description: Project directory structure, organization, and path aliases for the inventory management panel
+globs: **/*
+alwaysApply: true
+---
+
+# Project Structure
+
+## Tech Stack
+
+- **Framework**: Next.js 15.5 (App Router, standalone output)
+- **UI**: React 19, Tailwind CSS v4, shadcn/ui (new-york style)
+- **State**: TanStack Query (server), Zustand (client), nuqs (URL)
+- **Forms**: react-hook-form + Zod
+- **Database**: PostgreSQL + Drizzle ORM
+- **Auth**: Supabase
+- **i18n**: next-international (en, pl)
+- **Testing**: Storybook + Vitest
+
+## Root Directory Structure
+
+```
+/
+├── src/                 # All source code
+├── middlewares/         # Custom middleware chain utilities
+├── public/              # Static assets (images, SVGs)
+├── .storybook/          # Storybook configuration
+├── types/               # Global TypeScript declarations (axios.d.ts)
+└── drizzle.config.ts    # Drizzle ORM configuration
+```
+
+## src/ Organization
+
+```
+src/
+├── api/                 # API client (axios) and interceptors
+│   ├── clients/         # Axios instance configuration
+│   └── interceptors/    # Request/response interceptors
+├── app/                 # Next.js App Router pages
+│   ├── [locale]/        # Internationalized routes
+│   │   ├── (auth)/      # Auth pages group (login, sign-up, etc.)
+│   │   └── (dashboard)/ # Dashboard pages group (inventory, sales, etc.)
+│   └── api/             # API routes (REST endpoints)
+├── components/          # Shared components (Atomic Design)
+│   ├── atoms/           # Smallest components (buttons, inputs)
+│   ├── molecules/       # Composed components (search bar, date picker)
+│   ├── organisms/       # Complex components (data tables, sidebars)
+│   ├── templates/       # Page-level layouts
+│   └── ui/              # shadcn/ui components (DO NOT EDIT DIRECTLY)
+├── constants/           # App constants
+│   ├── routes.ts        # Navigation routes
+│   ├── public-routes.ts # Unauthenticated routes
+│   ├── languages.ts     # Supported languages
+│   └── date-formats.ts  # Date format constants
+├── features/            # Feature modules (see feature-module.mdc)
+├── hooks/               # Shared React hooks
+├── lib/                 # Utility libraries
+│   └── utils.ts         # cn() helper for class merging
+├── locales/             # i18n translations
+│   ├── client.ts        # Client-side i18n setup
+│   ├── server.ts        # Server-side i18n setup
+│   ├── en/              # English translations
+│   └── pl/              # Polish translations
+├── providers/           # React context providers
+├── server/              # Server-only code
+│   ├── db/              # Database (Drizzle schema, migrations)
+│   └── utils/           # Server utilities
+├── shared/              # Cross-feature shared code
+│   ├── api/             # Shared API functions
+│   ├── hooks/           # Shared query hooks
+│   └── server/          # Shared server code
+├── store/               # Zustand stores
+├── types/               # TypeScript types and interfaces
+│   ├── enum/            # Type enums
+│   └── interfaces/      # Type interfaces
+└── utils/               # Utility functions
+```
+
+## Path Aliases
+
+Use these aliases for imports (configured in tsconfig.json):
+
+| Alias | Path | Usage |
+|-------|------|-------|
+| `@/*` | `./src/*` | General src imports |
+| `@components/*` | `./src/components/*` | Shared components |
+| `@features/*` | `./src/features/*` | Feature modules |
+| `@hooks/*` | `./src/hooks/*` | Shared hooks |
+| `@lib/*` | `./src/lib/*` | Library utilities |
+| `@server/*` | `./src/server/*` | Server-only code |
+| `@types/*` | `./src/types/*` | TypeScript types |
+| `@constants/*` | `./src/constants/*` | App constants |
+| `@utils/*` | `./src/utils/*` | Utility functions |
+| `@assets/*` | `./public/assets/*` | Static assets |
+
+## Import Order
+
+Imports are automatically sorted by ESLint:
+
+1. Built-in/External packages (react, next, etc.)
+2. Internal modules (@/*, @components/*, etc.)
+3. Parent imports (../)
+4. Sibling/index imports (./)
+5. Object imports
+
+Always use path aliases instead of relative paths when crossing directory boundaries.
+
+## Key Files Reference
+
+| Purpose | Location |
+|---------|----------|
+| API client | `src/api/clients/api.ts` |
+| Auth provider | `src/features/auth/providers/auth-providers.tsx` |
+| Query provider | `src/providers/providers.tsx` |
+| Hydration boundary | `src/providers/hydration-boundary-provider.tsx` |
+| Middleware entry | `src/middleware.ts` |
+| Public routes | `src/constants/public-routes.ts` |
+| DB connection | `src/server/db/index.ts` |
+| DB schema | `src/server/db/schema/` |
+| User utility | `src/server/utils/get-logged-in-user.ts` |

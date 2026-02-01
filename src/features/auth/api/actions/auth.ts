@@ -2,11 +2,14 @@
 
 import { redirect } from 'next/navigation';
 
+import { getCurrentLocale } from '@/locales/server';
+
 import { createClient } from '../../utils/supabase/server';
 import { ServerActionErrorResponse } from '../types/server-action-error-response';
 
 export const logout = async (): Promise<void | ServerActionErrorResponse> => {
   const supabase = await createClient();
+  const locale = await getCurrentLocale();
 
   const {
     data: { user },
@@ -21,7 +24,7 @@ export const logout = async (): Promise<void | ServerActionErrorResponse> => {
       };
     }
 
-    redirect(`/login`);
+    redirect(`/${locale}`);
   }
 };
 

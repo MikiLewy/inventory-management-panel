@@ -1,0 +1,337 @@
+---
+description: Template and guidelines for creating new feature modules
+globs: src/features/**/*
+alwaysApply: false
+---
+
+# Feature Module Structure
+
+## Overview
+
+Features are self-contained modules in `src/features/` that encapsulate all related functionality including components, hooks, API logic, server actions, and types.
+
+## Directory Template
+
+When creating a new feature, follow this structure:
+
+```
+src/features/{feature-name}/
+├── api/
+│   ├── lib/
+│   │   ├── {feature}.ts           # Fetch functions
+│   │   └── {feature}.prefetch.ts  # Server-side prefetching
+│   └── query-keys/
+│       └── {feature}-keys.ts      # TanStack Query key factories
+├── components/
+│   ├── atoms/                     # Feature-specific small components
+│   ├── molecules/                 # Feature-specific composed components
+│   ├── organisms/
+│   │   ├── {component}/
+│   │   │   ├── {component}.tsx
+│   │   │   └── schema/            # Zod validation schemas
+│   │   │       └── {schema}.ts
+│   │   └── ...
+│   └── templates/
+│       └── {page}/
+│           ├── {page}.server.tsx  # Server component with prefetching
+│           └── {page}.client.tsx  # Client component with hooks
+├── hooks/
+│   ├── query/
+│   │   └── use-{feature}.ts       # useQuery hooks
+│   └── mutation/
+│       ├── use-create-{feature}.ts
+│       ├── use-update-{feature}.ts
+│       └── use-remove-{feature}.ts
+├── server/
+│   └── actions/
+│       └── {feature}.ts           # Server actions ('use server')
+├── stories/
+│   └── {component}.stories.tsx    # Storybook stories
+├── types/
+│   └── index.ts                   # Feature-specific types
+├── utils/                         # Feature-specific utilities
+├── index.server.ts                # Server-side exports
+└── index.client.ts                # Client-side exports
+```
+
+## Step-by-Step: Creating a New Feature
+
+### 1. Create Query Keys
+
+```typescript
+// src/features/{feature}/api/query-keys/{feature}-keys.ts
+export const {feature}Keys = {
+  all: ['{feature}'] as const,
+  list: () => [...{feature}Keys.all, 'list'] as const,
+  detail: (id: number) => [...{feature}Keys.all, 'detail', id] as const,
+};
+```
+
+### 2. Create Server Actions
+
+```typescript
+// src/features/{feature}/server/actions/{feature}.ts
+'use server';
+
+import 'server-only';
+
+import { db } from '@server/db';
+import { {feature}Table } from '@server/db/schema';
+import { getLoggedInUser } from '@server/utils/get-logged-in-user';
+import { eq } from 'drizzle-orm';
+
+export async function get{Feature}s() {
+  const user = await getLoggedInUser();
+  if (!user) throw new Error('Unauthorized');
+
+  return db.query.{feature}Table.findMany({
+    where: eq({feature}Table.userId, user.id),
+  });
+}
+
+export async function get{Feature}(id: number) {
+  const user = await getLoggedInUser();
+  if (!user) throw new Error('Unauthorized');
+
+  return db.query.{feature}Table.findFirst({
+    where: eq({feature}Table.id, id),
+  });
+}
+
+export async function create{Feature}(data: Create{Feature}Data) {
+  const user = await getLoggedInUser();
+  if (!user) throw new Error('Unauthorized');
+
+  const [result] = await db
+    .insert({feature}Table)
+    .values({ ...data, userId: user.id })
+    .returning();
+
+  return result;
+}
+
+export async function update{Feature}(id: number, data: Update{Feature}Data) {
+  const user = await getLoggedInUser();
+  if (!user) throw new Error('Unauthorized');
+
+  const [result] = await db
+    .update({feature}Table)
+    .set(data)
+    .where(eq({feature}Table.id, id))
+    .returning();
+
+  return result;
+}
+
+export async function remove{Feature}(id: number) {
+  const user = await getLoggedInUser();
+  if (!user) throw new Error('Unauthorized');
+
+  await db.delete({feature}Table).where(eq({feature}Table.id, id));
+}
+```
+
+### 3. Create API Route (if needed)
+
+```typescript
+// src/app/api/{feature}/route.ts
+import { NextResponse } from 'next/server';
+
+import { getLoggedInUser } from '@server/utils/get-logged-in-user';
+import { get{Feature}s } from '@features/{feature}/server/actions/{feature}';
+
+export async function GET() {
+  const user = await getLoggedInUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const data = await get{Feature}s();
+  return NextResponse.json(data);
+}
+```
+
+### 4. Create Fetch Functions
+
+```typescript
+// src/features/{feature}/api/lib/{feature}.ts
+import { api } from '@/api/clients/api';
+import type { {Feature} } from '../../types';
+
+export const fetch{Feature}s = async (): Promise<{Feature}[]> => {
+  const { data } = await api.get<{Feature}[]>('/api/{feature}');
+  return data;
+};
+
+export const fetch{Feature} = async (id: number): Promise<{Feature}> => {
+  const { data } = await api.get<{Feature}>(`/api/{feature}/${id}`);
+  return data;
+};
+
+// Re-export server actions for mutations
+export {
+  create{Feature},
+  update{Feature},
+  remove{Feature},
+} from '../../server/actions/{feature}';
+```
+
+### 5. Create Prefetch Function
+
+```typescript
+// src/features/{feature}/api/lib/{feature}.prefetch.ts
+import { QueryClient } from '@tanstack/react-query';
+
+import { {feature}Keys } from '../query-keys/{feature}-keys';
+import { fetch{Feature}s } from './{feature}';
+
+export const prefetch{Feature}s = async () => {
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery({
+    queryKey: {feature}Keys.list(),
+    queryFn: () => fetch{Feature}s(),
+  });
+
+  return queryClient;
+};
+```
+
+### 6. Create Query Hooks
+
+```typescript
+// src/features/{feature}/hooks/query/use-{feature}s.ts
+import { useQuery } from '@tanstack/react-query';
+
+import { {feature}Keys } from '../../api/query-keys/{feature}-keys';
+import { fetch{Feature}s } from '../../api/lib/{feature}';
+
+export const use{Feature}s = (enabled: boolean = true) => {
+  return useQuery({
+    queryKey: {feature}Keys.list(),
+    queryFn: () => fetch{Feature}s(),
+    enabled,
+  });
+};
+```
+
+### 7. Create Mutation Hooks
+
+```typescript
+// src/features/{feature}/hooks/mutation/use-create-{feature}.ts
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+
+import { {feature}Keys } from '../../api/query-keys/{feature}-keys';
+import { create{Feature} } from '../../api/lib/{feature}';
+
+export const useCreate{Feature} = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: create{Feature},
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: {feature}Keys.all });
+      toast.success('{Feature} created successfully');
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to create {feature}');
+    },
+  });
+};
+```
+
+### 8. Create Template Components
+
+```typescript
+// src/features/{feature}/components/templates/{feature}/{feature}.server.tsx
+import { HydrationBoundaryProvider } from '@/providers/hydration-boundary-provider';
+
+import { prefetch{Feature}s } from '../../../api/lib/{feature}.prefetch';
+import { {Feature}ClientTemplate } from './{feature}.client';
+
+export const {Feature}Template = async () => {
+  const queryClient = await prefetch{Feature}s();
+
+  return (
+    <HydrationBoundaryProvider queryClient={queryClient}>
+      <{Feature}ClientTemplate />
+    </HydrationBoundaryProvider>
+  );
+};
+```
+
+```typescript
+// src/features/{feature}/components/templates/{feature}/{feature}.client.tsx
+'use client';
+
+import { use{Feature}s } from '../../../hooks/query/use-{feature}s';
+
+export const {Feature}ClientTemplate = () => {
+  const { data: items, isLoading } = use{Feature}s();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div>
+      {/* Component content */}
+    </div>
+  );
+};
+```
+
+### 9. Create Index Exports
+
+```typescript
+// src/features/{feature}/index.server.ts
+export { {Feature}Template } from './components/templates/{feature}/{feature}.server';
+```
+
+```typescript
+// src/features/{feature}/index.client.ts
+'use client';
+
+export { use{Feature}s } from './hooks/query/use-{feature}s';
+export { useCreate{Feature} } from './hooks/mutation/use-create-{feature}';
+export { useUpdate{Feature} } from './hooks/mutation/use-update-{feature}';
+export { useRemove{Feature} } from './hooks/mutation/use-remove-{feature}';
+```
+
+### 10. Create Page Route
+
+```typescript
+// src/app/[locale]/(dashboard)/{feature}/page.tsx
+import { {Feature}Template } from '@features/{feature}/index.server';
+
+export default function {Feature}Page() {
+  return <{Feature}Template />;
+}
+```
+
+## Existing Features Reference
+
+| Feature | Description | Key Components |
+|---------|-------------|----------------|
+| `auth` | Authentication | Login, SignUp, ForgotPassword forms |
+| `inventory` | Product management | Product table, Create/Edit sheets |
+| `warehouse` | Warehouse management | Warehouse list, Create/Edit sheets |
+| `sales` | Sales tracking | Sales table, Create sale sheet |
+| `statistics` | Analytics dashboard | Charts, profit/analytics views |
+
+## Checklist for New Features
+
+- [ ] Database schema in `src/server/db/schema/`
+- [ ] Query keys defined
+- [ ] Server actions with auth checks
+- [ ] API route (if client-side fetching needed)
+- [ ] Fetch functions
+- [ ] Prefetch function
+- [ ] Query hooks
+- [ ] Mutation hooks
+- [ ] Template components (server/client split)
+- [ ] Index exports (server and client)
+- [ ] Page route in `src/app/[locale]/(dashboard)/`
+- [ ] Add route to `src/constants/routes.ts`
+- [ ] Add translations to `src/locales/`
