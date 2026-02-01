@@ -1,0 +1,226 @@
+---
+description: Component conventions including Atomic Design, server/client separation, and styling patterns
+globs: src/components/**/*.tsx, src/features/**/components/**/*.tsx
+alwaysApply: false
+---
+
+# Component Patterns
+
+## Atomic Design Structure
+
+Components follow Atomic Design methodology:
+
+### Atoms (`src/components/atoms/`)
+Smallest, indivisible components:
+- Buttons, inputs, labels, icons
+- Single responsibility
+- Highly reusable
+- Examples: `loading-button.tsx`, `password-input.tsx`, `theme-switcher.tsx`
+
+### Molecules (`src/components/molecules/`)
+Combinations of atoms:
+- Form fields with labels
+- Search bars, date pickers
+- Examples: `autocomplete-input.tsx`, `search-bar.tsx`, `date-range-picker.tsx`
+
+### Organisms (`src/components/organisms/`)
+Complex, self-contained sections:
+- Data tables, sidebars, navigation
+- May contain state and logic
+- Examples: `data-table/`, `sidebar.tsx`, `navbar.tsx`
+
+### Templates (`src/components/templates/`)
+Page-level layouts:
+- Define page structure
+- Use server/client split pattern
+- Examples: `dashboard/dashboard.server.tsx`
+
+### UI (`src/components/ui/`)
+shadcn/ui components - **DO NOT MODIFY** unless customizing variants.
+Add new shadcn components using: `npx shadcn@latest add <component>`
+
+## File Naming Conventions
+
+| Pattern | Purpose | Example |
+|---------|---------|---------|
+| `*.server.tsx` | Server components | `inventory.server.tsx` |
+| `*.client.tsx` | Client components | `inventory.client.tsx` |
+| `*.stories.tsx` | Storybook stories | `button.stories.tsx` |
+| `index.ts` | Barrel exports | `index.ts` |
+
+## Server/Client Split Pattern
+
+Templates and complex components use this pattern for data prefetching:
+
+```typescript
+// warehouses.server.tsx - Server Component
+import { HydrationBoundaryProvider } from '@/providers/hydration-boundary-provider';
+import { prefetchWarehouses } from '../api/lib/warehouse.prefetch';
+import { WarehousesClientTemplate } from './warehouses.client';
+
+export const WarehousesTemplate = async () => {
+  const queryClient = await prefetchWarehouses();
+  
+  return (
+    <HydrationBoundaryProvider queryClient={queryClient}>
+      <WarehousesClientTemplate />
+    </HydrationBoundaryProvider>
+  );
+};
+```
+
+```typescript
+// warehouses.client.tsx - Client Component
+'use client';
+
+import { useWarehouses } from '../hooks/query/use-warehouses';
+
+export const WarehousesClientTemplate = () => {
+  const { data: warehouses } = useWarehouses();
+  
+  return (
+    // Component JSX
+  );
+};
+```
+
+## Styling Patterns
+
+### Always use cn() for class merging
+
+```typescript
+import { cn } from '@/lib/utils';
+
+interface ButtonProps {
+  className?: string;
+}
+
+export const Button = ({ className }: ButtonProps) => {
+  return (
+    <button className={cn('px-4 py-2 rounded-md', className)}>
+      Click me
+    </button>
+  );
+};
+```
+
+### CVA for Component Variants
+
+Use `class-variance-authority` for components with variants:
+
+```typescript
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '@/lib/utils';
+
+const buttonVariants = cva(
+  'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors',
+  {
+    variants: {
+      variant: {
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        outline: 'border border-input bg-background hover:bg-accent',
+      },
+      size: {
+        default: 'h-10 px-4 py-2',
+        sm: 'h-9 rounded-md px-3',
+        lg: 'h-11 rounded-md px-8',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+    },
+  }
+);
+
+interface ButtonProps extends VariantProps<typeof buttonVariants> {
+  className?: string;
+}
+
+export const Button = ({ variant, size, className }: ButtonProps) => {
+  return (
+    <button className={cn(buttonVariants({ variant, size }), className)}>
+      Click me
+    </button>
+  );
+};
+```
+
+### Use Semantic Color Tokens
+
+Always use CSS variable-based colors from the theme:
+
+```typescript
+// Good - uses semantic tokens
+<div className="bg-background text-foreground border-border" />
+<div className="bg-primary text-primary-foreground" />
+<div className="bg-muted text-muted-foreground" />
+<div className="bg-destructive text-destructive-foreground" />
+
+// Avoid - hardcoded colors
+<div className="bg-white text-black" />
+```
+
+### Dark Mode Support
+
+Dark mode is handled automatically via CSS variables and `next-themes`.
+Use the `dark:` prefix only when the semantic tokens don't suffice.
+
+## Stories Organization
+
+Stories are co-located in `stories/` subdirectories:
+
+```
+components/
+├── atoms/
+│   ├── loading-button.tsx
+│   └── stories/
+│       └── loading-button.stories.tsx
+```
+
+Story file structure:
+
+```typescript
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { LoadingButton } from '../loading-button';
+
+const meta = {
+  title: 'Atoms/LoadingButton',
+  component: LoadingButton,
+} satisfies Meta<typeof LoadingButton>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {
+  args: {
+    children: 'Submit',
+  },
+};
+
+export const Loading: Story = {
+  args: {
+    children: 'Submit',
+    isLoading: true,
+  },
+};
+```
+
+## Component Export Pattern
+
+Use barrel exports for clean imports:
+
+```typescript
+// components/atoms/index.ts
+export { LoadingButton } from './loading-button';
+export { PasswordInput } from './password-input';
+export { ThemeSwitcher } from './theme-switcher';
+```
+
+## Accessibility
+
+- Always include proper ARIA attributes
+- Use semantic HTML elements
+- Ensure keyboard navigation works
+- Include focus-visible styles: `focus-visible:ring-ring/50 focus-visible:ring-[3px]`

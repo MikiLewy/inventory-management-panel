@@ -7,6 +7,8 @@ export const publicRoutesWithoutLanguage = [
   '/forgot-password',
   '/set-up-password',
   '/update-password',
+  '/privacy-policy',
+  '/terms-of-service',
 ];
 
 export const publicRoutesWithLanguage = publicRoutesWithoutLanguage.flatMap(route =>

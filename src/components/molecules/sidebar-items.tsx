@@ -5,10 +5,11 @@ import { usePathname } from 'next/navigation';
 
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { routes } from '@/constants/routes';
-import { useI18n } from '@/locales/client';
+import { useCurrentLocale, useI18n } from '@/locales/client';
 
 export function SidebarItems() {
   const t = useI18n();
+  const locale = useCurrentLocale();
 
   const pathname = usePathname();
 
@@ -17,7 +18,7 @@ export function SidebarItems() {
       {routes.map(item => (
         <SidebarMenuItem key={item.title}>
           <SidebarMenuButton asChild tooltip={t(item.title)} isActive={pathname.includes(item.href)}>
-            <Link href={item.href} prefetch>
+            <Link href={`/${locale}${item.href}`} prefetch>
               <item.icon />
               <span>{t(item.title)}</span>
             </Link>

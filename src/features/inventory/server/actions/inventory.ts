@@ -2,16 +2,19 @@
 import 'server-only';
 
 import { and, eq } from 'drizzle-orm';
+import pLimit from 'p-limit';
 
 import { db } from '@/server/db';
-import { products, sales } from '@/server/db/schema';
+import { products, sales, warehouses } from '@/server/db/schema';
 import { ProductStatus } from '@/server/db/types/enum/product-status';
 import { getLoggedInUser } from '@/server/utils/get-logged-in-user';
 import { SizeUnit } from '@/types/enum/size-unit';
 
 import { CreateProductPayload } from '../../types/payload/create-product';
+import { ImportError, ImportProductPayload, ImportResult } from '../../types/payload/import-products';
 import { MarkProductsAsSoldPayload } from '../../types/payload/mark-products-as-sold';
 import { UpdateProductPayload } from '../../types/payload/update-product';
+import { resolveCategoryId, resolveWarehouseId } from '../../utils/resolve-lookup-ids';
 
 export const createProduct = async (payload: CreateProductPayload) => {
   const user = await getLoggedInUser();
@@ -230,4 +233,81 @@ export const duplicateProduct = async (id: number) => {
 
     throw new Error(message);
   }
+};
+
+export const importProducts = async (productsToImport: ImportProductPayload[]): Promise<ImportResult> => {
+  const user = await getLoggedInUser();
+
+  if (!user) {
+    throw new Error('Unauthorized');
+  }
+
+  // Fetch categories and warehouses once (avoids N+1 queries)
+  const [categoriesList, warehousesList] = await Promise.all([
+    db.query.categories.findMany(),
+    db.query.warehouses.findMany({
+      where: eq(warehouses.userId, user.id),
+    }),
+  ]);
+
+  // Limit concurrent DB operations to prevent connection pool exhaustion
+  const limit = pLimit(25);
+
+  // Process all rows in parallel with controlled concurrency
+  const insertResults = await Promise.allSettled(
+    productsToImport.map((product, index) =>
+      limit(async () => {
+        const rowNumber = index + 2; // +2 for 1-indexed + header row
+
+        // Resolve category by name (match against translations)
+        const categoryId = resolveCategoryId(product.category, categoriesList);
+        if (product.category && categoryId === null) {
+          throw new Error(`Category "${product.category}" not found`);
+        }
+
+        // Resolve warehouse by name
+        const warehouseId = resolveWarehouseId(product.warehouse, warehousesList);
+        if (product.warehouse && warehouseId === null) {
+          throw new Error(`Warehouse "${product.warehouse}" not found`);
+        }
+
+        await db.insert(products).values({
+          name: product.name,
+          sku: product.sku,
+          size: product.size,
+          purchasePrice: product.purchasePrice,
+          purchaseDate: product.purchaseDate ? new Date(product.purchaseDate) : undefined,
+          status: product.status || ProductStatus.IN_STOCK,
+          brand: product.brand,
+          sizeUnit: product.sizeUnit || SizeUnit.EU,
+          purchasePlace: product.purchasePlace,
+          categoryId,
+          warehouseId: warehouseId ?? 1,
+          userId: user.id,
+          createdAt: new Date(),
+        });
+
+        return rowNumber;
+      }),
+    ),
+  );
+
+  const errors: ImportError[] = [];
+  let success = 0;
+  let failed = 0;
+
+  insertResults.forEach((result, index) => {
+    const rowNumber = index + 2;
+    if (result.status === 'fulfilled') {
+      success++;
+    } else {
+      failed++;
+      errors.push({
+        row: rowNumber,
+        message: result.reason?.message || 'Unknown error',
+      });
+    }
+  });
+
+  return { success, failed, errors };
 };

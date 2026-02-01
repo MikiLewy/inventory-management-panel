@@ -16,12 +16,12 @@ import {
 } from '@/features/inventory/hooks/use-inventory-table-columns';
 import { useWarehouses } from '@/features/warehouse/hooks/query/use-warehouses';
 import { useDialog } from '@/hooks/use-dialog';
-import { useSelection } from '@/hooks/use-selection';
 import { useUrlFilters } from '@/hooks/use-url-filters';
 import { useUrlPagination } from '@/hooks/use-url-pagination';
 import { useUrlQuery } from '@/hooks/use-url-query';
 import { useUrlSort } from '@/hooks/use-url-sort';
 import { useI18n } from '@/locales/client';
+import { useInventorySelection } from '@/store/inventory-selection';
 
 import MarkProductsAsSoldDialog from '../../organisms/dialogs/mark-products-as-sold/mark-products-as-sold';
 import RemoveProductDialog from '../../organisms/dialogs/remove-product-dialog';
@@ -48,7 +48,7 @@ const ClientInventory = () => {
 
   const [isOpenEditProductSheet, handleOpenEditProductSheet, handleCloseEditProductSheet] = useDialog();
 
-  const { selectedRows, setSelectedRows, handleClearSelected } = useSelection();
+  const { selectedRows, setSelectedRows, clearSelection: handleClearSelected } = useInventorySelection();
 
   const onQueryChange = useCallback(
     (query: string) => {
