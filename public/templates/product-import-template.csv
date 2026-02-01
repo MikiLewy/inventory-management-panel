@@ -1,0 +1,3 @@
+name,sku,size,purchasePrice,purchaseDate,status,brand,category,purchasePlace,sizeUnit,warehouse
+Nike Air Max 90,SKU-001,42,150.00,2024-01-15,IN_STOCK,Nike,Sneakers,StockX,EU,Main Warehouse
+Adidas Ultraboost,SKU-002,10.5,180.00,2024-02-20,IN_DELIVERY,Adidas,Sneakers,GOAT,US,Main Warehouse

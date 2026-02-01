@@ -1,0 +1,15 @@
+export default {
+  export: 'Eksportuj',
+  exportAll: 'Eksportuj wszystko',
+  exportSelected: 'Eksportuj zaznaczone',
+  csv: 'CSV',
+  xlsx: 'Excel (.xlsx)',
+  exporting: 'Eksportowanie...',
+  'success#one': 'Wyeksportowano {count} produkt',
+  'success#few': 'Wyeksportowano {count} produkty',
+  'success#other': 'Wyeksportowano {count} produktów',
+  error: 'Nie udało się wyeksportować produktów',
+  noProducts: 'Brak produktów do eksportu',
+  noSelection: 'Nie wybrano żadnych produktów',
+  limitExceeded: 'Przekroczono limit eksportu. Maksymalnie 10 000 produktów można wyeksportować jednocześnie.',
+} as const;

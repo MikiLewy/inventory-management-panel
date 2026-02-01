@@ -7,8 +7,35 @@ const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(file
 
 export default defineConfig({
   test: {
-    // Use `workspace` field in Vitest < 3.2
     projects: [
+      defineProject({
+        esbuild: {
+          jsx: 'automatic',
+        },
+        test: {
+          name: 'unit',
+          include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+          exclude: ['node_modules', '.storybook'],
+          environment: 'jsdom',
+          globals: true,
+          setupFiles: ['./vitest.setup.ts'],
+        },
+        resolve: {
+          alias: {
+            '@': path.resolve(dirname, './src'),
+            '@components': path.resolve(dirname, './src/components'),
+            '@features': path.resolve(dirname, './src/features'),
+            '@hooks': path.resolve(dirname, './src/hooks'),
+            '@lib': path.resolve(dirname, './src/lib'),
+            '@server': path.resolve(dirname, './src/server'),
+            '@types': path.resolve(dirname, './src/types'),
+            '@constants': path.resolve(dirname, './src/constants'),
+            '@utils': path.resolve(dirname, './src/utils'),
+            '@assets': path.resolve(dirname, './public/assets'),
+          },
+        },
+      }),
+      // Storybook tests project
       defineProject({
         plugins: [
           storybookTest({
