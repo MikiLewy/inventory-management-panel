@@ -6,6 +6,7 @@ import statistics from '@features/statistics/index.client';
 import warehouse from '@features/warehouse/index.client';
 
 import common from './common';
+import legal from './legal';
 import routes from './routes';
 import validation from './validation';
 
@@ -13,6 +14,7 @@ export default {
   validation,
   common,
   routes,
+  legal,
   ...auth.locales.en,
   ...home.locales.en,
   ...inventory.locales.en,
