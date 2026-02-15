@@ -7,39 +7,44 @@ import { ImportDialog } from '@/components/organisms/dialogs/import-dialog';
 import { useI18n } from '@/locales/client';
 import { ImportResult, ParsedRow } from '@/shared/types/import-export';
 
-import { useImportProducts } from '../../../../hooks/mutation/use-import-products';
-import { ImportProductPayload } from '../../../../types/payload/import-products';
+import { useImportSales } from '../../../../hooks/mutation/use-import-sales';
+import { ImportSalePayload } from '../../../../types/payload/import-sales';
 
-import { useImportProductRowSchema } from './schema/import-products-schema';
+import { useImportSaleRowSchema } from './schema/import-sales-schema';
 
 const COLUMN_MAPPINGS: Record<string, string> = {
   name: 'name',
   sku: 'sku',
   size: 'size',
   purchaseprice: 'purchasePrice',
-  price: 'purchasePrice',
+  purchasePrice: 'purchasePrice',
+  soldprice: 'soldPrice',
+  soldPrice: 'soldPrice',
   purchasedate: 'purchaseDate',
-  date: 'purchaseDate',
-  status: 'status',
+  purchaseDate: 'purchaseDate',
+  solddate: 'soldDate',
+  soldDate: 'soldDate',
+  soldplace: 'soldPlace',
+  soldPlace: 'soldPlace',
   brand: 'brand',
   category: 'category',
   purchaseplace: 'purchasePlace',
-  place: 'purchasePlace',
+  purchasePlace: 'purchasePlace',
   sizeunit: 'sizeUnit',
+  sizeUnit: 'sizeUnit',
   unit: 'sizeUnit',
-  warehouse: 'warehouse',
 };
 
-const REQUIRED_COLUMNS = ['name', 'sku', 'size', 'purchasePrice'];
+const REQUIRED_COLUMNS = ['name', 'sku', 'size', 'purchasePrice', 'soldPrice'];
 
-const ImportProductsDialog = ({ open, onClose }: DialogActions) => {
+const ImportSalesDialog = ({ open, onClose }: DialogActions) => {
   const t = useI18n();
-  const schema = useImportProductRowSchema();
-  const { mutate: importProducts, isPending } = useImportProducts();
+  const schema = useImportSaleRowSchema();
+  const { mutate: importSales, isPending } = useImportSales();
 
   const validateRows = useCallback(
-    (rows: ParsedRow[]): { validRows: ImportProductPayload[]; errors: { row: number; message: string }[] } => {
-      const validRows: ImportProductPayload[] = [];
+    (rows: ParsedRow[]): { validRows: ImportSalePayload[]; errors: { row: number; message: string }[] } => {
+      const validRows: ImportSalePayload[] = [];
       const errors: { row: number; message: string }[] = [];
 
       rows.forEach((row, index) => {
@@ -47,7 +52,7 @@ const ImportProductsDialog = ({ open, onClose }: DialogActions) => {
 
         try {
           const parsed = schema.parse(row);
-          validRows.push(parsed as ImportProductPayload);
+          validRows.push(parsed as ImportSalePayload);
         } catch (error) {
           if (error instanceof Error) {
             // Extract Zod error messages
@@ -85,7 +90,7 @@ const ImportProductsDialog = ({ open, onClose }: DialogActions) => {
         return;
       }
 
-      importProducts(validRows, {
+      importSales(validRows, {
         onSuccess: result => {
           // Merge validation errors with server errors
           const mergedResult: ImportResult = {
@@ -98,24 +103,24 @@ const ImportProductsDialog = ({ open, onClose }: DialogActions) => {
         onError,
       });
     },
-    [validateRows, importProducts],
+    [validateRows, importSales],
   );
 
   return (
     <ImportDialog
       open={open}
       onClose={onClose}
-      title={t('importProducts.title')}
-      description={t('importProducts.description')}
+      title={t('importSales.title')}
+      description={t('importSales.description')}
       columnMappings={COLUMN_MAPPINGS}
       requiredColumns={REQUIRED_COLUMNS}
-      csvTemplateUrl="/templates/product-import-template.csv"
-      xlsxTemplateUrl="/templates/product-import-template.xlsx"
-      importButtonText={t('importProducts.import')}
+      csvTemplateUrl="/templates/sales-import-template.csv"
+      xlsxTemplateUrl="/templates/sales-import-template.xlsx"
+      importButtonText={t('importSales.import')}
       onImport={handleImport}
       isPending={isPending}
     />
   );
 };
 
-export default ImportProductsDialog;
+export default ImportSalesDialog;

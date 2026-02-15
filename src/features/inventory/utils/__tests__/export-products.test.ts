@@ -1,13 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { ExportRow, getExportMimeType, triggerDownload } from '@/shared/utils/export';
+
 import {
-  ExportRow,
   formatProductForExport,
   generateExportFile,
   generateExportFilename,
-  getExportMimeType,
   ProductForExport,
-  triggerDownload,
 } from '../export-products';
 
 describe('formatProductForExport', () => {

@@ -5,8 +5,7 @@ import { useCallback, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/locales/client';
-
-import { ACCEPTED_FILE_TYPES, ACCEPTED_MIME_TYPES, MAX_FILE_SIZE } from '../utils/parse-import-file';
+import { ACCEPTED_FILE_TYPES, ACCEPTED_MIME_TYPES, MAX_FILE_SIZE } from '@/shared/utils/import';
 
 interface Props {
   onFileSelect: (file: File) => void;
@@ -25,7 +24,7 @@ export const FileDropzone = ({ onFileSelect, disabled, selectedFileName }: Props
       setError(null);
 
       if (file.size > MAX_FILE_SIZE) {
-        setError(t('importProducts.validation.fileTooLarge'));
+        setError(t('importExport.import.validation.fileTooLarge'));
         return false;
       }
 
@@ -36,13 +35,13 @@ export const FileDropzone = ({ onFileSelect, disabled, selectedFileName }: Props
         file.name.endsWith('.xls');
 
       if (!isValidType) {
-        setError(t('importProducts.validation.invalidFileType'));
+        setError(t('importExport.import.validation.invalidFileType'));
         return false;
       }
 
       return true;
     },
-    [t]
+    [t],
   );
 
   const handleFile = useCallback(
@@ -51,7 +50,7 @@ export const FileDropzone = ({ onFileSelect, disabled, selectedFileName }: Props
         onFileSelect(file);
       }
     },
-    [validateFile, onFileSelect]
+    [validateFile, onFileSelect],
   );
 
   const handleDrop = useCallback(
@@ -67,7 +66,7 @@ export const FileDropzone = ({ onFileSelect, disabled, selectedFileName }: Props
         handleFile(file);
       }
     },
-    [disabled, handleFile]
+    [disabled, handleFile],
   );
 
   const handleDragOver = useCallback(
@@ -78,7 +77,7 @@ export const FileDropzone = ({ onFileSelect, disabled, selectedFileName }: Props
         setIsDragging(true);
       }
     },
-    [disabled]
+    [disabled],
   );
 
   const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -99,10 +98,9 @@ export const FileDropzone = ({ onFileSelect, disabled, selectedFileName }: Props
       if (file) {
         handleFile(file);
       }
-      // Reset input so same file can be selected again
       e.target.value = '';
     },
-    [handleFile]
+    [handleFile],
   );
 
   return (
@@ -117,9 +115,8 @@ export const FileDropzone = ({ onFileSelect, disabled, selectedFileName }: Props
           isDragging && 'border-primary bg-primary/5',
           disabled && 'cursor-not-allowed opacity-50',
           error && 'border-destructive',
-          !isDragging && !error && 'border-muted-foreground/25 hover:border-muted-foreground/50'
-        )}
-      >
+          !isDragging && !error && 'border-muted-foreground/25 hover:border-muted-foreground/50',
+        )}>
         <input
           ref={inputRef}
           type="file"
@@ -135,12 +132,12 @@ export const FileDropzone = ({ onFileSelect, disabled, selectedFileName }: Props
           <p className="mb-1 text-sm font-medium">{selectedFileName}</p>
         ) : (
           <>
-            <p className="mb-1 text-sm font-medium">{t('importProducts.selectFile')}</p>
-            <p className="text-xs text-muted-foreground">{t('importProducts.dragDrop')}</p>
+            <p className="mb-1 text-sm font-medium">{t('importExport.import.selectFile')}</p>
+            <p className="text-xs text-muted-foreground">{t('importExport.import.dragDrop')}</p>
           </>
         )}
 
-        <p className="mt-2 text-xs text-muted-foreground">{t('importProducts.supportedFormats')}</p>
+        <p className="mt-2 text-xs text-muted-foreground">{t('importExport.import.supportedFormats')}</p>
       </div>
 
       {error && <p className="text-sm text-destructive">{error}</p>}

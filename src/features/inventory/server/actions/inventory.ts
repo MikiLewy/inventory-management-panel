@@ -8,13 +8,14 @@ import { db } from '@/server/db';
 import { products, sales, warehouses } from '@/server/db/schema';
 import { ProductStatus } from '@/server/db/types/enum/product-status';
 import { getLoggedInUser } from '@/server/utils/get-logged-in-user';
+import { ImportError, ImportResult } from '@/shared/types/import-export';
+import { resolveCategoryId, resolveWarehouseId } from '@/shared/utils/resolve-ids';
 import { SizeUnit } from '@/types/enum/size-unit';
 
 import { CreateProductPayload } from '../../types/payload/create-product';
-import { ImportError, ImportProductPayload, ImportResult } from '../../types/payload/import-products';
+import { ImportProductPayload } from '../../types/payload/import-products';
 import { MarkProductsAsSoldPayload } from '../../types/payload/mark-products-as-sold';
 import { UpdateProductPayload } from '../../types/payload/update-product';
-import { resolveCategoryId, resolveWarehouseId } from '../../utils/resolve-lookup-ids';
 
 export const createProduct = async (payload: CreateProductPayload) => {
   const user = await getLoggedInUser();
@@ -242,7 +243,6 @@ export const importProducts = async (productsToImport: ImportProductPayload[]): 
     throw new Error('Unauthorized');
   }
 
-  // Fetch categories and warehouses once (avoids N+1 queries)
   const [categoriesList, warehousesList] = await Promise.all([
     db.query.categories.findMany(),
     db.query.warehouses.findMany({
@@ -250,10 +250,8 @@ export const importProducts = async (productsToImport: ImportProductPayload[]): 
     }),
   ]);
 
-  // Limit concurrent DB operations to prevent connection pool exhaustion
   const limit = pLimit(25);
 
-  // Process all rows in parallel with controlled concurrency
   const insertResults = await Promise.allSettled(
     productsToImport.map((product, index) =>
       limit(async () => {

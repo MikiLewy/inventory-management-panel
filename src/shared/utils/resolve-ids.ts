@@ -1,7 +1,3 @@
-/**
- * Resolves a category ID from a category name by matching against translations.
- * Returns null if no category name is provided or no match is found.
- */
 export function resolveCategoryId(
   categoryName: string | undefined,
   categoriesList: { id: number; translations: unknown }[],
@@ -18,10 +14,6 @@ export function resolveCategoryId(
   return found?.id ?? null;
 }
 
-/**
- * Resolves a warehouse ID from a warehouse name.
- * Returns null if no warehouse name is provided or no match is found.
- */
 export function resolveWarehouseId(
   warehouseName: string | undefined,
   warehousesList: { id: number; name: string }[],
