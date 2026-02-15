@@ -7,14 +7,9 @@ import { db } from '@/server/db';
 import { products, warehouses } from '@/server/db/schema';
 import { ProductStatus } from '@/server/db/types/enum/product-status';
 import { getLoggedInUser } from '@/server/utils/get-logged-in-user';
+import { ExportRow, getExportMimeType } from '@/shared/utils/export';
 
-import {
-  ExportRow,
-  formatProductForExport,
-  generateExportFile,
-  generateExportFilename,
-  getExportMimeType,
-} from '../../utils/export-products';
+import { formatProductForExport, generateExportFile, generateExportFilename } from '../../utils/export-products';
 
 const MAX_EXPORT_LIMIT = 10000;
 

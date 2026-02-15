@@ -14,14 +14,3 @@ export interface ImportProductPayload {
   sizeUnit?: SizeUnit;
   warehouse?: string;
 }
-
-export interface ImportError {
-  row: number;
-  message: string;
-}
-
-export interface ImportResult {
-  success: number;
-  failed: number;
-  errors: ImportError[];
-}

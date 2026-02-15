@@ -2,26 +2,13 @@ import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 
 export interface ParsedRow {
-  name?: string;
-  sku?: string;
-  size?: string;
-  purchasePrice?: string | number;
-  purchaseDate?: string;
-  status?: string;
-  brand?: string;
-  category?: string;
-  purchasePlace?: string;
-  sizeUnit?: string;
-  warehouse?: string;
   [key: string]: string | number | undefined;
 }
 
-export interface ParseResult {
-  data: ParsedRow[];
+export interface ParseResult<T> {
+  data: T[];
   errors: string[];
 }
-
-const REQUIRED_COLUMNS = ['name', 'sku', 'size', 'purchasePrice'];
 
 const normalizeColumnName = (name: string): string => {
   return name
@@ -30,30 +17,12 @@ const normalizeColumnName = (name: string): string => {
     .replace(/[\s_-]+/g, '');
 };
 
-const COLUMN_MAPPINGS: Record<string, string> = {
-  name: 'name',
-  sku: 'sku',
-  size: 'size',
-  purchaseprice: 'purchasePrice',
-  price: 'purchasePrice',
-  purchasedate: 'purchaseDate',
-  date: 'purchaseDate',
-  status: 'status',
-  brand: 'brand',
-  category: 'category',
-  purchaseplace: 'purchasePlace',
-  place: 'purchasePlace',
-  sizeunit: 'sizeUnit',
-  unit: 'sizeUnit',
-  warehouse: 'warehouse',
-};
-
-const mapColumnHeaders = (headers: string[]): Record<string, string> => {
+const mapColumnHeaders = (headers: string[], columnMappings: Record<string, string>): Record<string, string> => {
   const mapping: Record<string, string> = {};
 
   headers.forEach(header => {
     const normalized = normalizeColumnName(header);
-    const mappedName = COLUMN_MAPPINGS[normalized];
+    const mappedName = columnMappings[normalized];
     if (mappedName) {
       mapping[header] = mappedName;
     }
@@ -62,7 +31,11 @@ const mapColumnHeaders = (headers: string[]): Record<string, string> => {
   return mapping;
 };
 
-const parseCSV = (file: File): Promise<ParseResult> => {
+const parseCSV = async <T>(
+  file: File,
+  columnMappings: Record<string, string>,
+  requiredColumns: string[],
+): Promise<ParseResult<T>> => {
   return new Promise((resolve, reject) => {
     Papa.parse<Record<string, string>>(file, {
       header: true,
@@ -81,11 +54,11 @@ const parseCSV = (file: File): Promise<ParseResult> => {
         }
 
         const headers = results.meta.fields || [];
-        const columnMapping = mapColumnHeaders(headers);
+        const columnMapping = mapColumnHeaders(headers, columnMappings);
 
         // Check for required columns
         const mappedColumns = Object.values(columnMapping);
-        const missingColumns = REQUIRED_COLUMNS.filter(col => !mappedColumns.includes(col));
+        const missingColumns = requiredColumns.filter(col => !mappedColumns.includes(col));
 
         if (missingColumns.length > 0) {
           resolve({
@@ -107,7 +80,7 @@ const parseCSV = (file: File): Promise<ParseResult> => {
           return mappedRow;
         });
 
-        resolve({ data: mappedData, errors: [] });
+        resolve({ data: mappedData as T[], errors: [] });
       },
       error: error => {
         reject(new Error(`Failed to parse CSV: ${error.message}`));
@@ -116,7 +89,11 @@ const parseCSV = (file: File): Promise<ParseResult> => {
   });
 };
 
-const parseExcel = async (file: File): Promise<ParseResult> => {
+const parseExcel = async <T>(
+  file: File,
+  columnMappings: Record<string, string>,
+  requiredColumns: string[],
+): Promise<ParseResult<T>> => {
   const arrayBuffer = await file.arrayBuffer();
   const workbook = XLSX.read(arrayBuffer, { type: 'array', cellDates: true });
 
@@ -136,11 +113,11 @@ const parseExcel = async (file: File): Promise<ParseResult> => {
   }
 
   const headers = Object.keys(jsonData[0] || {});
-  const columnMapping = mapColumnHeaders(headers);
+  const columnMapping = mapColumnHeaders(headers, columnMappings);
 
   // Check for required columns
   const mappedColumns = Object.values(columnMapping);
-  const missingColumns = REQUIRED_COLUMNS.filter(col => !mappedColumns.includes(col));
+  const missingColumns = requiredColumns.filter(col => !mappedColumns.includes(col));
 
   if (missingColumns.length > 0) {
     return {
@@ -166,18 +143,22 @@ const parseExcel = async (file: File): Promise<ParseResult> => {
     return mappedRow;
   });
 
-  return { data: mappedData, errors: [] };
+  return { data: mappedData as T[], errors: [] };
 };
 
-export const parseImportFile = async (file: File): Promise<ParseResult> => {
+export const parseImportFile = async <T>(
+  file: File,
+  columnMappings: Record<string, string>,
+  requiredColumns: string[],
+): Promise<ParseResult<T>> => {
   const fileName = file.name.toLowerCase();
 
   if (fileName.endsWith('.csv')) {
-    return parseCSV(file);
+    return parseCSV<T>(file, columnMappings, requiredColumns);
   }
 
   if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
-    return parseExcel(file);
+    return parseExcel<T>(file, columnMappings, requiredColumns);
   }
 
   return {

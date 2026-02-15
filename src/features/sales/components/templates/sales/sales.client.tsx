@@ -11,18 +11,18 @@ import { useDuplicateSale } from '@/features/sales/hooks/mutation/use-duplicate-
 import { useSales } from '@/features/sales/hooks/query/use-sales';
 import { SalesActionSlotPayload, useSalesTableColumns } from '@/features/sales/hooks/use-sales-table-columns';
 import { useDialog } from '@/hooks/use-dialog';
-import { useSelection } from '@/hooks/use-selection';
 import { useUrlFilters } from '@/hooks/use-url-filters';
 import { useUrlPagination } from '@/hooks/use-url-pagination';
 import { useUrlQuery } from '@/hooks/use-url-query';
 import { useUrlSort } from '@/hooks/use-url-sort';
 import { useI18n } from '@/locales/client';
+import { useSalesSelection } from '@/store/sales-selection';
 
 import RemoveSalesDialog from '../../organisms/dialogs/remove-sales-dialog';
 import RevertSalesDialog from '../../organisms/dialogs/revert-sales-dialog/revert-sales-dialog';
 import { EditSaleSheet } from '../../organisms/edit-sales-sheet/edit-sale-sheet';
 
-const ClientInventory = () => {
+const ClientSales = () => {
   const t = useI18n();
 
   const { query, handleChangeQuery } = useUrlQuery();
@@ -55,14 +55,14 @@ const ClientInventory = () => {
 
   const [isOpenEditSaleSheet, handleOpenEditSaleSheet, handleCloseEditSaleSheet] = useDialog();
 
-  const { selectedRows, setSelectedRows, handleClearSelected } = useSelection();
+  const { selectedRows, setSelectedRows, clearSelection: handleClearSelected } = useSalesSelection();
 
   const onQueryChange = useCallback(
     (query: string) => {
       handleChangeQuery(query);
       onPaginationChange({ pageIndex: 0, pageSize: limit });
     },
-    [handleChangeQuery],
+    [handleChangeQuery, limit, onPaginationChange],
   );
 
   const { mutate: duplicateSale } = useDuplicateSale();
@@ -205,4 +205,4 @@ const ClientInventory = () => {
   );
 };
 
-export default ClientInventory;
+export default ClientSales;
