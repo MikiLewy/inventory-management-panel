@@ -1,18 +1,10 @@
-import * as XLSX from 'xlsx';
-
-export interface ExportRow {
-  name: string;
-  sku: string;
-  size: string;
-  purchasePrice: number;
-  purchaseDate: string;
-  status: string;
-  brand: string;
-  category: string;
-  purchasePlace: string;
-  sizeUnit: string;
-  warehouse: string;
-}
+import {
+  ExportColumn,
+  ExportFormat,
+  ExportRow,
+  generateExportFile as sharedGenerateExportFile,
+  generateExportFilename as sharedGenerateExportFilename,
+} from '@/shared/utils/export';
 
 export interface ProductForExport {
   name: string;
@@ -30,6 +22,20 @@ export interface ProductForExport {
   sizeUnit: string | null;
   warehouseName: string | null;
 }
+
+const EXPORT_COLUMNS: ExportColumn[] = [
+  { key: 'name', header: 'Name', width: 30 },
+  { key: 'sku', header: 'SKU', width: 15 },
+  { key: 'size', header: 'Size', width: 8 },
+  { key: 'purchasePrice', header: 'Purchase Price', width: 14 },
+  { key: 'purchaseDate', header: 'Purchase Date', width: 12 },
+  { key: 'status', header: 'Status', width: 12 },
+  { key: 'brand', header: 'Brand', width: 15 },
+  { key: 'category', header: 'Category', width: 15 },
+  { key: 'purchasePlace', header: 'Purchase Place', width: 15 },
+  { key: 'sizeUnit', header: 'Size Unit', width: 10 },
+  { key: 'warehouse', header: 'Warehouse', width: 20 },
+];
 
 export function formatProductForExport(product: ProductForExport, locale: string = 'en'): ExportRow {
   let categoryName = '';
@@ -59,65 +65,10 @@ export function formatProductForExport(product: ProductForExport, locale: string
   };
 }
 
-export function generateExportFile(products: ExportRow[], format: 'csv' | 'xlsx'): Buffer {
-  const worksheet = XLSX.utils.json_to_sheet(products);
-
-  worksheet['!cols'] = [
-    { wch: 30 }, // name
-    { wch: 15 }, // sku
-    { wch: 8 }, // size
-    { wch: 14 }, // purchasePrice
-    { wch: 12 }, // purchaseDate
-    { wch: 12 }, // status
-    { wch: 15 }, // brand
-    { wch: 15 }, // category
-    { wch: 15 }, // purchasePlace
-    { wch: 10 }, // sizeUnit
-    { wch: 20 }, // warehouse
-  ];
-
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Products');
-
-  if (format === 'csv') {
-    const csvContent = XLSX.utils.sheet_to_csv(worksheet);
-    const bom = '\uFEFF';
-
-    return Buffer.from(bom + csvContent, 'utf-8');
-  } else {
-    return Buffer.from(XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }));
-  }
+export function generateExportFile(rows: ExportRow[], format: ExportFormat): Buffer {
+  return sharedGenerateExportFile(rows, EXPORT_COLUMNS, format);
 }
 
-export function triggerDownload(base64Data: string, filename: string, mimeType: string): void {
-  const byteCharacters = atob(base64Data);
-  const byteNumbers = new Array(byteCharacters.length);
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
-  }
-  const byteArray = new Uint8Array(byteNumbers);
-  const blob = new Blob([byteArray], { type: mimeType });
-
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-
-  document.body.appendChild(link);
-  link.click();
-
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-}
-
-export function generateExportFilename(format: 'csv' | 'xlsx'): string {
-  const date = new Date().toISOString().split('T')[0];
-
-  return `products-export-${date}.${format}`;
-}
-
-export function getExportMimeType(format: 'csv' | 'xlsx'): string {
-  return format === 'csv'
-    ? 'text/csv;charset=utf-8'
-    : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+export function generateExportFilename(format: ExportFormat): string {
+  return sharedGenerateExportFilename('products', format);
 }

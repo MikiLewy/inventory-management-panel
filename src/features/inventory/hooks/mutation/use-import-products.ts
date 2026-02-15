@@ -2,10 +2,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 
 import { useI18n } from '@/locales/client';
+import { ImportResult } from '@/shared/types/import-export';
 
 import { productsKeys } from '../../api/query-keys/products-keys';
 import { importProducts } from '../../server/actions/inventory';
-import { ImportProductPayload, ImportResult } from '../../types/payload/import-products';
+import { ImportProductPayload } from '../../types/payload/import-products';
 
 export const useImportProducts = () => {
   const t = useI18n();

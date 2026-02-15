@@ -1,8 +1,7 @@
 'use client';
 
 import { useI18n } from '@/locales/client';
-
-import { ImportError } from '../../../../../types/payload/import-products';
+import { ImportError } from '@/shared/types/import-export';
 
 interface Props {
   errors: ImportError[];
@@ -19,13 +18,13 @@ export const ImportErrorsTable = ({ errors, maxDisplay = 10 }: Props) => {
 
   return (
     <div className="mt-4 rounded-md border border-destructive/50 bg-destructive/10 p-4">
-      <h4 className="mb-2 font-medium text-destructive">{t('importProducts.errors.title')}</h4>
+      <h4 className="mb-2 font-medium text-destructive">{t('importExport.import.errors.title')}</h4>
       <div className="max-h-48 overflow-y-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-destructive/20">
-              <th className="py-1 pr-4 text-left font-medium">{t('importProducts.errors.row')}</th>
-              <th className="py-1 text-left font-medium">{t('importProducts.errors.message')}</th>
+              <th className="py-1 pr-4 text-left font-medium">{t('importExport.import.errors.row')}</th>
+              <th className="py-1 text-left font-medium">{t('importExport.import.errors.message')}</th>
             </tr>
           </thead>
           <tbody>
@@ -39,7 +38,7 @@ export const ImportErrorsTable = ({ errors, maxDisplay = 10 }: Props) => {
         </table>
         {remainingCount > 0 && (
           <p className="mt-2 text-xs text-muted-foreground">
-            {t('importProducts.errors.moreErrors', { count: remainingCount })}
+            {t('importExport.import.errors.moreErrors', { count: remainingCount })}
           </p>
         )}
       </div>
